@@ -86,13 +86,13 @@
                 android:text="Interesting in Hosting Events?" />
 
             <Button
-                android:id="@+id/sign_in"
+                android:id="@+id/register"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:elevation="0dp"
-                android:text="@string/action_sign_in_short"
+                android:text="@string/register"
                 android:textStyle="bold" />
 
         </LinearLayout>
