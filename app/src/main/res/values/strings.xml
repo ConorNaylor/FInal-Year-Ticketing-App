@@ -24,4 +24,6 @@
 
     <string name="action_settings">Settings</string>
     <string name="register">Register</string>
+    <string name="title_activity_account">AccountActivity</string>
+    <string name="signout">Signout</string>
 </resources>
