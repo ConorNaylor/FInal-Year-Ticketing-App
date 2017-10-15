@@ -3,6 +3,7 @@ package com.example.conornaylor.fyp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.DownloadManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,6 +25,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,8 +36,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +66,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "conornaylor@gmail.com:rathkip1995", "bar@example.com:world"
+            "Conor:rathkip1995", "bar@example.com:world"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -227,7 +237,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+//        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+        return true;
     }
 
     private boolean isPasswordValid(String password) {
@@ -343,18 +354,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Boolean doInBackground(Void... params){
+            String data = mEmail + ":" + mPassword;
+            int tmp;
+            String dataIn = "";
+
+//            JSONObject jsonObj = new JSONObject();
             try {
+                URL url = new URL("http://192.168.0.59/api-token-auth");
+                HttpURLConnection httpURLConnection =(HttpURLConnection) url.openConnection();
+                httpURLConnection.setDoOutput(true);
+                OutputStream os = httpURLConnection.getOutputStream();
+                os.write(data.getBytes());
+                os.flush();
+                os.close();
 
-
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                InputStream is = httpURLConnection.getInputStream();
+                while((tmp = is.read())!=-1){
+                    dataIn+= (char)tmp;
+                }
+                is.close();
+                httpURLConnection.disconnect();
+                System.out.println(dataIn);
+//                Thread.sleep(2000);
+            } catch ( IOException e) {
                 return false;
             }
 
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
+//                    Log.d("Email correct", "");
                     // Account exists, return true if the password matches.
                     return pieces[1].equals(mPassword);
                 }
