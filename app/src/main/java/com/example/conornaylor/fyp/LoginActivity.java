@@ -39,10 +39,12 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
-
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -72,6 +74,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+    private String auth;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -79,6 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private TextView register;
+    private int HttpResult;
 
     private NfcAdapter nfcAdapter;
 
@@ -343,56 +347,67 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         private final String mEmail;
         private final String mPassword;
-//        private final String creds;
-        private String url = "";
 
         UserLoginTask(String email, String password) {
-//            creds = email + ":" + password;
-//            String credBase64 = Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
             mEmail = email;
             mPassword = password;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params){
-            String data = mEmail + ":" + mPassword;
-            int tmp;
-            String dataIn = "";
-
-//            JSONObject jsonObj = new JSONObject();
+        protected Boolean doInBackground(Void... params) {
+            AuthToken token = new AuthToken(mEmail, mPassword);
             try {
-                URL url = new URL("http://192.168.0.59/api-token-auth");
-                HttpURLConnection httpURLConnection =(HttpURLConnection) url.openConnection();
-                httpURLConnection.setDoOutput(true);
-                OutputStream os = httpURLConnection.getOutputStream();
-                os.write(data.getBytes());
-                os.flush();
-                os.close();
+                String url = "http://192.168.0.59:8000/api-token-auth/";
+                URL object = new URL(url);
 
-                InputStream is = httpURLConnection.getInputStream();
-                while((tmp = is.read())!=-1){
-                    dataIn+= (char)tmp;
+                HttpURLConnection con = (HttpURLConnection) object.openConnection();
+                con.setDoOutput(true);
+                con.setDoInput(true);
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                con.setRequestProperty("Accept", "application/json");
+                con.setRequestMethod("POST");
+
+                JSONObject cred = new JSONObject();
+                try {
+                    cred.put("username", mEmail);
+                    cred.put("password", mPassword);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-                is.close();
-                httpURLConnection.disconnect();
-                System.out.println(dataIn);
-//                Thread.sleep(2000);
-            } catch ( IOException e) {
+
+
+                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                wr.write(cred.toString());
+                wr.flush();
+
+                //display what returns the POST request
+                StringBuilder sb = new StringBuilder();
+                int HttpResult = con.getResponseCode();
+                if (HttpResult == HttpURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(con.getInputStream(), "utf-8"));
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    auth = sb.toString();
+                    System.out.println(auth);
+
+                } else {
+                    System.out.println(con.getResponseMessage());
+                }
+            } catch (Exception e) {
+                Log.d("Fucked","Can't connect boss, we're fucked.");
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-//                    Log.d("Email correct", "");
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
+            if (auth.contains("token")) {
+                return true;
             }
-
-            // TODO: register the new account here.
-            return false ;
+            return false;
         }
+
 
         @Override
         protected void onPostExecute(final Boolean success) {
