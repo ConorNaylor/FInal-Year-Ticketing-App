@@ -398,14 +398,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     System.out.println(con.getResponseMessage());
                 }
             } catch (Exception e) {
-                Log.d("Fucked","Can't connect boss, we're fucked.");
+                Log.d("Uh Oh","No connection!, Check your network.");
                 return false;
             }
 
-            if (auth.contains("token")) {
-                return true;
-            }
-            return false;
+//            System.out.print(HttpResult);
+            if (auth == null){
+                return false;
+            }else if(auth.contains("token")) return true;
+            else return false;
         }
 
 
