@@ -1,5 +1,7 @@
 package com.example.conornaylor.fyp;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,10 +14,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static final String MyPreferences = "preferences";
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor e;
 
 
     @Override
@@ -42,6 +52,24 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        String[] events = {"Ed Sheeran", "Avicii"};
+        ListView eventsList = (ListView) findViewById(R.id.eventList);
+        ListAdapter myAdapter = new ArrayAdapter<String>(eventsList.getContext(), android.R.layout.simple_list_item_1, events);
+        eventsList.setAdapter(myAdapter);
+
+        eventsList.setOnItemClickListener(
+                new AdapterView.OnItemClickListener(){
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int pos, long id){
+                        String event = String.valueOf((parent.getItemAtPosition(pos)));
+                        Toast.makeText(MainActivity.this, event,Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
+
+
     }
 
     @Override
@@ -70,6 +98,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout ) {
+            Intent closeAppIntent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(closeAppIntent);
+            finish();
+            Toast.makeText(MainActivity.this,"Logged Out",Toast.LENGTH_SHORT).show();
             return true;
         }
 

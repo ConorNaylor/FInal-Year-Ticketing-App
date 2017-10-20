@@ -37,6 +37,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +53,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import android.os.Handler;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -69,6 +71,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
+    private boolean doubleBackToExitPressedOnce;
+    private Handler mHandler = new Handler();
     private UserLoginTask mAuthTask = null;
     private String auth;
     private String token = "token";
@@ -142,6 +146,33 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         });
 
         preferences = this.getSharedPreferences(MyPreferences,Context.MODE_PRIVATE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            finish();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+
+        mHandler.postDelayed(mRunnable, 2000);
+    }
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+        }
+    };
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        if (mHandler != null) { mHandler.removeCallbacks(mRunnable); }
     }
 
     private void populateAutoComplete() {
@@ -403,7 +434,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (auth == null){
                 return false;
             }else if(auth.contains("token")){
-                SharedPreferences.Editor e = preferences.edit();
+                e = preferences.edit();
                 e.putString(token, auth.substring(10,auth.length() - 3));
                 e.commit();
                 return true;
@@ -418,9 +449,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                finish();
                 Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
                 LoginActivity.this.startActivity(myIntent);
+                finish();
 
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
