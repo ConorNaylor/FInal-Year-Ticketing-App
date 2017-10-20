@@ -4,8 +4,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.provider.Settings;
@@ -58,23 +60,21 @@ import static android.Manifest.permission.READ_CONTACTS;
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-//    /**
-//     * Id to identity READ_CONTACTS permission request.
-//     */
-//    private static final int REQUEST_READ_CONTACTS = 0;
+/**
+ * Id to identity READ_CONTACTS permission request.
+*/
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "Conor:rathkip1995", "bar@example.com:world"
-    };
+    private static final int REQUEST_READ_CONTACTS = 0;
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
     private String auth;
+    private String token = "token";
+    public static final String MyPreferences = "preferences";
+    private SharedPreferences preferences;
+    private SharedPreferences.Editor e;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -82,7 +82,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private TextView register;
-    private int HttpResult;
 
     private NfcAdapter nfcAdapter;
 
@@ -141,50 +140,52 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 LoginActivity.this.startActivity(registerIntent);
             }
         });
+
+        preferences = this.getSharedPreferences(MyPreferences,Context.MODE_PRIVATE);
     }
 
-//    private void populateAutoComplete() {
-//        if (!mayRequestContacts()) {
-//            return;
-//        }
-//
-//        getLoaderManager().initLoader(0, null, this);
-//    }
+    private void populateAutoComplete() {
+        if (!mayRequestContacts()) {
+            return;
+        }
 
-//    private boolean mayRequestContacts() {
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-//            return true;
-//        }
-//        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-//            return true;
-//        }
-//        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-//            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-//                    .setAction(android.R.string.ok, new View.OnClickListener() {
-//                        @Override
-//                        @TargetApi(Build.VERSION_CODES.M)
-//                        public void onClick(View v) {
-//                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-//                        }
-//                    });
-//        } else {
-//            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-//        }
-//        return false;
-//    }
-//
-//    /**
-//     * Callback received when a permissions request has been completed.
-//     */
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-//                                           @NonNull int[] grantResults) {
-//        if (requestCode == REQUEST_READ_CONTACTS) {
-//            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                populateAutoComplete();
-//            }
-//        }
-//    }
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    private boolean mayRequestContacts() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
+            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+                        }
+                    });
+        } else {
+            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
+        }
+        return false;
+    }
+
+    /**
+     * Callback received when a permissions request has been completed.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_READ_CONTACTS) {
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                populateAutoComplete();
+            }
+        }
+    }
 
 
     /**
@@ -355,7 +356,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            AuthToken token = new AuthToken(mEmail, mPassword);
             try {
                 String url = "http://192.168.0.59:8000/api-token-auth/";
                 URL object = new URL(url);
@@ -380,7 +380,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 wr.write(cred.toString());
                 wr.flush();
 
-                //display what returns the POST request
+                //Display what the POST request returns
                 StringBuilder sb = new StringBuilder();
                 int HttpResult = con.getResponseCode();
                 if (HttpResult == HttpURLConnection.HTTP_OK) {
@@ -392,8 +392,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     }
                     br.close();
                     auth = sb.toString();
-                    System.out.println(auth);
-
                 } else {
                     System.out.println(con.getResponseMessage());
                 }
@@ -402,10 +400,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
 
-//            System.out.print(HttpResult);
             if (auth == null){
                 return false;
-            }else if(auth.contains("token")) return true;
+            }else if(auth.contains("token")){
+                SharedPreferences.Editor e = preferences.edit();
+                e.putString(token, auth.substring(10,auth.length() - 3));
+                e.commit();
+                return true;
+            }
             else return false;
         }
 
