@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        String[] events = {"Ed Sheeran", "Avicii"};
+        String[] events = {"Ed Sheeran", "Avicii", "BoltyWolty", "Messi"};
         ListView eventsList = (ListView) findViewById(R.id.eventList);
-        ListAdapter myAdapter = new ArrayAdapter<String>(eventsList.getContext(), android.R.layout.simple_list_item_1, events);
+        ListAdapter myAdapter = new EventAdaptor(this, events);
         eventsList.setAdapter(myAdapter);
 
         eventsList.setOnItemClickListener(
