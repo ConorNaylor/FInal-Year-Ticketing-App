@@ -1,10 +1,13 @@
 package com.example.conornaylor.fyp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,12 +23,24 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private SharedPreferences.Editor e;
+    private String tk = "token";
+    private String token;
+    private getEventsTask mAuthTask;
 
 
     @Override
@@ -60,16 +75,21 @@ public class MainActivity extends AppCompatActivity
         eventsList.setAdapter(myAdapter);
 
         eventsList.setOnItemClickListener(
-                new AdapterView.OnItemClickListener(){
+                new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int pos, long id){
+                    public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                         String event = String.valueOf((parent.getItemAtPosition(pos)));
-                        Toast.makeText(MainActivity.this, event,Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, event, Toast.LENGTH_LONG).show();
                     }
                 }
         );
 
+        preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+        token = preferences.getString(tk, null);
+        System.out.println("Token:"+token);
 
+        mAuthTask = new MainActivity.getEventsTask();
+        mAuthTask.execute();
     }
 
     @Override
@@ -97,11 +117,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.logout ) {
+        if (id == R.id.logout) {
             Intent closeAppIntent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(closeAppIntent);
             finish();
-            Toast.makeText(MainActivity.this,"Logged Out",Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -129,5 +149,58 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public class getEventsTask extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            try {
+                String url = "http://192.168.0.59:8000/events/";
+                URL object = new URL(url);
+
+                HttpURLConnection con = (HttpURLConnection) object.openConnection();
+                con.setDoOutput(true);
+                con.setDoInput(true);
+                con.setRequestMethod("GET");
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                con.setRequestProperty("Accept", "application/json");
+                con.setRequestProperty("Authorization", "Token " + token);
+
+
+//                JSONObject cred = new JSONObject();
+//                try {
+//                    cred.put("", "");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//
+//                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+//                wr.write(cred.toString());
+//                wr.flush();
+
+                //Display what the POST request returns
+                StringBuilder sb = new StringBuilder();
+                int HttpResult = con.getResponseCode();
+                if (HttpResult == HttpURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(con.getInputStream(), "utf-8"));
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                } else {
+                    System.out.println(con.getResponseMessage());
+                }
+            } catch (Exception e) {
+                Log.d("Uh Oh","No connection!, Check your network.");
+                return false;
+            }
+
+            return false;
+        }
     }
 }
