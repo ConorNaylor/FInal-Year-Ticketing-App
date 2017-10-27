@@ -101,6 +101,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             basicAlert("Your device is not NFC enabled.");
         }
 
+
         if(!nfcAdapter.isEnabled()){
             Intent NFCSettingsintent = new Intent(Settings.ACTION_NFC_SETTINGS);
             Intent closeAppIntent = new Intent(Intent.ACTION_MAIN);

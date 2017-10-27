@@ -161,25 +161,10 @@ public class MainActivity extends AppCompatActivity
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
-                con.setDoOutput(true);
                 con.setDoInput(true);
                 con.setRequestMethod("GET");
-                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 con.setRequestProperty("Accept", "application/json");
                 con.setRequestProperty("Authorization", "Token " + token);
-
-
-//                JSONObject cred = new JSONObject();
-//                try {
-//                    cred.put("", "");
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//
-//
-//                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-//                wr.write(cred.toString());
-//                wr.flush();
 
                 //Display what the POST request returns
                 StringBuilder sb = new StringBuilder();
@@ -187,11 +172,12 @@ public class MainActivity extends AppCompatActivity
                 if (HttpResult == HttpURLConnection.HTTP_OK) {
                     BufferedReader br = new BufferedReader(
                             new InputStreamReader(con.getInputStream(), "utf-8"));
-                    String line = null;
+                    String line;
                     while ((line = br.readLine()) != null) {
                         sb.append(line + "\n");
                     }
                     br.close();
+                    System.out.println(sb.toString());
                 } else {
                     System.out.println(con.getResponseMessage());
                 }
