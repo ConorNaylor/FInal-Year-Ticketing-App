@@ -23,6 +23,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +32,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -41,6 +44,9 @@ public class MainActivity extends AppCompatActivity
     private String tk = "token";
     private String token;
     private getEventsTask mAuthTask;
+    private JSONObject obj;
+    private JSONArray jArray;
+    private ArrayList<Event> events;
 
 
     @Override
@@ -90,6 +96,30 @@ public class MainActivity extends AppCompatActivity
 
         mAuthTask = new MainActivity.getEventsTask();
         mAuthTask.execute();
+        
+    }
+
+    public void makeEvents(JSONArray jArray){
+        events = new ArrayList<>();
+        try {
+            for (int i = 0; i < jArray.length(); i++) {
+                try {
+                    obj = jArray.getJSONObject(i);
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+                LocationData loc = new LocationData(0, 0);
+                Event ev = new Event(
+                        obj.getString("title"),
+                        obj.getString("description"),
+                        obj.getString("location"),
+                        obj.getString("date"),
+                        loc);
+                events.add(ev);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -166,7 +196,6 @@ public class MainActivity extends AppCompatActivity
                 con.setRequestProperty("Accept", "application/json");
                 con.setRequestProperty("Authorization", "Token " + token);
 
-                //Display what the POST request returns
                 StringBuilder sb = new StringBuilder();
                 int HttpResult = con.getResponseCode();
                 if (HttpResult == HttpURLConnection.HTTP_OK) {
@@ -177,15 +206,20 @@ public class MainActivity extends AppCompatActivity
                         sb.append(line + "\n");
                     }
                     br.close();
-                    System.out.println(sb.toString());
-                } else {
+                    if (sb.toString() != null) {
+                        jArray = new JSONArray(sb.toString());
+                        System.out.println(jArray.toString());
+                        makeEvents(jArray);
+                    } else {
+                        Toast.makeText(MainActivity.this, "There are no events.", Toast.LENGTH_SHORT).show();
+                    }
+                }else {
                     System.out.println(con.getResponseMessage());
                 }
             } catch (Exception e) {
-                Log.d("Uh Oh","No connection!, Check your network.");
+                Toast.makeText(MainActivity.this, "No connection!, Check your network.", Toast.LENGTH_SHORT).show();
                 return false;
             }
-
             return false;
         }
     }
