@@ -94,19 +94,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Check if phone is NFC Enabled
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
-        if(nfcAdapter == null){
+
+
+        if(NfcAdapter.getDefaultAdapter(this) == null){
             basicAlert("Your device is not NFC enabled.");
-        }
-
-
-        if(!nfcAdapter.isEnabled()){
+        }else if(!NfcAdapter.getDefaultAdapter(this).isEnabled()){
+            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
             Intent NFCSettingsintent = new Intent(Settings.ACTION_NFC_SETTINGS);
             Intent closeAppIntent = new Intent(Intent.ACTION_MAIN);
             closeAppIntent.addCategory(Intent.CATEGORY_HOME);
             settingsAlert("Enable your NFC chip to continue.", NFCSettingsintent,closeAppIntent);
+        }else{
+            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         }
 
 
@@ -389,7 +389,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/api-token-auth/";
+                String url = "http://192.168.0.59:8000/api-token-auth/"; //Galway
+//                String url = "http://192.168.1.10:8000/api-token-auth/";    //Mayo
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -471,6 +472,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(this);
         dialog.setTitle("OnePass");
         dialog.setMessage(message);
+        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.dismiss();
+            }
+        });
         dialog.show();
     }
 

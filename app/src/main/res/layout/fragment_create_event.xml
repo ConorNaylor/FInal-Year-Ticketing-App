@@ -8,11 +8,11 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.conornaylor.fyp.RegisteringActivity">
+    tools:context="com.example.conornaylor.fyp.CreateEventFragment">
 
     <!-- Login progress -->
     <ProgressBar
-        android:id="@+id/login_progress"
+        android:id="@+id/create_event_progress"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,13 +20,13 @@
         android:visibility="gone" />
 
     <ScrollView
-        android:id="@+id/reg_form"
+        android:id="@+id/event_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
         <LinearLayout
-            android:id="@+id/email_reg_form"
+            android:id="@+id/_create_event_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -36,11 +36,11 @@
                 android:layout_height="match_parent">
 
                 <EditText
-                    android:id="@+id/name"
+                    android:id="@+id/eventName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/name"
-                    android:imeActionId="@+id/login"
+                    android:hint="@string/event_name"
+                    android:imeActionId="@+id/button_create_event"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="text"
@@ -53,48 +53,62 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/email"
+                    android:id="@+id/eventDescription"
                     style="?attr/editTextStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/prompt_email"
-                    android:inputType="textEmailAddress"
+                    android:hint="@string/description"
+                    android:inputType="textMultiLine"
                     android:maxLines="1" />
 
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent">
 
                 <EditText
-                    android:id="@+id/password"
+                    android:id="@+id/eventLocation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/prompt_password"
+                    android:hint="@string/location"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
-                    android:inputType="textPassword"
+                    android:inputType="text"
                     android:maxLines="1" />
 
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <EditText
+                        android:id="@+id/eventDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/date"
+                        android:imeActionId="@+id/login"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="date"
+                        android:maxLines="1" />
+
+                    <Button
+                        android:id="@+id/button_create_event"
+                        style="?android:textAppearanceSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_weight="1"
+                        android:elevation="0dp"
+                        android:text="@string/create_event"
+                        android:textStyle="bold" />
+
+
+                </android.support.design.widget.TextInputLayout>
+
+
             </android.support.design.widget.TextInputLayout>
-
-            <CheckBox
-                android:id="@+id/host"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Interesting in Hosting Events?" />
-
-            <Button
-                android:id="@+id/register"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:elevation="0dp"
-                android:text="@string/register"
-                android:textStyle="bold" />
 
         </LinearLayout>
     </ScrollView>
