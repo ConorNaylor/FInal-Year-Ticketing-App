@@ -13,7 +13,7 @@ public class Event {
     private String description;
     private String date;
     private LocationData location;
-    private ArrayList<Event> events = new ArrayList<>();
+    private static ArrayList<Event> events = new ArrayList<>();
 
     public Event(String title, String address, String description, String date, LocationData loc){
         this.title = title;
@@ -62,7 +62,7 @@ public class Event {
         this.location = location;
     }
 
-    public ArrayList<Event> getEvents(){
+    public static ArrayList<Event> getEvents(){
         return events;
     }
 
@@ -71,6 +71,6 @@ public class Event {
     }
 
     public String toString(){
-        return this.title + this.description + this.address + this.date;
+        return this.title;
     }
 }

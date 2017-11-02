@@ -12,20 +12,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * Created by conornaylor on 20/10/2017.
  */
 
-public class EventAdaptor extends ArrayAdapter<String> {
+public class EventAdaptor extends ArrayAdapter<Event> {
 
-    private String singleEvent;
     private TextView eventName;
-    private TextView eventDesc;
-    private TextView eventLoc;
+    private TextView eventAdd;
     private TextView eventDate;
     private ImageView eventImage;
+    private Event e;
 
-    public EventAdaptor(Context context, String[] events) {
+    public EventAdaptor(Context context, ArrayList<Event> events) {
         super(context, R.layout.custom_event_row, events);
     }
 
@@ -34,11 +35,15 @@ public class EventAdaptor extends ArrayAdapter<String> {
         LayoutInflater  inflater = LayoutInflater.from(getContext());
         View customView = inflater.inflate(R.layout.custom_event_row, parent, false);
 
-        singleEvent = getItem(position);
-        eventName = customView.findViewById(R.id.eventName);
-        eventImage = customView.findViewById(R.id.eventImage);
+        e = getItem(position);
+        eventName = customView.findViewById(R.id.customeventName);
+        eventAdd = customView.findViewById(R.id.customeventAddress);
+        eventDate = customView.findViewById(R.id.customeventDate);
+        eventImage = customView.findViewById(R.id.customeventImage);
 
-        eventName.setText(singleEvent);
+        eventName.setText(e.getTitle());
+        eventAdd.setText(e.getAddress());
+        eventDate.setText(e.getDate());
         eventImage.setImageResource(R.drawable.boltmess);
         return customView;
     }

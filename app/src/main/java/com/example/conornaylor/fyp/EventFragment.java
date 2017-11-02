@@ -21,7 +21,6 @@ import java.util.ArrayList;
 public class EventFragment extends Fragment {
 
     private boolean isOrganiser;
-    private Event e;
 
 
     public EventFragment() {
@@ -41,9 +40,8 @@ public class EventFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("Events");
 
-        String[] events = {"Ed Sheeran", "Avicii", "BoltyWolty", "Messi"};
-//        ArrayList<Event> events = e.getEvents();
-        ListView eventsList = (ListView) view.findViewById(R.id.eventList);
+        ArrayList<Event> events =  Event.getEvents();
+        ListView eventsList = view.findViewById(R.id.eventList);
         ListAdapter myAdapter = new EventAdaptor(getActivity(), events);
         eventsList.setAdapter(myAdapter);
 
@@ -52,12 +50,12 @@ public class EventFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                         String event = String.valueOf((parent.getItemAtPosition(pos)));
-                        Toast.makeText(getActivity(), event, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), event, Toast.LENGTH_SHORT).show();
                     }
                 }
         );
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
