@@ -1,5 +1,6 @@
 package com.example.conornaylor.fyp;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -12,6 +13,7 @@ public class Event {
     private String description;
     private String date;
     private LocationData location;
+    private ArrayList<Event> events = new ArrayList<>();
 
     public Event(String title, String address, String description, String date, LocationData loc){
         this.title = title;
@@ -19,6 +21,7 @@ public class Event {
         this.description = description;
         this.date = date;
         this.location = loc;
+        events.add(this);
     }
 
     public String getTitle() {
@@ -57,6 +60,14 @@ public class Event {
 
     public void setLocation(LocationData location) {
         this.location = location;
+    }
+
+    public ArrayList<Event> getEvents(){
+        return events;
+    }
+
+    public void removeEvent(Event event){
+        events.remove(event);
     }
 
     public String toString(){

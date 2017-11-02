@@ -18,6 +18,13 @@ import android.widget.TextView;
 
 public class EventAdaptor extends ArrayAdapter<String> {
 
+    private String singleEvent;
+    private TextView eventName;
+    private TextView eventDesc;
+    private TextView eventLoc;
+    private TextView eventDate;
+    private ImageView eventImage;
+
     public EventAdaptor(Context context, String[] events) {
         super(context, R.layout.custom_event_row, events);
     }
@@ -27,11 +34,11 @@ public class EventAdaptor extends ArrayAdapter<String> {
         LayoutInflater  inflater = LayoutInflater.from(getContext());
         View customView = inflater.inflate(R.layout.custom_event_row, parent, false);
 
-        String singleEvent = getItem(position);
-        TextView eventText = (TextView) customView.findViewById(R.id.eventName);
-        ImageView eventImage = (ImageView) customView.findViewById(R.id.eventImage);
+        singleEvent = getItem(position);
+        eventName = customView.findViewById(R.id.eventName);
+        eventImage = customView.findViewById(R.id.eventImage);
 
-        eventText.setText(singleEvent);
+        eventName.setText(singleEvent);
         eventImage.setImageResource(R.drawable.boltmess);
         return customView;
     }

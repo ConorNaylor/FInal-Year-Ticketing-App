@@ -15,10 +15,13 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 
 public class EventFragment extends Fragment {
 
     private boolean isOrganiser;
+    private Event e;
 
 
     public EventFragment() {
@@ -39,6 +42,7 @@ public class EventFragment extends Fragment {
         getActivity().setTitle("Events");
 
         String[] events = {"Ed Sheeran", "Avicii", "BoltyWolty", "Messi"};
+//        ArrayList<Event> events = e.getEvents();
         ListView eventsList = (ListView) view.findViewById(R.id.eventList);
         ListAdapter myAdapter = new EventAdaptor(getActivity(), events);
         eventsList.setAdapter(myAdapter);

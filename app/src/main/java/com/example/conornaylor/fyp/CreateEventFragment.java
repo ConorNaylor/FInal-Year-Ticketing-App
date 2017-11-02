@@ -111,7 +111,7 @@ public class CreateEventFragment extends Fragment {
                     ev.put("title", eventNameString);
                     ev.put("description", eventDescString);
                     ev.put("location", eventLocString);
-                    ev.put("date", "2017-10-20");
+                    ev.put("date", eventDateString);
                 }catch(JSONException e){
                     e.printStackTrace();
                 }
