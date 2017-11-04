@@ -43,7 +43,7 @@ public class EventAdaptor extends ArrayAdapter<Event> {
 
         eventName.setText(e.getTitle());
         eventAdd.setText(e.getAddress());
-        eventDate.setText(e.getDate());
+        eventDate.setText(e.getDate().toString());
         eventImage.setImageResource(R.drawable.boltmess);
         return customView;
     }

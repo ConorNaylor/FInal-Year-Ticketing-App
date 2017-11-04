@@ -2,6 +2,7 @@ package com.example.conornaylor.fyp;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -42,12 +43,14 @@ public class CreateEventFragment extends Fragment {
     private EditText eventLoc;
     private EditText eventDate;
     private Button createEvent;
+    private Button eventImage;
     private String eventNameString;
     private String eventDescString;
     private String eventLocString;
     private String eventDateString;
     private Event event;
     private LocationData data = null;
+    public static final int pickImage = 1;
 
     public CreateEventFragment() {
         // Required empty public constructor
@@ -70,11 +73,22 @@ public class CreateEventFragment extends Fragment {
 
         mAuthTask = new getEventsTask();
 
-        eventName = (EditText) getActivity().findViewById(R.id.eventName);
-        eventDesc = (EditText) getActivity().findViewById(R.id.eventDescription);
-        eventLoc = (EditText) getActivity().findViewById(R.id.eventLocation);
-        eventDate = (EditText) getActivity().findViewById(R.id.eventDate);
-        createEvent = (Button) getActivity().findViewById(R.id.button_create_event);
+        eventName = getActivity().findViewById(R.id.eventName);
+        eventDesc = getActivity().findViewById(R.id.eventDescription);
+        eventLoc = getActivity().findViewById(R.id.eventLocation);
+        eventDate = getActivity().findViewById(R.id.eventDate);
+        createEvent = getActivity().findViewById(R.id.button_create_event);
+        eventImage = getActivity().findViewById(R.id.button_image);
+
+        eventImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), pickImage);
+            }
+        });
 
         createEvent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,6 +103,13 @@ public class CreateEventFragment extends Fragment {
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == pickImage) {
+            System.out.println("Image has been selected....!");
+        }
+    }
 
     public class getEventsTask extends AsyncTask<Void, Void, Boolean> {
         @Override
