@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity
     private getEventsTask mAuthTask;
     private JSONObject obj;
     private JSONArray jArray;
+    private boolean doubleBackToExitPressedOnce = false;
+    private Handler mHandler = new Handler();
 
 
     @Override
@@ -91,13 +94,41 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
+
+        int count = getFragmentManager().getBackStackEntryCount();
+
+        if (count == 0) {
+            if (doubleBackToExitPressedOnce) {
+                Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(logoutIntent);
+                finish();
+                Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+                return;
+            }else{
+                this.doubleBackToExitPressedOnce = true;
+                Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+                mHandler.postDelayed(mRunnable, 2000);
+            }
+        }else {
+            getFragmentManager().popBackStack();
         }
     }
+
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+        }
+    };
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        if (mHandler != null) { mHandler.removeCallbacks(mRunnable); }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -112,8 +143,8 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
-            Intent closeAppIntent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(closeAppIntent);
+            Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(logoutIntent);
             finish();
             Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
             return true;

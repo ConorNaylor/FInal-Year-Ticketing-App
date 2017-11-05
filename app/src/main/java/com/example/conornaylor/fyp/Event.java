@@ -15,6 +15,7 @@ public class Event implements Serializable{
     private String description;
     private String date;
     private LocationData location;
+    private int numTicks;
     private static ArrayList<Event> events = new ArrayList<>();
 
     public Event(String id, String title, String address, String description, String date, LocationData loc){

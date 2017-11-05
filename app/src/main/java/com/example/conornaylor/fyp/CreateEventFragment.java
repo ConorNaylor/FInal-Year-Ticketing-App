@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,11 +59,13 @@ public class CreateEventFragment extends Fragment {
     private String tk = "token";
     private getEventsTask mAuthTask = null;
     private EditText eventName;
+    private EditText eventNumTicks;
+    private EditText eventPrice;
     private EditText eventDesc;
     private EditText eventLoc;
     private EditText eventDate;
     private ImageView imageview;
-    private ImageView image;
+    private ImageView mapImage;
     private Bitmap bitmap;
     private Button createEvent;
     private Button eventImage;
@@ -70,6 +73,9 @@ public class CreateEventFragment extends Fragment {
     private String eventDescString;
     private String eventLocString;
     private String eventDateString;
+    private Double eventPriceD;
+    private int eventNumTicksInt;
+
     private Event event;
     private LocationData data = null;
     private String encodedImage;
@@ -101,6 +107,8 @@ public class CreateEventFragment extends Fragment {
 
         mAuthTask = new getEventsTask();
 
+        eventPrice = getActivity().findViewById(R.id.eventName);
+        eventNumTicks = getActivity().findViewById(R.id.eventDescription);
         eventName = getActivity().findViewById(R.id.eventName);
         eventDesc = getActivity().findViewById(R.id.eventDescription);
         eventLoc = getActivity().findViewById(R.id.eventLocation);
@@ -108,6 +116,7 @@ public class CreateEventFragment extends Fragment {
         createEvent = getActivity().findViewById(R.id.button_create_event);
         eventImage = getActivity().findViewById(R.id.button_image);
         imageview = getActivity().findViewById(R.id.imageView);
+        mapImage = getActivity().findViewById(R.id.mapImage);
 
         eventImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,6 +128,13 @@ public class CreateEventFragment extends Fragment {
             }
         });
 
+        mapImage.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View view) {
+              Toast.makeText(getActivity(), "Choose your location.", Toast.LENGTH_SHORT).show();
+          }
+      });
+
         createEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -129,12 +145,20 @@ public class CreateEventFragment extends Fragment {
                 if(TextUtils.isEmpty(eventNameString)){
                     eventName.setError(getString(R.string.error_field_required));
                     focusView = eventName;
-                }else if(TextUtils.isEmpty(eventDescString)){
-                    eventDesc.setError(getString(R.string.error_field_required));
-                    focusView = eventDesc;
                 }else if(TextUtils.isEmpty(eventLocString)){
                     eventLoc.setError(getString(R.string.error_field_required));
                     focusView = eventLoc;
+                }else if(TextUtils.isEmpty(eventDescString)){
+                    eventDesc.setError(getString(R.string.error_field_required));
+                    focusView = eventDesc;
+                }else if(TextUtils.isEmpty(eventPrice.getText().toString())){
+                    eventNumTicksInt = Integer.parseInt(eventNumTicks.getText().toString());
+                    eventNumTicks.setError(getString(R.string.error_field_required));
+                    focusView = eventNumTicks;
+                }else if(TextUtils.isEmpty(eventNumTicks.getText().toString())){
+                    eventPriceD = Double.parseDouble(eventNumTicks.getText().toString());
+                    eventPrice.setError(getString(R.string.error_field_required));
+                    focusView = eventPrice;
                 }else if(TextUtils.isEmpty(eventDateString)){
                     eventDate.setError(getString(R.string.error_field_required));
                     focusView = eventDate;

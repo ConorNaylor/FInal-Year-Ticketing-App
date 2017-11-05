@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -17,7 +18,15 @@ import android.widget.TextView;
 public class ViewEventFragment extends Fragment {
 
     private Event event;
-    private TextView text;
+    private EditText nameText;
+    private EditText descText;
+    private EditText dateText;
+    private EditText priceText;
+    private EditText numTicksText;
+    private EditText locText;
+    private CheckBox cb;
+    private boolean show;
+
 
     public ViewEventFragment() {
     }
@@ -47,7 +56,39 @@ public class ViewEventFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         readBundle(getArguments());
-        text = getActivity().findViewById(R.id.eventNameView);
-        text.setText(event.toString());
+        cb = getActivity().findViewById(R.id.vieweditFields);
+        show = cb.isChecked();
+        nameText = getActivity().findViewById(R.id.viewEventName);
+        descText = getActivity().findViewById(R.id.viewEventDescription);
+        dateText = getActivity().findViewById(R.id.viewEventDate);
+        priceText = getActivity().findViewById(R.id.viewEventPrice);
+        numTicksText = getActivity().findViewById(R.id.viewnumTickets);
+        locText = getActivity().findViewById(R.id.viewEventLocation);
+
+        nameText.setEnabled(show);
+        descText.setEnabled(show);
+        dateText.setEnabled(show);
+        locText.setEnabled(show);
+        priceText.setEnabled(show);
+        numTicksText.setEnabled(show);
+
+        nameText.setText(event.getTitle());
+        descText.setText(event.getDescription());
+        dateText.setText(event.getDate());
+        locText.setText(event.getAddress());
+
+        cb.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                show = cb.isChecked();
+                nameText.setEnabled(show);
+                descText.setEnabled(show);
+                dateText.setEnabled(show);
+                locText.setEnabled(show);
+                priceText.setEnabled(show);
+                numTicksText.setEnabled(show);
+            }
+        });
     }
 }

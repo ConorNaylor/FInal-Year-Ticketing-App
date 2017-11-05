@@ -12,9 +12,10 @@
     tools:context="com.example.conornaylor.fyp.CreateEventFragment">
 
     <!-- Login progress -->
+
     <ProgressBar
         android:id="@+id/create_event_progress"
-        style="?android:attr/progressBarStyleLarge"
+        style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
@@ -49,6 +50,38 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/mapImage"
+                    android:layout_width="93dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/map" />
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_column="6"
+                    android:layout_row="0">
+
+                    <EditText
+                        android:id="@+id/eventLocation"
+                        android:layout_width="240dp"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/location"
+                        android:imeActionId="@+id/login"
+                        android:imeActionLabel="@string/action_sign_in_short"
+                        android:imeOptions="actionUnspecified"
+                        android:inputType="text"
+                        android:maxLines="1" />
+
+
+                </android.support.design.widget.TextInputLayout>
+
+            </GridLayout>
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -64,23 +97,28 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <EditText
-                    android:id="@+id/eventLocation"
-                    android:layout_width="match_parent"
+                    android:id="@+id/priceEvent"
+                    android:layout_width="170dp"
                     android:layout_height="wrap_content"
-                    android:hint="@string/location"
-                    android:imeActionId="@+id/login"
-                    android:imeActionLabel="@string/action_sign_in_short"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="text"
-                    android:maxLines="1" />
+                    android:ems="10"
+                    android:hint="@string/price"
+                    android:inputType="number" />
 
-
-            </android.support.design.widget.TextInputLayout>
+                <EditText
+                    android:id="@+id/numTickets"
+                    android:layout_width="170dp"
+                    android:layout_height="match_parent"
+                    android:layout_column="4"
+                    android:layout_row="0"
+                    android:ems="10"
+                    android:hint="Number Tickets"
+                    android:inputType="number" />
+            </GridLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
