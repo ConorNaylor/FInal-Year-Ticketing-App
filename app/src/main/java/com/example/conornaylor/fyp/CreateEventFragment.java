@@ -4,27 +4,46 @@ package com.example.conornaylor.fyp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+
+import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -42,6 +61,9 @@ public class CreateEventFragment extends Fragment {
     private EditText eventDesc;
     private EditText eventLoc;
     private EditText eventDate;
+    private ImageView imageview;
+    private ImageView image;
+    private Bitmap bitmap;
     private Button createEvent;
     private Button eventImage;
     private String eventNameString;
@@ -50,7 +72,13 @@ public class CreateEventFragment extends Fragment {
     private String eventDateString;
     private Event event;
     private LocationData data = null;
+    private String encodedImage;
+    private String selectedImagePath;
+    private JSONObject obj;
     public static final int pickImage = 1;
+    private String input;
+    private boolean pictureChosen = false;
+    private View focusView = null;
 
     public CreateEventFragment() {
         // Required empty public constructor
@@ -79,6 +107,7 @@ public class CreateEventFragment extends Fragment {
         eventDate = getActivity().findViewById(R.id.eventDate);
         createEvent = getActivity().findViewById(R.id.button_create_event);
         eventImage = getActivity().findViewById(R.id.button_image);
+        imageview = getActivity().findViewById(R.id.imageView);
 
         eventImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,17 +126,98 @@ public class CreateEventFragment extends Fragment {
                 eventDescString = eventDesc.getText().toString();
                 eventLocString = eventLoc.getText().toString();
                 eventDateString = eventDate.getText().toString();
-                mAuthTask.execute();
-            }
+                if(TextUtils.isEmpty(eventNameString)){
+                    eventName.setError(getString(R.string.error_field_required));
+                    focusView = eventName;
+                }else if(TextUtils.isEmpty(eventDescString)){
+                    eventDesc.setError(getString(R.string.error_field_required));
+                    focusView = eventDesc;
+                }else if(TextUtils.isEmpty(eventLocString)){
+                    eventLoc.setError(getString(R.string.error_field_required));
+                    focusView = eventLoc;
+                }else if(TextUtils.isEmpty(eventDateString)){
+                    eventDate.setError(getString(R.string.error_field_required));
+                    focusView = eventDate;
+                }else if(pictureChosen == false){
+                    eventImage.setError(getString(R.string.error_field_required));
+                    focusView = eventImage;
+                } else{
+                    mAuthTask.execute();
+                    }
+                }
         });
 
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == pickImage) {
-            System.out.println("Image has been selected....!");
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == 1 && null != data) {
+            decodeUri(data.getData());
+        }
+    }
+
+    public void decodeUri(Uri uri) {
+        ParcelFileDescriptor parcelFD = null;
+        try {
+            parcelFD = getActivity().getContentResolver().openFileDescriptor(uri, "r");
+            FileDescriptor imageSource = parcelFD.getFileDescriptor();
+
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFileDescriptor(imageSource, null, o);
+
+            // the new size we want to scale to
+            final int REQUIRED_SIZE = 1024;
+
+            // Find the correct scale value. It should be the power of 2.
+            int width_tmp = o.outWidth, height_tmp = o.outHeight;
+            int scale = 1;
+            while (true) {
+                if (width_tmp < REQUIRED_SIZE && height_tmp < REQUIRED_SIZE) {
+                    break;
+                }
+                width_tmp /= 2;
+                height_tmp /= 2;
+                scale *= 2;
+            }
+
+            // decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(imageSource, null, o2);
+
+            imageview.setImageBitmap(bitmap);
+
+            pictureChosen = true;
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (parcelFD != null)
+                try {
+                    parcelFD.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+    }
+
+            public void makeEvent(String input){
+                try {
+                    obj = new JSONObject(input);
+                    LocationData loc = new LocationData(0, 0);
+                    Event ev = new Event(
+                    obj.getString("id"),
+                    obj.getString("title"),
+                    obj.getString("description"),
+                    obj.getString("location"),
+                    obj.getString("date"),
+                    loc);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -152,9 +262,7 @@ public class CreateEventFragment extends Fragment {
                     }
                     br.close();
                     if (sb.toString() != null) {
-                        System.out.println(sb.toString());
-                    } else {
-                        System.out.println("Nothing here boss.");
+                        input = sb.toString();
                     }
                 } else {
                     System.out.println(con.getResponseMessage());
@@ -173,7 +281,7 @@ public class CreateEventFragment extends Fragment {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, new EventFragment());
                 ft.commit();
-                event = new Event(eventNameString, eventDescString, eventLocString, eventDateString, data);
+                makeEvent(input);
             }else{
 
             }

@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity
     private getEventsTask mAuthTask;
     private JSONObject obj;
     private JSONArray jArray;
-    private ArrayList<Event> events;
 
 
     @Override
@@ -69,7 +68,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void makeEvents(JSONArray jArray){
-        events = new ArrayList<>();
         try {
             for (int i = 0; i < jArray.length(); i++) {
                 try {
@@ -79,12 +77,12 @@ public class MainActivity extends AppCompatActivity
                 }
                 LocationData loc = new LocationData(0, 0);
                 Event ev = new Event(
+                        obj.getString("id"),
                         obj.getString("title"),
                         obj.getString("description"),
                         obj.getString("location"),
                         obj.getString("date"),
                         loc);
-                events.add(ev);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -183,9 +181,6 @@ public class MainActivity extends AppCompatActivity
                             jArray = new JSONArray(sb.toString());
                             makeEvents(jArray);
                         }
-                        else{
-                            System.out.println("Nothing here boss.");
-                        }
                     } else {
                         System.out.println(con.getResponseMessage());
                         return false;
@@ -197,9 +192,7 @@ public class MainActivity extends AppCompatActivity
             }
 
         @Override
-        protected void onPostExecute(Boolean b) {
-            super.onPostExecute(b);
-        }
+        protected void onPostExecute(Boolean b) { super.onPostExecute(b); }
 
         @Override
         protected void onCancelled() {

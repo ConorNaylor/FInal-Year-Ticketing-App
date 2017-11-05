@@ -8,6 +8,7 @@ import java.util.Date;
  */
 
 public class Event {
+    private String id;
     private String title;
     private String address;
     private String description;
@@ -15,13 +16,18 @@ public class Event {
     private LocationData location;
     private static ArrayList<Event> events = new ArrayList<>();
 
-    public Event(String title, String address, String description, String date, LocationData loc){
+    public Event(String id, String title, String address, String description, String date, LocationData loc){
+        this.id = id;
         this.title = title;
         this.address = address;
         this.description = description;
         this.date = date;
         this.location = loc;
         events.add(this);
+    }
+
+    public String getId(){
+        return this.id;
     }
 
     public String getTitle() {
