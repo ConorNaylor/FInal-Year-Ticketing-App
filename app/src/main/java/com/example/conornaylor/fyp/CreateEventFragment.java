@@ -188,7 +188,6 @@ public class CreateEventFragment extends Fragment {
             Bitmap bitmap = BitmapFactory.decodeFileDescriptor(imageSource, null, o2);
 
             imageview.setImageBitmap(bitmap);
-
             pictureChosen = true;
 
         } catch (FileNotFoundException e) {

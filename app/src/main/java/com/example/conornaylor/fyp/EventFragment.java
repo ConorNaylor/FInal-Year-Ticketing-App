@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class EventFragment extends Fragment {
 
     private boolean isOrganiser;
+    private Bundle bundle;
 
 
     public EventFragment() {
@@ -51,6 +52,10 @@ public class EventFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                         String event = String.valueOf((parent.getItemAtPosition(pos)));
                         Toast.makeText(getActivity(), event, Toast.LENGTH_SHORT).show();
+                        Fragment fragment = ViewEventFragment.newInstance((Event)parent.getItemAtPosition(pos));
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.container, fragment);
+                        ft.commit();
                     }
                 }
         );

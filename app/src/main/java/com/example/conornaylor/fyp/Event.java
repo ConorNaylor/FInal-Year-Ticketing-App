@@ -1,5 +1,6 @@
 package com.example.conornaylor.fyp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -7,7 +8,7 @@ import java.util.Date;
  * Created by conornaylor on 27/10/2017.
  */
 
-public class Event {
+public class Event implements Serializable{
     private String id;
     private String title;
     private String address;
