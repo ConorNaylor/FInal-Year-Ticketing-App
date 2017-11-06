@@ -1,12 +1,15 @@
 package com.example.conornaylor.fyp;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,8 +27,10 @@ public class ViewEventFragment extends Fragment {
     private EditText priceText;
     private EditText numTicksText;
     private EditText locText;
-    private CheckBox cb;
-    private boolean show;
+    private Button button;
+    private boolean show = false;
+    private FloatingActionButton fab;
+    private boolean isEventOwner = false;
 
 
     public ViewEventFragment() {
@@ -56,14 +61,21 @@ public class ViewEventFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         readBundle(getArguments());
-        cb = getActivity().findViewById(R.id.vieweditFields);
-        show = cb.isChecked();
+        show = false;
+        fab = getActivity().findViewById(R.id.fab2);
+        button = getActivity().findViewById(R.id.viewStatsButton);
         nameText = getActivity().findViewById(R.id.viewEventName);
         descText = getActivity().findViewById(R.id.viewEventDescription);
         dateText = getActivity().findViewById(R.id.viewEventDate);
         priceText = getActivity().findViewById(R.id.viewEventPrice);
         numTicksText = getActivity().findViewById(R.id.viewnumTickets);
         locText = getActivity().findViewById(R.id.viewEventLocation);
+
+        if(!isEventOwner) {
+            fab.setVisibility(View.INVISIBLE);
+            numTicksText.setVisibility(View.INVISIBLE);
+            button.setText("Buy Ticket");
+        }
 
         nameText.setEnabled(show);
         descText.setEnabled(show);
@@ -77,11 +89,13 @@ public class ViewEventFragment extends Fragment {
         dateText.setText(event.getDate());
         locText.setText(event.getAddress());
 
-        cb.setOnClickListener(new View.OnClickListener() {
-
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                show = cb.isChecked();
+                if(show == true) {
+                    show = false;
+                    fab.setBackgroundColor(Color.GREEN);
+                }else { show = true; }
                 nameText.setEnabled(show);
                 descText.setEnabled(show);
                 dateText.setEnabled(show);

@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity
     private String tk = "token";
     private String token;
     private getEventsTask mAuthTask;
+    private getEventsTask mAuthTaskRefresh;
     private JSONObject obj;
     private JSONArray jArray;
     private boolean doubleBackToExitPressedOnce = false;
@@ -94,10 +95,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-
-        int count = getFragmentManager().getBackStackEntryCount();
-
-        if (count == 0) {
             if (doubleBackToExitPressedOnce) {
                 Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(logoutIntent);
@@ -105,13 +102,13 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
                 return;
             }else{
-                this.doubleBackToExitPressedOnce = true;
-                Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+                doubleBackToExitPressedOnce = true;
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.container, new EventFragment());
+                ft.commit();
+                Toast.makeText(this, "Click BACK again to logout", Toast.LENGTH_SHORT).show();
                 mHandler.postDelayed(mRunnable, 2000);
             }
-        }else {
-            getFragmentManager().popBackStack();
-        }
     }
 
     private final Runnable mRunnable = new Runnable() {
@@ -148,6 +145,10 @@ public class MainActivity extends AppCompatActivity
             finish();
             Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
             return true;
+        }
+        if (id == R.id.refresh) {
+            mAuthTaskRefresh = new MainActivity.getEventsTask();
+            mAuthTaskRefresh.execute();
         }
 
         return super.onOptionsItemSelected(item);
