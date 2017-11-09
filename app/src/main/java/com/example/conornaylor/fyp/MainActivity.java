@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity
                         obj.getString("description"),
                         obj.getString("location"),
                         obj.getString("date"),
+                        obj.getDouble("price"),
+                        obj.getInt("numticks"),
                         loc);
             }
         } catch (JSONException e) {

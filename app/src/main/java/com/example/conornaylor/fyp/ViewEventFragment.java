@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +89,8 @@ public class ViewEventFragment extends Fragment {
         descText.setText(event.getDescription());
         dateText.setText(event.getDate());
         locText.setText(event.getAddress());
+        priceText.setText(event.getPrice().toString());
+        numTicksText.setText(event.getNumTicks());
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,5 +107,17 @@ public class ViewEventFragment extends Fragment {
                 numTicksText.setEnabled(show);
             }
         });
+
+        button.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Fragment fragment = ViewEventFragment.newInstance(event);
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.container, fragment);
+                        ft.commit();
+                    }
+                }
+        );
     }
 }
