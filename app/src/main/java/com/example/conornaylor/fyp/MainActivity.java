@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity
     private getEventsTask mAuthTaskRefresh;
     private JSONObject obj;
     private JSONArray jArray;
-    private boolean doubleBackToExitPressedOnce = false;
+    private int doubleBackToExitPressedOnce;
     private Handler mHandler = new Handler();
 
 
@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity
                 } catch (JSONException e1) {
                     e1.printStackTrace();
                 }
+
                 LocationData loc = new LocationData(0, 0);
                 Event ev = new Event(
                         obj.getString("id"),
@@ -86,8 +87,7 @@ public class MainActivity extends AppCompatActivity
                         obj.getString("description"),
                         obj.getString("location"),
                         obj.getString("date"),
-                        obj.getDouble("price"),
-                        obj.getInt("numticks"),
+                        obj.getInt("num_tickets"),
                         loc);
             }
         } catch (JSONException e) {
@@ -97,26 +97,31 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-            if (doubleBackToExitPressedOnce) {
-                Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(logoutIntent);
-                finish();
-                Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
-                return;
-            }else{
-                doubleBackToExitPressedOnce = true;
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new EventFragment());
-                ft.commit();
-                Toast.makeText(this, "Click BACK again to logout", Toast.LENGTH_SHORT).show();
-                mHandler.postDelayed(mRunnable, 2000);
-            }
+        if (doubleBackToExitPressedOnce == 2) {
+            Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(logoutIntent);
+            finish();
+            Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+            return;
+        }else if(doubleBackToExitPressedOnce == 1){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, new EventFragment());
+            ft.commit();
+            Toast.makeText(this, "Click BACK again to logout", Toast.LENGTH_SHORT).show();
+            mHandler.postDelayed(mRunnable, 2000);
+        }else{
+            doubleBackToExitPressedOnce++;
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, new EventFragment());
+            ft.commit();
+            mHandler.postDelayed(mRunnable, 2000);
+        }
     }
 
     private final Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            doubleBackToExitPressedOnce = false;
+            doubleBackToExitPressedOnce = 0;
         }
     };
 
@@ -212,6 +217,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         br.close();
                         if (sb.toString() != null) {
+                            System.out.println(sb.toString());
                             jArray = new JSONArray(sb.toString());
                             makeEvents(jArray);
                         }

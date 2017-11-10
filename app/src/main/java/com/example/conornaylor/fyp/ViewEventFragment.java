@@ -89,8 +89,8 @@ public class ViewEventFragment extends Fragment {
         descText.setText(event.getDescription());
         dateText.setText(event.getDate());
         locText.setText(event.getAddress());
-        priceText.setText(event.getPrice().toString());
-        numTicksText.setText(event.getNumTicks());
+//        priceText.setText(event.getPrice().toString());
+        numTicksText.setText(( event.getNumTicks()) + "");
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +112,7 @@ public class ViewEventFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Fragment fragment = ViewEventFragment.newInstance(event);
+                        Fragment fragment = CreateTicketFragment.newInstance(event);
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
                         ft.replace(R.id.container, fragment);
                         ft.commit();

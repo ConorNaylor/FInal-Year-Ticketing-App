@@ -107,8 +107,8 @@ public class CreateEventFragment extends Fragment {
 
         mAuthTask = new getEventsTask();
 
-        eventPrice = getActivity().findViewById(R.id.eventName);
-        eventNumTicks = getActivity().findViewById(R.id.eventDescription);
+        eventPrice = getActivity().findViewById(R.id.priceEvent);
+        eventNumTicks = getActivity().findViewById(R.id.numTickets);
         eventName = getActivity().findViewById(R.id.eventName);
         eventDesc = getActivity().findViewById(R.id.eventDescription);
         eventLoc = getActivity().findViewById(R.id.eventLocation);
@@ -139,6 +139,7 @@ public class CreateEventFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 eventNameString = eventName.getText().toString();
+                eventNumTicksInt = Integer.parseInt(eventNumTicks.getText().toString());
                 eventDescString = eventDesc.getText().toString();
                 eventLocString = eventLoc.getText().toString();
                 eventDateString = eventDate.getText().toString();
@@ -238,7 +239,6 @@ public class CreateEventFragment extends Fragment {
                     obj.getString("description"),
                     obj.getString("location"),
                     obj.getString("date"),
-                    obj.getDouble("price"),
                     obj.getInt("numticks"),
                     loc);
         } catch (JSONException e) {
@@ -268,6 +268,7 @@ public class CreateEventFragment extends Fragment {
                     ev.put("description", eventDescString);
                     ev.put("location", eventLocString);
                     ev.put("date", eventDateString);
+                    ev.put("num_tickets", eventNumTicksInt);
                 }catch(JSONException e){
                     e.printStackTrace();
                 }

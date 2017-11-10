@@ -15,25 +15,19 @@ public class Event implements Serializable{
     private String description;
     private String date;
     private LocationData location;
-    private Double price;
     private int numTicks;
     private static ArrayList<Event> events = new ArrayList<>();
 
-    public Event(String id, String title, String address, String description, String date, Double price, int numTicks, LocationData loc){
+    public Event(String id, String title, String address, String description, String date, int numTicks, LocationData loc){
         this.id = id;
         this.title = title;
         this.address = address;
         this.description = description;
         this.date = date;
         this.location = loc;
-        this.price = price;
         this.numTicks = numTicks;
         events.add(this);
     }
-
-    public Double getPrice() { return price; }
-
-    public void setPrice(Double price) { this.price = price; }
 
     public int getNumTicks() { return numTicks; }
 

@@ -10,70 +10,70 @@
         android:orientation="vertical">
         tools:context="com.example.conornaylor.fyp.CreateTicketFragment">
 
-         <ScrollView
-             android:id="@+id/event_form"
+     <ScrollView
+         android:id="@+id/event_form"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content">
+
+         <LinearLayout
+             android:id="@+id/_create_event_form"
              android:layout_width="match_parent"
-             android:layout_height="match_parent">
+             android:layout_height="match_parent"
+             android:orientation="vertical">
 
              <LinearLayout
-                 android:id="@+id/_create_event_form"
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"
                  android:orientation="vertical">
 
-                 <LinearLayout
-                     android:layout_width="match_parent"
-                     android:layout_height="match_parent"
-                     android:orientation="vertical">
-
-                     <EditText
-                         android:id="@+id/confirmEventName"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:background="@android:color/transparent"
-                         android:ems="10"
-                         android:fontFamily="sans-serif"
-                         android:inputType="textPersonName"
-                         android:text="Name"
-                         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                         android:textSize="22sp" />
-
-                     <EditText
-                         android:id="@+id/confirmPurchasePrice"
-                         android:layout_width="355dp"
-                         android:layout_height="wrap_content"
-                         android:background="@android:color/transparent"
-                         android:ems="10"
-                         android:hint="@string/price"
-                         android:inputType="number"
-                         android:paddingTop="5dp"
-                         android:text="Price"
-                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                         android:textSize="18sp" />
-
-                 </LinearLayout>
-
-                 <GridLayout
+                 <EditText
+                     android:id="@+id/confirmEventName"
                      android:layout_width="match_parent"
                      android:layout_height="wrap_content"
-                     android:paddingTop="5dp">
+                     android:background="@android:color/transparent"
+                     android:ems="10"
+                     android:fontFamily="sans-serif"
+                     android:inputType="textPersonName"
+                     android:text="Name"
+                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                     android:textSize="22sp" />
 
-                     <Button
-                         android:id="@+id/confirm_purchase"
-                         style="@style/Widget.AppCompat.Button.Colored"
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:layout_marginTop="16dp"
-                         android:backgroundTint="@android:color/holo_blue_bright"
-                         android:drawableRight="@drawable/ic_menu_send"
-                         android:drawableTint="@android:color/background_dark"
-                         android:elevation="0dp"
-                         android:text="Confirm" />
-                 </GridLayout>
+                 <EditText
+                     android:id="@+id/confirmPurchasePrice"
+                     android:layout_width="355dp"
+                     android:layout_height="wrap_content"
+                     android:background="@android:color/transparent"
+                     android:ems="10"
+                     android:hint="@string/price"
+                     android:inputType="number"
+                     android:paddingTop="5dp"
+                     android:text="Price"
+                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                     android:textSize="18sp" />
 
              </LinearLayout>
 
-         </ScrollView>
+             <GridLayout
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:paddingTop="5dp">
+
+                 <Button
+                     android:id="@+id/confirm_purchase"
+                     style="@style/Widget.AppCompat.Button.Colored"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_marginTop="16dp"
+                     android:backgroundTint="@color/colorPrimaryDark"
+                     android:drawableRight="@drawable/ic_menu_send"
+                     android:drawableTint="@android:color/background_light"
+                     android:elevation="0dp"
+                     android:text="Confirm" />
+             </GridLayout>
+
+         </LinearLayout>
+
+     </ScrollView>
      <ProgressBar
          android:id="@+id/create_event_progress"
          style="@style/Widget.AppCompat.ProgressBar"
