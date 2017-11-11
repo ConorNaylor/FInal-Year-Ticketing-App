@@ -236,10 +236,10 @@ public class CreateEventFragment extends Fragment {
                     Event ev = new Event(
                     obj.getString("id"),
                     obj.getString("title"),
-                    obj.getString("description"),
                     obj.getString("location"),
+                    obj.getString("description"),
                     obj.getString("date"),
-                    obj.getInt("numticks"),
+                    obj.getInt("numtickets"),
                     loc);
         } catch (JSONException e) {
             e.printStackTrace();

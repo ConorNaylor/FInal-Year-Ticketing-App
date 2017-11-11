@@ -76,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private UserLoginTask mAuthTask = null;
     private String auth;
     private String token = "token";
+    private String userId = "id";
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private SharedPreferences.Editor e;
@@ -86,6 +87,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private TextView register;
+    private JSONObject obj;
 
     private NfcAdapter nfcAdapter;
 
@@ -389,7 +391,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/api-token-auth/"; //Galway
+                String url = "http://192.168.0.59:8000/authenticate/"; //Galway
 //                String url = "http://192.168.1.10:8000/api-token-auth/";    //Mayo
                 URL object = new URL(url);
 
@@ -437,7 +439,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }else if(auth.contains("token")){
                 e = preferences.edit();
-                e.putString(token, auth.substring(10,auth.length() - 3));
+                try {
+                    obj = new JSONObject(auth);
+                    e.putString(token, obj.getString(token));
+                    e.putString(userId, obj.getString(userId));
+                }catch(JSONException error){
+                    error.printStackTrace();
+                }
                 e.commit();
                 return true;
             }

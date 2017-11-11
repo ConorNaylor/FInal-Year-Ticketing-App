@@ -84,8 +84,8 @@ public class MainActivity extends AppCompatActivity
                 Event ev = new Event(
                         obj.getString("id"),
                         obj.getString("title"),
-                        obj.getString("description"),
                         obj.getString("location"),
+                        obj.getString("description"),
                         obj.getString("date"),
                         obj.getInt("num_tickets"),
                         loc);

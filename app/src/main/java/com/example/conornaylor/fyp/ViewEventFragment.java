@@ -31,7 +31,7 @@ public class ViewEventFragment extends Fragment {
     private Button button;
     private boolean show = false;
     private FloatingActionButton fab;
-    private boolean isEventOwner = false;
+    private boolean isEventOwner = true;
 
 
     public ViewEventFragment() {
@@ -89,7 +89,7 @@ public class ViewEventFragment extends Fragment {
         descText.setText(event.getDescription());
         dateText.setText(event.getDate());
         locText.setText(event.getAddress());
-//        priceText.setText(event.getPrice().toString());
+        priceText.setText("Free");
         numTicksText.setText(( event.getNumTicks()) + "");
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -98,7 +98,11 @@ public class ViewEventFragment extends Fragment {
                 if(show == true) {
                     show = false;
                     fab.setBackgroundColor(Color.GREEN);
-                }else { show = true; }
+                }else {
+                    nameText.requestFocus();
+                    show = true;
+                    fab.setBackgroundColor(Color.BLACK);
+                }
                 nameText.setEnabled(show);
                 descText.setEnabled(show);
                 dateText.setEnabled(show);

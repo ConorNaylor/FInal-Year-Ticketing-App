@@ -9,8 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 
 /**
@@ -21,6 +25,7 @@ public class AccountFragment extends Fragment {
     TextView mEmailView;
     TextView mNameView;
     CheckBox mEditAccount;
+    ArrayList<Event> myEvents;
 
 
     public AccountFragment() {
@@ -46,7 +51,17 @@ public class AccountFragment extends Fragment {
         mEmailView.setEnabled(false);
         mNameView.setEnabled(false);
 //        mEditAccount.setOnClickListener(
-//
+
+        myEvents = new ArrayList<Event>();
+        ArrayList<Event> events =  Event.getEvents();
+        for(Event e: events) {
+//            if()
+            myEvents.add(e);
+        }
+
+        ListView accountEventsList = view.findViewById(R.id.yourEvents);
+        ListAdapter myAccountAdapter = new EventAdaptor(getActivity(), events);
+        accountEventsList.setAdapter(myAccountAdapter);
 //        );
     }
 

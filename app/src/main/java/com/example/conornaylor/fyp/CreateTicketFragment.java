@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,7 @@ public class CreateTicketFragment extends Fragment {
     private TextView eventName;
     private TextView eventPrice;
     private String input;
+    private ProgressBar spinner;
 
     public CreateTicketFragment() {
         // Required empty public constructor
@@ -94,13 +97,20 @@ public class CreateTicketFragment extends Fragment {
         eventName.setText(event.getTitle());
 //        eventPrice.setText(event.getPrice().toString());
 
+        spinner = getActivity().findViewById(R.id.create_ticket_progress);
+
         button.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, new AccountFragment());
-                        ft.commit();
+                        mAuthTask.execute();
+//                        spinner.setVisibility(View.VISIBLE);
+//                        Handler handler = new Handler();
+//                        handler.postDelayed(new Runnable() {
+//                            public void run() {
+//                                spinner.setVisibility(View.INVISIBLE);
+//                            }
+//                        }, 1000);
                     }
                 }
         );
@@ -111,8 +121,8 @@ public class CreateTicketFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/events/";
-//                String url = "http://192.168.1.10:8000/events/";
+                String url = "http://192.168.0.59:8000/tickets/";
+//                String url = "http://192.168.1.10:8000/tickets/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -125,10 +135,10 @@ public class CreateTicketFragment extends Fragment {
 
                 JSONObject ev = new JSONObject();
                 try{
-                    ev.put("event", event.getId());
-                    ev.put("price", 10.50);
+                    ev.put("event", "63720e2cfb754dc89169d97ed7f68f16"); //event.getId());
+                    ev.put("price", 0.0);
                     ev.put("seat", "5A");
-                    ev.put("user", 1);
+                    ev.put("user", 3);
                 }catch(JSONException e){
                     e.printStackTrace();
                 }
@@ -149,6 +159,7 @@ public class CreateTicketFragment extends Fragment {
                     br.close();
                     if (sb.toString() != null) {
                         input = sb.toString();
+                        System.out.println(input);
                     }
                 } else {
                     System.out.println(con.getResponseMessage());
@@ -162,10 +173,9 @@ public class CreateTicketFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Boolean b) {
-
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new EventFragment());
+                ft.replace(R.id.container, new AccountFragment());
                 ft.commit();
                 makeTicket(input);
             }else{

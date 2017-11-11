@@ -74,8 +74,9 @@
          </LinearLayout>
 
      </ScrollView>
+
      <ProgressBar
-         android:id="@+id/create_event_progress"
+         android:id="@+id/create_ticket_progress"
          style="@style/Widget.AppCompat.ProgressBar"
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
