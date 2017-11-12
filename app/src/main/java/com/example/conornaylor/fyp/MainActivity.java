@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_account) {
             fragment = new AccountFragment();
         } else if (id == R.id.nav_slideshow) {
-
+            fragment = new ViewTicketsFragment();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

@@ -1,9 +1,13 @@
 package com.example.conornaylor.fyp;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -17,6 +21,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +52,10 @@ public class CreateTicketFragment extends Fragment {
     private TextView eventPrice;
     private String input;
     private ProgressBar spinner;
+    private View mProgressView;
+    private View mLoginFormView;
+    private Gson gson;
+    private String str;
 
     public CreateTicketFragment() {
         // Required empty public constructor
@@ -68,7 +78,16 @@ public class CreateTicketFragment extends Fragment {
 
     private void makeTicket(String input) {
         try {
+            gson = new Gson();
+            str = gson.toJson(event);
             JSONObject obj = new JSONObject(input);
+            ticket = new Ticket(
+                    obj.getString("id"),
+                    obj.getString("seat"),
+                    Double.parseDouble(obj.getString("price"))  ,
+                    obj.getString("user"),
+                    event
+            );
         }catch(JSONException e ) {
             e.printStackTrace();
         }
@@ -93,6 +112,8 @@ public class CreateTicketFragment extends Fragment {
         button = getActivity().findViewById(R.id.confirm_purchase);
         eventName = getActivity().findViewById(R.id.confirmEventName);
         eventPrice = getActivity().findViewById(R.id.confirmPurchasePrice);
+        mLoginFormView = getActivity().findViewById(R.id.event_form);
+        mProgressView = getActivity().findViewById(R.id.create_ticket_progress);
 
         eventName.setText(event.getTitle());
 //        eventPrice.setText(event.getPrice().toString());
@@ -104,16 +125,43 @@ public class CreateTicketFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         mAuthTask.execute();
-//                        spinner.setVisibility(View.VISIBLE);
-//                        Handler handler = new Handler();
-//                        handler.postDelayed(new Runnable() {
-//                            public void run() {
-//                                spinner.setVisibility(View.INVISIBLE);
-//                            }
-//                        }, 1000);
+                        showProgress(true);
                     }
                 }
         );
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
 
 
@@ -173,6 +221,8 @@ public class CreateTicketFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Boolean b) {
+            mAuthTask = null;
+            showProgress(false);
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, new AccountFragment());
@@ -185,7 +235,8 @@ public class CreateTicketFragment extends Fragment {
 
         @Override
         protected void onCancelled() {
-            super.onCancelled();
+            mAuthTask = null;
+            showProgress(false);
         }
     }
 }
