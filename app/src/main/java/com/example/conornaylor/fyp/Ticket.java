@@ -20,14 +20,14 @@ public class Ticket implements Serializable{
         this.seat = seat;
         this.userId = userId;
         this.event = event;
-        tickets.add(this);
+        addUniqueTickets(this);
     }
 
     public static ArrayList<Ticket> getTickets(){
         return tickets;
     }
 
-    public String getTicketId() {
+    public String getId() {
         return ticketId;
     }
 
@@ -53,5 +53,18 @@ public class Ticket implements Serializable{
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public void addUniqueTickets(Ticket t) {
+        if(tickets.isEmpty()){
+            tickets.add(t);
+        }else{
+            for(Ticket tk: tickets) {
+                if (tk.getId().equals(t.getId())) {
+                    return;
+                }
+            }
+            tickets.add(t);
+        }
     }
 }

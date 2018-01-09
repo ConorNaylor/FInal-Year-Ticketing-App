@@ -26,7 +26,8 @@
             android:layout_weight="1"
             android:padding="5dp"
             android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/customeventAddress"
@@ -38,7 +39,8 @@
             android:layout_weight="1"
             android:padding="5dp"
             android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/customeventDate"
@@ -48,9 +50,11 @@
             android:layout_alignParentStart="true"
             android:layout_below="@+id/customeventName"
             android:layout_weight="1"
+            android:maxLines="2"
             android:padding="5dp"
             android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/customeventPrice"
@@ -62,7 +66,8 @@
             android:layout_weight="1"
             android:padding="5dp"
             android:text="TBC"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/black" />
 
     </RelativeLayout>
 

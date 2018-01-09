@@ -42,9 +42,9 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
 
         ticketName.setText(t.getEvent().getTitle());
         ticketDate.setText(t.getEvent().getDate());
-        ticketPrice.setText(t.getUserId());
         ticketSeat.setText(t.getSeat());
         eventImage.setImageResource(R.drawable.boltmess);
+        ticketPrice.setText(t.getUserId());
         return customView;
     }
 }

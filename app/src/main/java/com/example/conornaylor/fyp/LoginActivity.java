@@ -75,8 +75,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private Handler mHandler = new Handler();
     private UserLoginTask mAuthTask = null;
     private String auth;
-    private String token = "token";
-    private String userId = "id";
+    private String tokenString = "token";
+    private String usernameString = "username";
+    private String userEmailString = "email";
+    private String userIdString = "id";
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private SharedPreferences.Editor e;
@@ -159,7 +161,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Click BACK again to Exit", Toast.LENGTH_SHORT).show();
 
         mHandler.postDelayed(mRunnable, 2000);
     }
@@ -391,8 +393,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/authenticate/"; //Galway
-//                String url = "http://192.168.1.10:8000/api-token-auth/";    //Mayo
+//                String url = "http://192.168.0.59:8000/authenticate/"; //Galway
+                String url = "http://192.168.1.10:8000/authenticate/";    //Mayo
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -434,15 +436,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Log.d("Uh Oh","No connection!, Check your network.");
                 return false;
             }
-
+            System.out.println(auth);
             if (auth == null){
                 return false;
             }else if(auth.contains("token")){
                 e = preferences.edit();
                 try {
                     obj = new JSONObject(auth);
-                    e.putString(token, obj.getString(token));
-                    e.putString(userId, obj.getString(userId));
+                    e.putString(tokenString, obj.getString(tokenString));
+                    e.putString(userIdString, obj.getString(userIdString));
+                    e.putString(userEmailString, obj.getString(userEmailString));
+                    e.putString(usernameString, obj.getString(usernameString));
                 }catch(JSONException error){
                     error.printStackTrace();
                 }

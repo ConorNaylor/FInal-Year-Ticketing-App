@@ -29,6 +29,7 @@
 
                 <EditText
                     android:id="@+id/name"
+                    style="@android:style/Widget.TextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/name"
@@ -36,7 +37,9 @@
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="text"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -46,12 +49,14 @@
 
                 <EditText
                     android:id="@+id/email"
-                    style="?attr/editTextStyle"
+                    style="@android:style/Widget.TextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -91,22 +96,7 @@
                 <ListView
                     android:id="@+id/yourEvents"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp" />
-
-                <TextView
-                    android:id="@+id/your_tickets_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="Your Tickets"
-                    android:textAlignment="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:textColor="@android:color/background_dark" />
-
-                <ListView
-                    android:id="@+id/eventTicketList"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp" />
+                    android:layout_height="340dp" />
 
             </LinearLayout>
         </LinearLayout>

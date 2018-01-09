@@ -16,9 +16,10 @@ public class Event implements Serializable{
     private String date;
     private LocationData location;
     private int numTicks;
+    private String userId;
     private static ArrayList<Event> events = new ArrayList<>();
 
-    public Event(String id, String title, String address, String description, String date, int numTicks, LocationData loc){
+    public Event(String id, String title, String address, String description, String date, int numTicks, String userId, LocationData loc){
         this.id = id;
         this.title = title;
         this.address = address;
@@ -26,8 +27,22 @@ public class Event implements Serializable{
         this.date = date;
         this.location = loc;
         this.numTicks = numTicks;
-        events.add(this);
+        this.userId = userId;
+        this.addToUniqueEvents(this);
     }
+
+    public static Event getEventByID(String id){
+        for(Event e: events){
+            if(e.getId().equals(id)){
+                return e;
+            }
+        }
+        return null;
+    }
+
+    public String getUserId() { return userId; }
+
+    public void setUserId(String userId) { this.userId = userId; }
 
     public int getNumTicks() { return numTicks; }
 
@@ -84,6 +99,19 @@ public class Event implements Serializable{
     }
 
     public String toString(){
-        return this.title;
+        return this.id;
+    }
+
+    public void addToUniqueEvents(Event e) {
+        if(events.isEmpty()){
+            events.add(e);
+        }else{
+            for(Event ev: events) {
+                if (ev.getId().equals(e.getId())) {
+                    return;
+                }
+            }
+            events.add(e);
+        }
     }
 }

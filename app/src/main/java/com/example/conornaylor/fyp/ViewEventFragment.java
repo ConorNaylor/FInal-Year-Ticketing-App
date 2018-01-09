@@ -31,7 +31,7 @@ public class ViewEventFragment extends Fragment {
     private Button button;
     private boolean show = false;
     private FloatingActionButton fab;
-    private boolean isEventOwner = true;
+    private boolean isEventOwner = false;
 
 
     public ViewEventFragment() {

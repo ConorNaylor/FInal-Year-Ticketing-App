@@ -44,6 +44,8 @@ public class CreateTicketFragment extends Fragment {
     private SharedPreferences preferences;
     private String token;
     private String tk = "token";
+    private String userId = "id";
+    private String userID;
     private Ticket ticket;
     private CreateTicketFragment.createTicketTask mAuthTask = null;
     private Event event;
@@ -106,6 +108,7 @@ public class CreateTicketFragment extends Fragment {
 
         preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
         token = preferences.getString(tk, null);
+        userID = preferences.getString(userId, null);
 
         mAuthTask = new createTicketTask();
 
@@ -116,9 +119,9 @@ public class CreateTicketFragment extends Fragment {
         mProgressView = getActivity().findViewById(R.id.create_ticket_progress);
 
         eventName.setText(event.getTitle());
+        eventPrice.setText("Free");
 //        eventPrice.setText(event.getPrice().toString());
 
-        spinner = getActivity().findViewById(R.id.create_ticket_progress);
 
         button.setOnClickListener(
                 new View.OnClickListener() {
@@ -169,8 +172,8 @@ public class CreateTicketFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/tickets/";
-//                String url = "http://192.168.1.10:8000/tickets/";
+//                String url = "http://192.168.0.59:8000/tickets/";
+                String url = "http://192.168.1.10:8000/tickets/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -183,10 +186,10 @@ public class CreateTicketFragment extends Fragment {
 
                 JSONObject ev = new JSONObject();
                 try{
-                    ev.put("event", "63720e2cfb754dc89169d97ed7f68f16"); //event.getId());
-                    ev.put("price", 0.0);
+                    ev.put("event", event.getId()); //event.getId());
+                    ev.put("price", 0.00);
                     ev.put("seat", "5A");
-                    ev.put("user", 3);
+                    ev.put("user", userID);
                 }catch(JSONException e){
                     e.printStackTrace();
                 }
@@ -225,7 +228,7 @@ public class CreateTicketFragment extends Fragment {
             showProgress(false);
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new AccountFragment());
+                ft.replace(R.id.container, new ViewTicketsFragment());
                 ft.commit();
                 makeTicket(input);
             }else{

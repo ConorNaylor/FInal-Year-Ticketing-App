@@ -57,6 +57,8 @@ public class CreateEventFragment extends Fragment {
     private SharedPreferences preferences;
     private String token;
     private String tk = "token";
+    private String userId = "id";
+    private String userID;
     private getEventsTask mAuthTask = null;
     private EditText eventName;
     private EditText eventNumTicks;
@@ -104,6 +106,7 @@ public class CreateEventFragment extends Fragment {
 
         preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
         token = preferences.getString(tk, null);
+        userID = preferences.getString(userId, null);
 
         mAuthTask = new getEventsTask();
 
@@ -239,7 +242,8 @@ public class CreateEventFragment extends Fragment {
                     obj.getString("location"),
                     obj.getString("description"),
                     obj.getString("date"),
-                    obj.getInt("numtickets"),
+                    obj.getInt("num_tickets"),
+                    obj.getString(userId),
                     loc);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -250,8 +254,8 @@ public class CreateEventFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                    String url = "http://192.168.0.59:8000/events/";
-//                String url = "http://192.168.1.10:8000/events/";
+//                    String url = "http://192.168.0.59:8000/events/";
+                String url = "http://192.168.1.10:8000/events/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -269,6 +273,7 @@ public class CreateEventFragment extends Fragment {
                     ev.put("location", eventLocString);
                     ev.put("date", eventDateString);
                     ev.put("num_tickets", eventNumTicksInt);
+                    ev.put("user", userID);
                 }catch(JSONException e){
                     e.printStackTrace();
                 }
