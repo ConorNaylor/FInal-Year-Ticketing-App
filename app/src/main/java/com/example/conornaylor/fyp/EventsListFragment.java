@@ -23,7 +23,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 
-public class EventFragment extends Fragment {
+public class EventsListFragment extends Fragment {
 
     private boolean isOrganiser;
     private Bundle bundle;
@@ -31,7 +31,7 @@ public class EventFragment extends Fragment {
     private View mLoginFormView;
 
 
-    public EventFragment() {
+    public EventsListFragment() {
         // Required empty public constructor
     }
 

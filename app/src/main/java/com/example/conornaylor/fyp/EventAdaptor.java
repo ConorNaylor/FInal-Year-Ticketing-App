@@ -12,7 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by conornaylor on 20/10/2017.
@@ -25,6 +29,7 @@ public class EventAdaptor extends ArrayAdapter<Event> {
     private TextView eventDate;
     private ImageView eventImage;
     private Event e;
+    private Date date;
 
     public EventAdaptor(Context context, ArrayList<Event> events) {
         super(context, R.layout.custom_event_row, events);
@@ -41,9 +46,11 @@ public class EventAdaptor extends ArrayAdapter<Event> {
         eventDate = customView.findViewById(R.id.customeventDate);
         eventImage = customView.findViewById(R.id.customeventImage);
 
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+
         eventName.setText(e.getTitle());
         eventAdd.setText(e.getAddress());
-        eventDate.setText(e.getDate().toString());
+        eventDate.setText(formatter.format(e.getDate()));
         eventImage.setImageResource(R.drawable.boltmess);
         return customView;
     }

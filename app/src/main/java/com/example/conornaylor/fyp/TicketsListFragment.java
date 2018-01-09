@@ -7,13 +7,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +34,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ViewTicketsFragment extends Fragment {
+public class TicketsListFragment extends Fragment {
 
     private TabHost tabHost;
     public static final String MyPreferences = "preferences";
@@ -47,7 +50,7 @@ public class ViewTicketsFragment extends Fragment {
     private ListAdapter myUpcomingAdapter;
     private ListAdapter myPastAdapter;
 
-    public ViewTicketsFragment() {
+    public TicketsListFragment() {
         // Required empty public constructor
     }
 
@@ -106,6 +109,20 @@ public class ViewTicketsFragment extends Fragment {
         myPastAdapter = new TicketAdaptor(getActivity(), myPastTickets);
         upcomingEventsList.setAdapter(myUpcomingAdapter);
         pastEventsList.setAdapter(myPastAdapter);
+
+        upcomingEventsList.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+//                        showProgress(true);
+//                        String ticket = String.valueOf((parent.getItemAtPosition(pos)));
+                        Fragment fragment = ViewTicketFragment.newInstance((Ticket)parent.getItemAtPosition(pos));
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.container, fragment);
+                        ft.commit();
+                    }
+                }
+        );
     }
 
     public void makeTickets(JSONArray jArray){

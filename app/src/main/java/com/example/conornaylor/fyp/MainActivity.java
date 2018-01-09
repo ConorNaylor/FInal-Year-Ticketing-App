@@ -14,12 +14,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,11 +24,12 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
@@ -55,6 +53,7 @@ public class MainActivity extends AppCompatActivity
     private Boolean doubleBackToExitPressedOnce = false;
     private Handler mHandler = new Handler();
     private SerializableManager sm = new SerializableManager();
+    private Date date;
 
 
     @Override
@@ -87,7 +86,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, new EventFragment());
+        ft.replace(R.id.container, new EventsListFragment());
         ft.commit();
     }
 
@@ -127,12 +126,18 @@ public class MainActivity extends AppCompatActivity
                         }
 
                     LocationData loc = new LocationData(0, 0);
+                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                    try {
+                        date = formatter.parse(obj.getString("date"));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     Event ev = new Event(
                             obj.getString("id"),
                             obj.getString("title"),
                             obj.getString("location"),
                             obj.getString("description"),
-                            obj.getString("date"),
+                            date,
                             obj.getInt("num_tickets"),
                             obj.getString("user"),
                             loc);
@@ -202,7 +207,7 @@ public class MainActivity extends AppCompatActivity
             mAuthTaskRefresh = new MainActivity.getEventsTask();
             mAuthTaskRefresh.execute();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, new EventFragment());
+            ft.replace(R.id.container, new EventsListFragment());
             ft.commit();
         }
 
@@ -217,11 +222,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_events) {
-           fragment = new EventFragment();
+           fragment = new EventsListFragment();
         } else if (id == R.id.nav_account) {
             fragment = new AccountFragment();
         } else if (id == R.id.nav_tickets) {
-            fragment = new ViewTicketsFragment();
+            fragment = new TicketsListFragment();
         } else if (id == R.id.nav_share) {
 
         }

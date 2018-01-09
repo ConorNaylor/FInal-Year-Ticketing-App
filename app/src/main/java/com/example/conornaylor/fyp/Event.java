@@ -13,13 +13,13 @@ public class Event implements Serializable{
     private String title;
     private String address;
     private String description;
-    private String date;
+    private Date date;
     private LocationData location;
     private int numTicks;
     private String userId;
     private static ArrayList<Event> events = new ArrayList<>();
 
-    public Event(String id, String title, String address, String description, String date, int numTicks, String userId, LocationData loc){
+    public Event(String id, String title, String address, String description, Date date, int numTicks, String userId, LocationData loc){
         this.id = id;
         this.title = title;
         this.address = address;
@@ -76,9 +76,9 @@ public class Event implements Serializable{
         this.description = description;
     }
 
-    public String getDate() {return date;}
+    public Date getDate() {return date;}
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

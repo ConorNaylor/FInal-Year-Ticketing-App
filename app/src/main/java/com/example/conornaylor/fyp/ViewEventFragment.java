@@ -29,9 +29,9 @@ public class ViewEventFragment extends Fragment {
     private EditText numTicksText;
     private EditText locText;
     private Button button;
-    private boolean show = false;
+    private boolean show = true;
     private FloatingActionButton fab;
-    private boolean isEventOwner = false;
+    private boolean isEventOwner = true;
 
 
     public ViewEventFragment() {
@@ -62,7 +62,10 @@ public class ViewEventFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         readBundle(getArguments());
-        show = false;
+
+        getActivity().setTitle(event.getTitle());
+
+//        show = false;
         fab = getActivity().findViewById(R.id.fab2);
         button = getActivity().findViewById(R.id.viewStatsButton);
         nameText = getActivity().findViewById(R.id.viewEventName);
@@ -87,7 +90,7 @@ public class ViewEventFragment extends Fragment {
 
         nameText.setText(event.getTitle());
         descText.setText(event.getDescription());
-        dateText.setText(event.getDate());
+        dateText.setText(event.getDate().toString());
         locText.setText(event.getAddress());
         priceText.setText("Free");
         numTicksText.setText(( event.getNumTicks()) + "");

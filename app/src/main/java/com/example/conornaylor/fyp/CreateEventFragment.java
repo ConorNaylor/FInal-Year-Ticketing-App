@@ -4,21 +4,16 @@ package com.example.conornaylor.fyp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,22 +22,18 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -241,7 +232,7 @@ public class CreateEventFragment extends Fragment {
                     obj.getString("title"),
                     obj.getString("location"),
                     obj.getString("description"),
-                    obj.getString("date"),
+                    (Date)obj.get("date"),
                     obj.getInt("num_tickets"),
                     obj.getString(userId),
                     loc);
@@ -310,11 +301,13 @@ public class CreateEventFragment extends Fragment {
 
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new EventFragment());
+                ft.replace(R.id.container, new EventsListFragment());
                 ft.commit();
                 makeEvent(input);
             }else{
-
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.container, new CreateEventFragment());
+                ft.commit();
             }
         }
 

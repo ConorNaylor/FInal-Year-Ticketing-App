@@ -41,7 +41,7 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
         eventImage = customView.findViewById(R.id.customeventImage);
 
         ticketName.setText(t.getEvent().getTitle());
-        ticketDate.setText(t.getEvent().getDate());
+        ticketDate.setText(t.getEvent().getDate().toString());
         ticketSeat.setText(t.getSeat());
         eventImage.setImageResource(R.drawable.boltmess);
         ticketPrice.setText(t.getUserId());
