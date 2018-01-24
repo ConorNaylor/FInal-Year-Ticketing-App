@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity
             e1.printStackTrace();
         }
 
+        ImageHandler IH = new ImageHandler(token);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -84,10 +86,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, new EventsListFragment());
-        ft.commit();
     }
 
 //    public JSONArray getEventPreferences() {
@@ -117,7 +115,6 @@ public class MainActivity extends AppCompatActivity
 
     public void makeEvents(JSONArray jArray){
         try {
-//            if (jArray != null) {
                 for (int i = 0; i < jArray.length(); i++) {
                         try {
                             obj = jArray.getJSONObject(i);
@@ -126,7 +123,7 @@ public class MainActivity extends AppCompatActivity
                         }
 
                     LocationData loc = new LocationData(0, 0);
-                    SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                     try {
                         date = formatter.parse(obj.getString("date"));
                     } catch (ParseException e) {
@@ -140,46 +137,54 @@ public class MainActivity extends AppCompatActivity
                             date,
                             obj.getInt("num_tickets"),
                             obj.getString("user"),
-                            loc);
+                            loc,
+                            obj.getDouble("price"));
                 }
-//            }
-//            else return;
         } catch(JSONException e){
             e.printStackTrace();
         }
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, new EventsListFragment()).addToBackStack("");
+        ft.commit();
     }
 
     @Override
     public void onBackPressed() {
-        if (doubleBackToExitPressedOnce) {
-            Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(logoutIntent);
-            finish();
-            SharedPreferences settings = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
-            settings.edit().clear().apply();
-            Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
-            return;
+        if (getFragmentManager().getBackStackEntryCount() > 0) {
+            getFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+//
+//            if (doubleBackToExitPressedOnce) {
+//                Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
+//                startActivity(logoutIntent);
+//                finish();
+//                SharedPreferences settings = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+//                settings.edit().clear().apply();
+//                Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+//                return;
+//            }
+//
+//            this.doubleBackToExitPressedOnce = true;
+//            Toast.makeText(this, "Click BACK again to Log Out", Toast.LENGTH_SHORT).show();
+//
+//            mHandler.postDelayed(mRunnable, 1000);
         }
-
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Click BACK again to Log Out", Toast.LENGTH_SHORT).show();
-
-        mHandler.postDelayed(mRunnable, 2000);
     }
-    private final Runnable mRunnable = new Runnable() {
-        @Override
-        public void run() {
-            doubleBackToExitPressedOnce = false;
-        }
-    };
-
-    @Override
-    protected void onDestroy()
-    {
-        super.onDestroy();
-
-        if (mHandler != null) { mHandler.removeCallbacks(mRunnable); }
-    }
+//    private final Runnable mRunnable = new Runnable() {
+//        @Override
+//        public void run() {
+//            doubleBackToExitPressedOnce = false;
+//        }
+//    };
+//
+//    @Override
+//    protected void onDestroy()
+//    {
+//        super.onDestroy();
+//
+//        if (mHandler != null) { mHandler.removeCallbacks(mRunnable); }
+//    }
 
 
     @Override
@@ -233,7 +238,7 @@ public class MainActivity extends AppCompatActivity
 
         if(fragment != null){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, fragment);
+            ft.replace(R.id.container, fragment).addToBackStack("fragment");;
             ft.commit();
         }
 
@@ -247,8 +252,8 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected Boolean doInBackground(Void...params) {
                 try {
-//                    String url = "http://192.168.0.59:8000/events/";
-                    String url = "http://192.168.1.10:8000/events/";
+                    String url = "http://192.168.0.59:8000/events/"; // Galway
+//                    String url = "http://192.168.1.2:8000/events/"; //Mayo
                     URL object = new URL(url);
 
                     HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -268,7 +273,7 @@ public class MainActivity extends AppCompatActivity
                         }
                         br.close();
                         if (sb.toString() != null) {
-//                            System.out.println(sb.toString());
+                            System.out.println(sb.toString());
                             jArray = new JSONArray(sb.toString());
                             makeEvents(jArray);
                         }

@@ -65,7 +65,7 @@
             android:layout_below="@+id/customeventAddress"
             android:layout_weight="1"
             android:padding="5dp"
-            android:text="TBC"
+            android:text="TextView"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@android:color/black" />
 

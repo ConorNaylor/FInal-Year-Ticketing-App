@@ -1,6 +1,7 @@
 package com.example.conornaylor.fyp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.Image;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -9,14 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
+import static com.example.conornaylor.fyp.ImageHandler.*;
 
 /**
  * Created by conornaylor on 20/10/2017.
@@ -24,15 +31,28 @@ import java.util.Locale;
 
 public class EventAdaptor extends ArrayAdapter<Event> {
 
+    private static final String MyPreferences = "preferences";
+    private SharedPreferences preferences;
+    private String token;
+    private String tk = "token";
+    private String userId = "id";
+    private String userID;
     private TextView eventName;
     private TextView eventAdd;
     private TextView eventDate;
     private ImageView eventImage;
+    private TextView eventPrice;
     private Event e;
-    private Date date;
+    private Context context;
 
     public EventAdaptor(Context context, ArrayList<Event> events) {
         super(context, R.layout.custom_event_row, events);
+
+        this.context = context;
+
+        preferences = context.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+        userID = preferences.getString(userId, null);
+        token = preferences.getString(tk, null);
     }
 
     @Override
@@ -45,13 +65,21 @@ public class EventAdaptor extends ArrayAdapter<Event> {
         eventAdd = customView.findViewById(R.id.customeventAddress);
         eventDate = customView.findViewById(R.id.customeventDate);
         eventImage = customView.findViewById(R.id.customeventImage);
+        eventPrice = customView.findViewById(R.id.customeventPrice);
 
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(e.getDate());
 
         eventName.setText(e.getTitle());
         eventAdd.setText(e.getAddress());
-        eventDate.setText(formatter.format(e.getDate()));
-        eventImage.setImageResource(R.drawable.boltmess);
+        eventDate.setText(date);
+//        new ImageHandler.DownloadImageTask(eventImage, token).execute("http://192.168.0.59:8000/eventphoto" + "/media/eventphotos/d046bdbf-eba.png");
+//        Picasso.with(context).load("http://192.168.0.59:8000/eventphoto"  + e.getImageURL()).into(eventImage);
+        Picasso.with(context).load("http://www.pngmart.com/image/29789").into(eventImage);
+        if(e.getPrice() <= 0){
+            eventPrice.setText("Free");
+        }else {
+            eventPrice.setText("€" + e.getPrice().toString());
+        }
         return customView;
     }
 }

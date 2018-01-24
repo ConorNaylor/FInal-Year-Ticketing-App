@@ -1,18 +1,19 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.conornaylor.fyp.EventsListFragment">
+    tools:context="com.example.conornaylor.fyp.AttendeeListFragment">
+
+    <!-- TODO: Update blank fragment layout -->
 
     <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/main_content"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/main_content_attend"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ListView
-            android:id="@+id/eventList"
+            android:id="@+id/attendeeList"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -24,18 +25,6 @@
             android:layout_gravity="center"
             android:visibility="gone" />
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="16dp"
-            android:src="@android:drawable/ic_input_add"
-            android:tint="@android:color/background_dark"
-            app:backgroundTint="@android:color/background_light"
-            app:layout_anchorGravity="bottom|right|end" />
-
     </android.support.design.widget.CoordinatorLayout>
-
 
 </FrameLayout>

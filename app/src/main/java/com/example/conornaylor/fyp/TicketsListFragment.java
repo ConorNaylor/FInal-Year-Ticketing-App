@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 
@@ -97,10 +98,19 @@ public class TicketsListFragment extends Fragment {
         tabHost.addTab(tab1);
         tabHost.addTab(tab2);
 
+        Date date = new Date();
 
         // Inflate the layout for this fragment
-        ArrayList<Ticket> myUpcomingTickets = Ticket.getTickets();
-        ArrayList<Ticket> myPastTickets = Ticket.getTickets();
+        ArrayList<Ticket> myUpcomingTickets = new ArrayList<>();
+        ArrayList<Ticket> myPastTickets = new ArrayList<>();
+
+        for(Ticket t: Ticket.getTickets()){
+            if(t.getEvent().getDate().after(date)){
+                myUpcomingTickets.add(t);
+            }else{
+                myPastTickets.add(t);
+            }
+        }
 
         // Sort tickets by date.
         ListView upcomingEventsList = view.findViewById(R.id.upcoming_tickets);
@@ -118,7 +128,21 @@ public class TicketsListFragment extends Fragment {
 //                        String ticket = String.valueOf((parent.getItemAtPosition(pos)));
                         Fragment fragment = ViewTicketFragment.newInstance((Ticket)parent.getItemAtPosition(pos));
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment);
+                        ft.replace(R.id.container, fragment).addToBackStack("viewTicket");
+                        ft.commit();
+                    }
+                }
+        );
+
+        pastEventsList.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+//                        showProgress(true);
+//                        String ticket = String.valueOf((parent.getItemAtPosition(pos)));
+                        Fragment fragment = ViewTicketFragment.newInstance((Ticket)parent.getItemAtPosition(pos));
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.container, fragment).addToBackStack("viewTicket");
                         ft.commit();
                     }
                 }
@@ -137,15 +161,11 @@ public class TicketsListFragment extends Fragment {
                 Ticket tk = new Ticket(
                         obj.getString("id"),
                         obj.getString("seat"),
-                        Double.parseDouble(obj.getString("price")),
                         obj.getString("user"),
                         Event.getEventByID(obj.getString("event")));
             }
         } catch(JSONException e){
             e.printStackTrace();
-        }
-        for(Ticket t: Ticket.getTickets()){
-            System.out.println("Printing that shite"+ t.getUserId()+t.getSeat()+t.getEvent());
         }
     }
 
@@ -154,8 +174,8 @@ public class TicketsListFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void...params) {
             try {
-//                    String url = "http://192.168.0.59:8000/events/";
-                String url = "http://192.168.1.10:8000/tickets/";
+                    String url = "http://192.168.0.59:8000/tickets/";
+//                String url = "http://192.168.1.2:8000/tickets/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

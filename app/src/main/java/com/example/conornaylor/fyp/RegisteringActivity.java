@@ -36,6 +36,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,13 +50,16 @@ import java.util.List;
 
 public class RegisteringActivity extends AppCompatActivity {
 
-    private Handler mHandler = new Handler();
-    private UserLoginTask mAuthTask = null;
+    private UserRegTask mAuthTask = null;
     private String auth;
-    private String token = "token";
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private SharedPreferences.Editor e;
+    private String tokenString = "token";
+    private String usernameString = "username";
+    private String userEmailString = "email";
+    private String userIdString = "id";
+    private View focusView;
 
     // UI references.
     private EditText mEmailView;
@@ -65,6 +69,9 @@ public class RegisteringActivity extends AppCompatActivity {
     private View mRegFormView;
     private Button register;
     private CheckBox host;
+    private JSONObject jsonObject;
+    private JSONObject obj;
+    boolean cancel;
 
 
     @Override
@@ -89,18 +96,18 @@ public class RegisteringActivity extends AppCompatActivity {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.register);
-        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptRegister();
-            }
-        });
 
-        mRegFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        mRegFormView = findViewById(R.id.reg_form);
+        mProgressView = findViewById(R.id.reg_progress);
 
         register = (Button) findViewById(R.id.register);
+        register.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            attemptRegister();
+                                        }
+                                    }
+        );
 
         preferences = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
     }
@@ -117,7 +124,7 @@ public class RegisteringActivity extends AppCompatActivity {
             return;
         }
 
-        // Reset errors.
+//        // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
@@ -126,11 +133,11 @@ public class RegisteringActivity extends AppCompatActivity {
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
-        boolean cancel = false;
-        View focusView = null;
+        cancel = false;
+        focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -141,28 +148,29 @@ public class RegisteringActivity extends AppCompatActivity {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mName;
             cancel = true;
+        }
 
-            // Check for a valid email address.
-            if (TextUtils.isEmpty(email)) {
-                mEmailView.setError(getString(R.string.error_field_required));
-                focusView = mEmailView;
-                cancel = true;
-            } else if (!isEmailValid(email)) {
-                mEmailView.setError(getString(R.string.error_invalid_email));
-                focusView = mEmailView;
-                cancel = true;
-            }
+        // Check for a valid email address.
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
+            cancel = true;
+        } else if (!isEmailValid(email)) {
+            mEmailView.setError(getString(R.string.error_invalid_email));
+            focusView = mEmailView;
+            cancel = true;
+        }
 
-            if (cancel) {
-                // There was an error; don't attempt login and focus the first
-                // form field with an error.
-                focusView.requestFocus();
-            } else {
-                // Show a progress spinner, and kick off a background task to
-                // perform the user login attempt.
-                mAuthTask = new UserLoginTask(name, email, password);
-                mAuthTask.execute((Void) null);
-            }
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        } else {
+            // Show a progress spinner, and kick off a background task to
+            // perform the user login attempt.
+            showProgress(true);
+            mAuthTask = new UserRegTask(name, email, password);
+            mAuthTask.execute((Void) null);
         }
     }
 
@@ -171,23 +179,56 @@ public class RegisteringActivity extends AppCompatActivity {
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() > 5;
     }
 
     /**
      * Shows the progress UI and hides the login form.
      */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mRegFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mRegFormView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mRegFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mRegFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
 
     /**
      * An asynchronous registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask< Void, Void, Boolean> {
+    public class UserRegTask extends AsyncTask< Void, Void, Boolean> {
         private final String mEmail;
         private final String mPassword;
         private final String mName;
 
-        UserLoginTask(String name, String email, String password) {
+        UserRegTask(String name, String email, String password) {
+            System.out.println("Getting this far");
             mName = name;
             mEmail = email;
             mPassword = password;
@@ -196,7 +237,8 @@ public class RegisteringActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/api-token-auth/";
+//                String url = "http://192.168.0.59:8000/makeusers/";
+                String url = "http://192.168.1.2:8000/makeusers/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -208,8 +250,8 @@ public class RegisteringActivity extends AppCompatActivity {
 
                 JSONObject cred = new JSONObject();
                 try {
-                    cred.put("name", mName);
-                    cred.put("username", mEmail);
+                    cred.put("username", mName);
+                    cred.put("email", mEmail);
                     cred.put("password", mPassword);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -232,6 +274,7 @@ public class RegisteringActivity extends AppCompatActivity {
                     }
                     br.close();
                     auth = sb.toString();
+                    System.out.println(sb.toString());
                 } else {
                     System.out.println(con.getResponseMessage());
                 }
@@ -239,12 +282,19 @@ public class RegisteringActivity extends AppCompatActivity {
                 Log.d("Uh Oh","No connection!, Check your network.");
                 return false;
             }
-
             if (auth == null){
                 return false;
             }else if(auth.contains("token")){
                 e = preferences.edit();
-                e.putString(token, auth.substring(10,auth.length() - 3));
+                try {
+                    jsonObject = new JSONObject(auth);
+                    e.putString(tokenString, jsonObject.getString(tokenString));
+                    e.putString(userIdString, jsonObject.getJSONObject("user").getString(userIdString));
+                    e.putString(userEmailString, jsonObject.getJSONObject("user").getString(userEmailString));
+                    e.putString(usernameString, jsonObject.getJSONObject("user").getString(usernameString));
+                }catch(JSONException error){
+                    error.printStackTrace();
+                }
                 e.commit();
                 return true;
             }
@@ -257,12 +307,24 @@ public class RegisteringActivity extends AppCompatActivity {
             mAuthTask = null;
 
             if (success) {
+                if (auth.contains("token")) {
+                    e = preferences.edit();
+                    try {
+                        jsonObject = new JSONObject(auth);
+                        e.putString(tokenString, jsonObject.getString(tokenString));
+                        e.putString(userIdString, jsonObject.getJSONObject("user").getString(userIdString));
+                        e.putString(userEmailString, jsonObject.getJSONObject("user").getString(userEmailString));
+                        e.putString(usernameString, jsonObject.getJSONObject("user").getString(usernameString));
+                    } catch (JSONException error) {
+                        error.printStackTrace();
+                    }
+                    e.commit();
+                }
                 Intent myIntent = new Intent(RegisteringActivity.this, MainActivity.class);
                 RegisteringActivity.this.startActivity(myIntent);
                 finish();
-
             } else {
-                mPasswordView.setError("Please ensure your password contains at least 8 characters and a number");
+                mPasswordView.setError("Registering failed!");
                 mPasswordView.requestFocus();
             }
         }

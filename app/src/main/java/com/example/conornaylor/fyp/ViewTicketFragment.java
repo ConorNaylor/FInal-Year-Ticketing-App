@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +32,7 @@ public class ViewTicketFragment extends Fragment {
     private Button button;
     private FloatingActionButton fab;
     private boolean isTicketOwner = true;
+    private String date;
 
     public ViewTicketFragment() {
         // Required empty public constructor
@@ -61,6 +65,9 @@ public class ViewTicketFragment extends Fragment {
         readBundle(getArguments());
 
         getActivity().setTitle(ticket.getEvent().getTitle());
+
+        date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(ticket.getEvent().getDate());
+
 //        show = false;
         fab = getActivity().findViewById(R.id.enterEventFAB);
         button = getActivity().findViewById(R.id.viewEventButton);
@@ -75,10 +82,14 @@ public class ViewTicketFragment extends Fragment {
         }
 
         nameText.setText(ticket.getEvent().getTitle());
-        dateText.setText(ticket.getEvent().getDate().toString());
+        dateText.setText(date);
         seatText.setText(ticket.getSeat());
         locText.setText(ticket.getEvent().getAddress());
-        priceText.setText("Free");
+        if(ticket.getEvent().getPrice() <= 0){
+            priceText.setText("Free");
+        }else {
+            priceText.setText("€" + ticket.getEvent().getPrice().toString());
+        }
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -79,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private String usernameString = "username";
     private String userEmailString = "email";
     private String userIdString = "id";
+
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private SharedPreferences.Editor e;
@@ -246,7 +247,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (TextUtils.isEmpty(password) || !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -393,8 +394,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/authenticate/"; //Galway
-                String url = "http://192.168.1.10:8000/authenticate/";    //Mayo
+                String url = "http://192.168.0.59:8000/authenticate/"; //Galway
+//                String url = "http://192.168.1.2:8000/authenticate/";    //Mayo
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

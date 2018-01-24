@@ -169,10 +169,20 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
+                        android:layout_weight="3.63"
                         android:drawableRight="@drawable/ic_menu_send"
                         android:drawableTint="@android:color/background_dark"
                         android:elevation="0dp"
                         android:text="View Statistics" />
+
+                    <Button
+                        android:id="@+id/auth_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="3.63"
+                        android:drawableRight="?android:attr/actionModeFindDrawable"
+                        android:drawableTint="@android:color/black"
+                        android:text="Authenticate Tickets" />
 
                 </LinearLayout>
 
@@ -182,10 +192,10 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_gravity="bottom|right"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:src="@drawable/ic_menu_manage"
             app:backgroundTint="@android:color/background_light"
             app:layout_anchorGravity="bottom|right|end" />

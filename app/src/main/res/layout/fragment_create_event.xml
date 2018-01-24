@@ -107,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:ems="10"
                     android:hint="@string/price"
-                    android:inputType="number" />
+                    android:inputType="numberDecimal" />
 
                 <EditText
                     android:id="@+id/numTickets"
@@ -124,16 +124,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <EditText
-                    android:id="@+id/eventDate"
+                <GridLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/date"
-                    android:imeActionId="@+id/login"
-                    android:imeActionLabel="@string/action_sign_in_short"
-                    android:imeOptions="actionUnspecified"
-                    android:inputType="date"
-                    android:maxLines="1" />
+                    android:layout_height="match_parent">
+
+                    <Button
+                        android:id="@+id/eventDate"
+                        android:layout_width="183dp"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/date"
+                        android:maxLines="1"
+                        android:text="Date" />
+
+                    <TextView
+                        android:id="@+id/dateText"
+                        android:layout_width="170dp"
+                        android:layout_height="match_parent"
+                        android:layout_column="4"
+                        android:layout_row="0"
+                        android:ems="10"
+                        android:textColor="@android:color/black"
+                        android:textSize="18sp" />
+
+                </GridLayout>
 
 
             </android.support.design.widget.TextInputLayout>
@@ -148,13 +161,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableRight="@drawable/ic_menu_gallery"
-                    android:elevation="0dp"
                     android:text="Choose Event Image" />
 
                 <ImageView
                     android:id="@+id/imageView"
                     android:layout_width="169dp"
                     android:layout_height="wrap_content" />
+
             </LinearLayout>
 
             <LinearLayout

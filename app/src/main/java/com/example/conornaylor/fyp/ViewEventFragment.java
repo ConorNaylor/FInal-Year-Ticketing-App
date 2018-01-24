@@ -1,6 +1,8 @@
 package com.example.conornaylor.fyp;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +16,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 
 /**
@@ -29,9 +34,14 @@ public class ViewEventFragment extends Fragment {
     private EditText numTicksText;
     private EditText locText;
     private Button button;
+    private Button authButton;
     private boolean show = true;
     private FloatingActionButton fab;
-    private boolean isEventOwner = true;
+    public static final String MyPreferences = "preferences";
+    private SharedPreferences preferences;
+    private String userIdString = "id";
+    private String userID;
+    private String date;
 
 
     public ViewEventFragment() {
@@ -63,9 +73,27 @@ public class ViewEventFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         readBundle(getArguments());
 
+        preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+        userID = preferences.getString(userIdString, null);
+
         getActivity().setTitle(event.getTitle());
 
+        date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate());
+
 //        show = false;
+        authButton = getActivity().findViewById(R.id.auth_button);
+        authButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Fragment fragment = AuthTickets.newInstance(event);
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.container, fragment).addToBackStack("auth");
+                        ft.commit();
+                    }
+                }
+        );
+
         fab = getActivity().findViewById(R.id.fab2);
         button = getActivity().findViewById(R.id.viewStatsButton);
         nameText = getActivity().findViewById(R.id.viewEventName);
@@ -75,9 +103,12 @@ public class ViewEventFragment extends Fragment {
         numTicksText = getActivity().findViewById(R.id.viewnumTickets);
         locText = getActivity().findViewById(R.id.viewEventLocation);
 
-        if(!isEventOwner) {
+        if (!event.getUserId().equals(userID)) {
             fab.setVisibility(View.INVISIBLE);
+            fab.setEnabled(false);
             numTicksText.setVisibility(View.INVISIBLE);
+            authButton.setVisibility(View.INVISIBLE);
+            authButton.setEnabled(false);
             button.setText("Buy Ticket");
         }
 
@@ -90,18 +121,22 @@ public class ViewEventFragment extends Fragment {
 
         nameText.setText(event.getTitle());
         descText.setText(event.getDescription());
-        dateText.setText(event.getDate().toString());
+        dateText.setText(date);
         locText.setText(event.getAddress());
-        priceText.setText("Free");
-        numTicksText.setText(( event.getNumTicks()) + "");
+        if (event.getPrice() <= 0) {
+            priceText.setText("Free");
+        } else {
+            priceText.setText("€" + event.getPrice().toString());
+        }
+        numTicksText.setText(event.getNumTicks() + "");
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(show == true) {
+                if (show == true) {
                     show = false;
                     fab.setBackgroundColor(Color.GREEN);
-                }else {
+                } else {
                     nameText.requestFocus();
                     show = true;
                     fab.setBackgroundColor(Color.BLACK);
@@ -115,16 +150,29 @@ public class ViewEventFragment extends Fragment {
             }
         });
 
-        button.setOnClickListener(
+        if (!event.getUserId().equals(userID)) {
+            button.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Fragment fragment = CreateTicketFragment.newInstance(event);
+                            FragmentTransaction ft = getFragmentManager().beginTransaction();
+                            ft.replace(R.id.container, fragment).addToBackStack("createTicket");
+                            ft.commit();
+                        }
+                    }
+            );
+        }else button.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Fragment fragment = CreateTicketFragment.newInstance(event);
+                        Fragment fragment = EventStatsFragment.newInstance(event);
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment);
+                        ft.replace(R.id.container, fragment).addToBackStack("createTicket");
                         ft.commit();
                     }
                 }
         );
+
     }
 }

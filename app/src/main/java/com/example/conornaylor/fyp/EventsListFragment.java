@@ -99,7 +99,7 @@ public class EventsListFragment extends Fragment {
                         Toast.makeText(getActivity(), Event.getEventByID(event).getTitle(), Toast.LENGTH_SHORT).show();
                         Fragment fragment = ViewEventFragment.newInstance((Event)parent.getItemAtPosition(pos));
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment);
+                        ft.replace(R.id.container, fragment).addToBackStack("viewEvent");
                         ft.commit();
                     }
                 }
@@ -110,7 +110,7 @@ public class EventsListFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new CreateEventFragment());
+                ft.replace(R.id.container, new CreateEventFragment()).addToBackStack("createEvent");
                 ft.commit();
             }
         });

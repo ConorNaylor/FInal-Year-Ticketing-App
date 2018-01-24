@@ -6,15 +6,18 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -26,7 +29,6 @@ public class AccountFragment extends Fragment {
 
     private TextView mEmailView;
     private TextView mNameView;
-    private CheckBox mEditAccount;
     private ArrayList<Event> myEvents;
     private static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
@@ -82,7 +84,20 @@ public class AccountFragment extends Fragment {
         ListView accountEventsList = view.findViewById(R.id.yourEvents);
         ListAdapter myAccountAdapter = new EventAdaptor(getActivity(), myEvents);
         accountEventsList.setAdapter(myAccountAdapter);
-//        );
+
+        accountEventsList.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
+                        String event = String.valueOf((parent.getItemAtPosition(pos)));
+                        Toast.makeText(getActivity(), Event.getEventByID(event).getTitle(), Toast.LENGTH_SHORT).show();
+                        Fragment fragment = ViewEventFragment.newInstance((Event)parent.getItemAtPosition(pos));
+                        FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.replace(R.id.container, fragment).addToBackStack("viewEvent");
+                        ft.commit();
+                    }
+                }
+        );
     }
 
 }

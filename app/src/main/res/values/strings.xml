@@ -37,4 +37,8 @@
     <string name="location">Location</string>
     <string name="price">Price</string>
     <string name="refresh">Refresh</string>
+    <string name="number_tickets_sold">Tickets Sold</string>
+    <string name="revenue">Revenue</string>
+    <string name="purcahseDate">Purchase Date</string>
+    <string name="username">Username</string>
 </resources>

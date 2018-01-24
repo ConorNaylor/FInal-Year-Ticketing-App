@@ -83,7 +83,6 @@ public class CreateTicketFragment extends Fragment {
             ticket = new Ticket(
                     obj.getString("id"),
                     obj.getString("seat"),
-                    Double.parseDouble(obj.getString("price"))  ,
                     obj.getString("user"),
                     event
             );
@@ -116,9 +115,11 @@ public class CreateTicketFragment extends Fragment {
         mProgressView = getActivity().findViewById(R.id.create_ticket_progress);
 
         eventName.setText(event.getTitle());
-        eventPrice.setText("Free");
-//        eventPrice.setText(event.getPrice().toString());
-
+        if(event.getPrice() <= 0){
+            eventPrice.setText("Free");
+        }else {
+            eventPrice.setText("€" + event.getPrice().toString());
+        }
 
         button.setOnClickListener(
                 new View.OnClickListener() {
@@ -169,8 +170,8 @@ public class CreateTicketFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/tickets/";
-                String url = "http://192.168.1.10:8000/tickets/";
+                String url = "http://192.168.0.59:8000/tickets/";
+//                String url = "http://192.168.1.2:8000/tickets/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -183,8 +184,7 @@ public class CreateTicketFragment extends Fragment {
 
                 JSONObject ev = new JSONObject();
                 try{
-                    ev.put("event", event.getId()); //event.getId());
-                    ev.put("price", 0.00);
+                    ev.put("event", event.getId());
                     ev.put("seat", "5A");
                     ev.put("user", userID);
                 }catch(JSONException e){
@@ -225,7 +225,7 @@ public class CreateTicketFragment extends Fragment {
             showProgress(false);
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new TicketsListFragment());
+                ft.replace(R.id.container, new TicketsListFragment()).addToBackStack("ticketList");
                 ft.commit();
                 makeTicket(input);
             }else{

@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
@@ -20,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -33,7 +35,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -41,8 +46,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CreateEventFragment extends Fragment {
-
+public class CreateEventFragment extends Fragment{
 
     private static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
@@ -56,18 +60,22 @@ public class CreateEventFragment extends Fragment {
     private EditText eventPrice;
     private EditText eventDesc;
     private EditText eventLoc;
-    private EditText eventDate;
+    private TextView dateText;
+    private Button eventDate;
     private ImageView imageview;
     private ImageView mapImage;
-    private Bitmap bitmap;
     private Button createEvent;
     private Button eventImage;
     private String eventNameString;
     private String eventDescString;
     private String eventLocString;
     private String eventDateString;
+    private String eventImagineString;
     private Double eventPriceD;
     private int eventNumTicksInt;
+    private Date date;
+    private Bitmap bitmap;
+    ImageHandler imageUp;
 
     private Event event;
     private LocationData data = null;
@@ -111,6 +119,7 @@ public class CreateEventFragment extends Fragment {
         eventImage = getActivity().findViewById(R.id.button_image);
         imageview = getActivity().findViewById(R.id.imageView);
         mapImage = getActivity().findViewById(R.id.mapImage);
+        dateText = getActivity().findViewById(R.id.dateText);
 
         eventImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,47 +132,57 @@ public class CreateEventFragment extends Fragment {
         });
 
         mapImage.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-              Toast.makeText(getActivity(), "Choose your location.", Toast.LENGTH_SHORT).show();
-          }
-      });
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getActivity(), "Choose your location.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        eventDate.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View view) {
+                                             DialogFragment datePicker = new DatePickerFragment();
+                                             datePicker.show(getActivity().getSupportFragmentManager(), "Date Picker");
+                                         }
+                                     }
+        );
+
 
         createEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dateText.setText(DatePickerFragment.formattedDate);
                 eventNameString = eventName.getText().toString();
-                eventNumTicksInt = Integer.parseInt(eventNumTicks.getText().toString());
                 eventDescString = eventDesc.getText().toString();
                 eventLocString = eventLoc.getText().toString();
-                eventDateString = eventDate.getText().toString();
-                if(TextUtils.isEmpty(eventNameString)){
+                eventDateString = DatePickerFragment.formattedDate;
+                if (TextUtils.isEmpty(eventNameString)) {
                     eventName.setError(getString(R.string.error_field_required));
                     focusView = eventName;
-                }else if(TextUtils.isEmpty(eventLocString)){
+                } else if (TextUtils.isEmpty(eventLocString)) {
                     eventLoc.setError(getString(R.string.error_field_required));
                     focusView = eventLoc;
-                }else if(TextUtils.isEmpty(eventDescString)){
+                } else if (TextUtils.isEmpty(eventDescString)) {
                     eventDesc.setError(getString(R.string.error_field_required));
                     focusView = eventDesc;
-                }else if(TextUtils.isEmpty(eventPrice.getText().toString())){
-                    eventNumTicksInt = Integer.parseInt(eventNumTicks.getText().toString());
+                } else if (TextUtils.isEmpty(eventPrice.getText().toString())) {
+                    eventPrice.setError(getString(R.string.error_field_required));
+                    focusView = eventNumTicks;
+                } else if (TextUtils.isEmpty(eventNumTicks.getText().toString())) {
                     eventNumTicks.setError(getString(R.string.error_field_required));
                     focusView = eventNumTicks;
-                }else if(TextUtils.isEmpty(eventNumTicks.getText().toString())){
-                    eventPriceD = Double.parseDouble(eventNumTicks.getText().toString());
-                    eventPrice.setError(getString(R.string.error_field_required));
-                    focusView = eventPrice;
-                }else if(TextUtils.isEmpty(eventDateString)){
+                } else if (TextUtils.isEmpty(eventDateString)) {
                     eventDate.setError(getString(R.string.error_field_required));
                     focusView = eventDate;
-                }else if(pictureChosen == false){
+                } else if (!pictureChosen) {
                     eventImage.setError(getString(R.string.error_field_required));
                     focusView = eventImage;
-                } else{
+                } else {
+                    eventNumTicksInt = Integer.valueOf(eventNumTicks.getText().toString());
+                    eventPriceD = Double.valueOf(eventPrice.getText().toString());
                     mAuthTask.execute();
-                    }
                 }
+            }
         });
 
     }
@@ -204,14 +223,13 @@ public class CreateEventFragment extends Fragment {
             // decode with inSampleSize
             BitmapFactory.Options o2 = new BitmapFactory.Options();
             o2.inSampleSize = scale;
-            Bitmap bitmap = BitmapFactory.decodeFileDescriptor(imageSource, null, o2);
+            bitmap = BitmapFactory.decodeFileDescriptor(imageSource, null, o2);
 
             imageview.setImageBitmap(bitmap);
+
             pictureChosen = true;
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (parcelFD != null)
@@ -223,30 +241,53 @@ public class CreateEventFragment extends Fragment {
         }
     }
 
-            public void makeEvent(String input){
-                try {
-                    obj = new JSONObject(input);
-                    LocationData loc = new LocationData(0, 0);
-                    Event ev = new Event(
+//    public String convertBitmapToString(Bitmap bitmap){
+//        String encodedImage = "";
+//
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+//        try {
+//            encodedImage= URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT), "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return encodedImage;
+//    }
+
+    public void makeEvent(String input) {
+        try {
+            obj = new JSONObject(input);
+            LocationData loc = new LocationData(0, 0);
+            try {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                date = formatter.parse(obj.getString("date"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Event ev = new Event(
                     obj.getString("id"),
                     obj.getString("title"),
                     obj.getString("location"),
                     obj.getString("description"),
-                    (Date)obj.get("date"),
+                    date,
                     obj.getInt("num_tickets"),
                     obj.getString(userId),
-                    loc);
+                    loc,
+                    obj.getDouble("price"));
+            imageUp = new ImageHandler(bitmap, ev.getId(), token);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+
     public class getEventsTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                    String url = "http://192.168.0.59:8000/events/";
-                String url = "http://192.168.1.10:8000/events/";
+                    String url = "http://192.168.0.59:8000/events/";
+//                String url = "http://192.168.1.2:8000/events/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -265,6 +306,7 @@ public class CreateEventFragment extends Fragment {
                     ev.put("date", eventDateString);
                     ev.put("num_tickets", eventNumTicksInt);
                     ev.put("user", userID);
+                    ev.put("price", eventPriceD);
                 }catch(JSONException e){
                     e.printStackTrace();
                 }
@@ -285,6 +327,7 @@ public class CreateEventFragment extends Fragment {
                     br.close();
                     if (sb.toString() != null) {
                         input = sb.toString();
+                        System.out.println(input);
                     }
                 } else {
                     System.out.println(con.getResponseMessage());
@@ -301,7 +344,7 @@ public class CreateEventFragment extends Fragment {
 
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new EventsListFragment());
+                ft.replace(R.id.container, new EventsListFragment()).addToBackStack("eventsList");
                 ft.commit();
                 makeEvent(input);
             }else{
