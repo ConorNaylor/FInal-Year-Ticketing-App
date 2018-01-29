@@ -56,7 +56,7 @@
                         android:layout_height="match_parent">
 
                         <ImageView
-                            android:id="@+id/imageView"
+                            android:id="@+id/imageViewTicket"
                             android:layout_width="179dp"
                             android:layout_height="181dp" />
 

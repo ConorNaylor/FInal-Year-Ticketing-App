@@ -63,7 +63,7 @@ public class RegisteringActivity extends AppCompatActivity {
 
     // UI references.
     private EditText mEmailView;
-    private EditText mName;
+    private EditText mNameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mRegFormView;
@@ -81,7 +81,7 @@ public class RegisteringActivity extends AppCompatActivity {
 
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
-        mName = (EditText) findViewById(R.id.name);
+        mNameView = (EditText) findViewById(R.id.regNameView);
 
 
         mPasswordView = (EditText) findViewById(R.id.password);
@@ -127,9 +127,10 @@ public class RegisteringActivity extends AppCompatActivity {
 //        // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        mNameView.setError(null);
 
         // Store values at the time of the login attempt.
-        String name = mName.getText().toString();
+        String name = mNameView.getText().toString();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -145,8 +146,8 @@ public class RegisteringActivity extends AppCompatActivity {
 
         //Check name
         if (TextUtils.isEmpty(name)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mName;
+            mNameView.setError(getString(R.string.error_field_required));
+            focusView = mNameView;
             cancel = true;
         }
 
@@ -237,8 +238,8 @@ public class RegisteringActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/makeusers/";
-                String url = "http://192.168.1.2:8000/makeusers/";
+                String url = "http://192.168.0.59:8000/makeusers/"; //Galway
+//                String url = "http://192.168.1.2:8000/makeusers/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -305,6 +306,7 @@ public class RegisteringActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
+            showProgress(false);
 
             if (success) {
                 if (auth.contains("token")) {
@@ -324,7 +326,8 @@ public class RegisteringActivity extends AppCompatActivity {
                 RegisteringActivity.this.startActivity(myIntent);
                 finish();
             } else {
-                mPasswordView.setError("Registering failed!");
+                showProgress(false);
+                mPasswordView.setError("Provide a unique username and email!");
                 mPasswordView.requestFocus();
             }
         }
@@ -332,6 +335,7 @@ public class RegisteringActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             mAuthTask = null;
+            showProgress(false);
         }
     }
 

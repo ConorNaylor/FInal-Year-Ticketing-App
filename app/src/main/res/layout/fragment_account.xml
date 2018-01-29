@@ -57,6 +57,12 @@
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
+                <CheckBox
+                    android:id="@+id/createEventBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Create Events" />
+
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -74,32 +80,21 @@
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textColor="@android:color/background_light" />
+
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
     </ScrollView>
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
-        <LinearLayout
+        <ListView
+            android:id="@+id/yourEvents"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ListView
-                    android:id="@+id/yourEvents"
-                    android:layout_width="match_parent"
-                    android:layout_height="430dp" />
-
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+            android:layout_height="match_parent" />
+    </FrameLayout>
 
 </LinearLayout>

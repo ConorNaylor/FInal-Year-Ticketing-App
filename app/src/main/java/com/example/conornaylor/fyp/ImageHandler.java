@@ -1,11 +1,12 @@
 package com.example.conornaylor.fyp;
 
+import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,18 +15,10 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
-import static android.R.attr.bitmap;
 
 /**
  * Created by conornaylor on 20/01/2018.
@@ -33,8 +26,7 @@ import static android.R.attr.bitmap;
 
 public class ImageHandler {
 
-    private Bitmap bitmap;
-    private putImageTask put = null;
+    private putEventTask put = null;
     private getImageURLsTask get = null;
     private String eventId;
     private String token;
@@ -43,35 +35,68 @@ public class ImageHandler {
     private JSONObject obj;
     private String input;
     private Event ev;
+    private JSONObject json;
+    private String imgURL;
+    private Context context;
+    private ImageView iv;
+    private Bitmap bitmap;
+    private String eventName;
+    private String eventDesc;
+    private String eventDate;
+    private Double eventPrice;
+    private String eventAdd;
+    private int eventNumTicks;
+    private String userId;
 
-    public ImageHandler(Bitmap bitmap, String eventId, String token){
+    public ImageHandler(String token, Bitmap bitmap, String eventName, String eventDesc, Double eventPrice, int eventNumTicks, String eventAdd, String eventDate, String userId) {
         this.bitmap = bitmap;
-        this.eventId = eventId;
         this.token = token;
-        put = new putImageTask(bitmap, eventId);
+        this.eventName = eventName;
+        this.eventDesc = eventDesc;
+        this.eventPrice = eventPrice;
+        this.eventNumTicks = eventNumTicks;
+        this.eventAdd = eventAdd;
+        this.eventDate = eventDate;
+        this.userId = userId;
+        put = new putEventTask(token, bitmap, eventName, eventDesc, eventPrice, eventNumTicks, eventAdd, eventDate, userId);
         put.execute();
     }
 
-    public ImageHandler(String token){
+    public ImageHandler(String token) {
         this.token = token;
         get = new getImageURLsTask();
         get.execute();
     }
 
-    public class putImageTask extends AsyncTask<Void, Void, Boolean> {
+    public class putEventTask extends AsyncTask<Void, Void, Boolean> {
 
         private Bitmap bitmap;
-        private String eventId;
+        private String eventName;
+        private String eventDesc;
+        private String eventDate;
+        private Double eventPrice;
+        private String eventAdd;
+        private int eventNumTicks;
+        private String token;
+        private String userId;
 
-        public putImageTask(Bitmap bitmap, String eventId){
+        public putEventTask(String token, Bitmap bitmap, String name, String desc, Double price, int numTicks, String add, String date, String userId) {
+            this.token = token;
             this.bitmap = bitmap;
-            this.eventId = eventId;
+            this.eventName = name;
+            this.eventDesc = desc;
+            this.eventAdd = add;
+            this.eventPrice = price;
+            this.eventNumTicks = numTicks;
+            this.eventDate = date;
+            this.userId = userId;
         }
+
         @Override
-        protected Boolean doInBackground(Void...params) {
+        protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/eventphoto/";
-//                String url = "http://192.168.1.2:8000/eventphoto/";
+                String url = "http://192.168.0.59:8000/events/";
+//                String url = "http://192.168.1.5:8000/events/";
                 URL object = new URL(url);
 
                 HttpURLConnection c = (HttpURLConnection) object.openConnection();
@@ -89,17 +114,24 @@ public class ImageHandler {
                 byte[] byte_arr = stream.toByteArray();
                 encodedString = Base64.encodeToString(byte_arr, 0);
 
+
                 JSONObject ev = new JSONObject();
-                try{
+                try {
                     ev.put("image", encodedString);
-                    ev.put("event", eventId);
-                }catch(JSONException e){
+                    ev.put("title", eventName);
+                    ev.put("description", eventDesc);
+                    ev.put("location", eventAdd);
+                    ev.put("date", "2017-10-10");
+                    ev.put("num_tickets", eventNumTicks);
+                    ev.put("price", eventPrice);
+                    ev.put("user", userId);
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
                 output.write(ev.toString().getBytes("utf-8"));
-
                 output.close();
+
                 StringBuilder sb = new StringBuilder();
                 int HttpResult = c.getResponseCode();
                 if (HttpResult == HttpURLConnection.HTTP_OK) {
@@ -111,7 +143,8 @@ public class ImageHandler {
                     }
                     br.close();
                     if (sb.toString() != null) {
-                        System.out.println("This is the output" + sb.toString());
+                        input = sb.toString();
+                        System.out.println(input);
                     }
                 } else {
                     System.out.println(c.getResponseMessage());
@@ -124,11 +157,25 @@ public class ImageHandler {
         }
 
         @Override
-        protected void onPostExecute(Boolean b) { super.onPostExecute(b); }
+        protected void onPostExecute(Boolean b) {
+            if (b) {
+                super.onPostExecute(b);
+//                parseEvent(input);
+            }
+        }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
+        }
+    }
+
+    public void parseEvent(String in) {
+        try {
+            json = new JSONObject(in);
+            Event.getEventByID(json.getString("event")).setImageURL(json.getString("image"));
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -152,10 +199,9 @@ public class ImageHandler {
     public class getImageURLsTask extends AsyncTask<Void, Void, Boolean> {
 
         @Override
-        protected Boolean doInBackground(Void...params) {
+        protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/eventphoto/";
-                String url = "140.203.241.66:8000/eventphoto/";    //College
+                String url = "http://192.168.1.5:8000/eventphoto/";
 //                String url = "http://192.168.1.2:8000/eventphoto/";
                 URL object = new URL(url);
 
@@ -194,7 +240,7 @@ public class ImageHandler {
         @Override
         protected void onPostExecute(Boolean b) {
             super.onPostExecute(b);
-            setEventURL(input);
+//            setEventURL(input);
         }
 
         @Override
@@ -202,46 +248,5 @@ public class ImageHandler {
             super.onCancelled();
         }
     }
-
-    public static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-        String token;
-        InputStream is;
-
-        public DownloadImageTask(ImageView bmImage, String token) {
-            this.bmImage = bmImage;
-            this.token = token;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap bm = null;
-            URL object = null;
-            try {
-                object = new URL(urldisplay);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            HttpURLConnection conn = null;
-            try {
-                conn = (HttpURLConnection) object.openConnection();
-                conn.setRequestProperty("Authorization", "Token " + token);
-                conn.setDoInput(true);
-                conn.connect();
-
-            int length = conn.getContentLength();
-            if (length > 0) {
-                is = conn.getInputStream();
-                }
-                bm = BitmapFactory.decodeStream(is);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return bm;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-    }
 }
+

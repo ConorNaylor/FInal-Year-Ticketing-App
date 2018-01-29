@@ -1,6 +1,9 @@
 package com.example.conornaylor.fyp;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.annotation.Nullable;
@@ -15,6 +19,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +33,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -55,12 +62,14 @@ public class CreateEventFragment extends Fragment{
     private String userId = "id";
     private String userID;
     private getEventsTask mAuthTask = null;
+    private View mCreateEventView;
+    private View mProgressView;
     private EditText eventName;
     private EditText eventNumTicks;
     private EditText eventPrice;
     private EditText eventDesc;
     private EditText eventLoc;
-    private TextView dateText;
+    public static TextView dateText;
     private Button eventDate;
     private ImageView imageview;
     private ImageView mapImage;
@@ -70,12 +79,14 @@ public class CreateEventFragment extends Fragment{
     private String eventDescString;
     private String eventLocString;
     private String eventDateString;
+    private String eventDateStringUp;
     private String eventImagineString;
     private Double eventPriceD;
     private int eventNumTicksInt;
     private Date date;
     private Bitmap bitmap;
     ImageHandler imageUp;
+    private String encodedString;
 
     private Event event;
     private LocationData data = null;
@@ -108,6 +119,9 @@ public class CreateEventFragment extends Fragment{
         userID = preferences.getString(userId, null);
 
         mAuthTask = new getEventsTask();
+
+        mCreateEventView = getActivity().findViewById(R.id.event_form);
+        mProgressView = getActivity().findViewById(R.id.create_event_progress);
 
         eventPrice = getActivity().findViewById(R.id.priceEvent);
         eventNumTicks = getActivity().findViewById(R.id.numTickets);
@@ -151,11 +165,10 @@ public class CreateEventFragment extends Fragment{
         createEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dateText.setText(DatePickerFragment.formattedDate);
                 eventNameString = eventName.getText().toString();
                 eventDescString = eventDesc.getText().toString();
                 eventLocString = eventLoc.getText().toString();
-                eventDateString = DatePickerFragment.formattedDate;
+                eventDateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(DatePickerFragment.formattedDate);
                 if (TextUtils.isEmpty(eventNameString)) {
                     eventName.setError(getString(R.string.error_field_required));
                     focusView = eventName;
@@ -180,11 +193,18 @@ public class CreateEventFragment extends Fragment{
                 } else {
                     eventNumTicksInt = Integer.valueOf(eventNumTicks.getText().toString());
                     eventPriceD = Double.valueOf(eventPrice.getText().toString());
+                    mAuthTask = new getEventsTask();
                     mAuthTask.execute();
+//                    ImageHandler im = new ImageHandler(token, bitmap, eventNameString, eventDescString, eventPriceD, eventNumTicksInt, eventLocString, eventDateString, userId);
+                    showProgress(true);
                 }
             }
         });
+    }
 
+    public static void dateEditied() throws ParseException {
+        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(DatePickerFragment.formattedDate);
+        dateText.setText(date);
     }
 
     @Override
@@ -241,20 +261,6 @@ public class CreateEventFragment extends Fragment{
         }
     }
 
-//    public String convertBitmapToString(Bitmap bitmap){
-//        String encodedImage = "";
-//
-//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-//        try {
-//            encodedImage= URLEncoder.encode(Base64.encodeToString(byteArrayOutputStream.toByteArray(), Base64.DEFAULT), "UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return encodedImage;
-//    }
-
     public void makeEvent(String input) {
         try {
             obj = new JSONObject(input);
@@ -272,13 +278,16 @@ public class CreateEventFragment extends Fragment{
                     obj.getString("description"),
                     date,
                     obj.getInt("num_tickets"),
-                    obj.getString(userId),
+                    userID,
                     loc,
-                    obj.getDouble("price"));
-            imageUp = new ImageHandler(bitmap, ev.getId(), token);
+                    obj.getDouble("price"),
+                    obj.getString("image"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.container, new EventsListFragment()).addToBackStack("create");
+        ft.commit();
     }
 
 
@@ -286,40 +295,50 @@ public class CreateEventFragment extends Fragment{
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                    String url = "http://192.168.0.59:8000/events/";
-//                String url = "http://192.168.1.2:8000/events/";
+                String url = "http://192.168.0.59:8000/events/";
+//                String url = "http://192.168.1.5:8000/events/";
                 URL object = new URL(url);
 
-                HttpURLConnection con = (HttpURLConnection) object.openConnection();
-                con.setDoInput(true);
-                con.setDoOutput(true);
-                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                con.setRequestProperty("Accept", "application/json");
-                con.setRequestProperty("Authorization", "Token " + token);
-                con.setRequestMethod("PUT");
+                HttpURLConnection c = (HttpURLConnection) object.openConnection();
+                c.setDoInput(true);
+                c.setRequestMethod("PUT");
+                c.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                c.setRequestProperty("Accept", "application/json");
+                c.setRequestProperty("Authorization", "Token " + token);
+                c.setDoOutput(true);
+                c.connect();
+                OutputStream output = c.getOutputStream();
 
-               JSONObject ev = new JSONObject();
-                try{
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.PNG, 10, stream);
+                byte[] byte_arr = stream.toByteArray();
+                encodedString = Base64.encodeToString(byte_arr, 0);
+
+                eventDateStringUp = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(DatePickerFragment.formattedDate);
+                System.out.println("The date of all this :"+eventDateStringUp);
+
+                JSONObject ev = new JSONObject();
+                try {
+                    ev.put("image", encodedString);
                     ev.put("title", eventNameString);
                     ev.put("description", eventDescString);
                     ev.put("location", eventLocString);
-                    ev.put("date", eventDateString);
+                    ev.put("date", eventDateStringUp);
                     ev.put("num_tickets", eventNumTicksInt);
-                    ev.put("user", userID);
                     ev.put("price", eventPriceD);
-                }catch(JSONException e){
+                    ev.put("user", userID);
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-                wr.write(ev.toString());
-                wr.flush();
+                output.write(ev.toString().getBytes("utf-8"));
+                output.close();
 
                 StringBuilder sb = new StringBuilder();
-                int HttpResult = con.getResponseCode();
+                int HttpResult = c.getResponseCode();
                 if (HttpResult == HttpURLConnection.HTTP_OK) {
                     BufferedReader br = new BufferedReader(
-                            new InputStreamReader(con.getInputStream(), "utf-8"));
+                            new InputStreamReader(c.getInputStream(), "utf-8"));
                     String line = null;
                     while ((line = br.readLine()) != null) {
                         sb.append(line + "\n");
@@ -330,7 +349,7 @@ public class CreateEventFragment extends Fragment{
                         System.out.println(input);
                     }
                 } else {
-                    System.out.println(con.getResponseMessage());
+                    System.out.println(c.getResponseMessage());
                     return false;
                 }
             } catch (IOException e) {
@@ -341,22 +360,57 @@ public class CreateEventFragment extends Fragment{
 
         @Override
         protected void onPostExecute(Boolean b) {
-
-            if(b) {
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new EventsListFragment()).addToBackStack("eventsList");
-                ft.commit();
+            mAuthTask = null;
+            if (b) {
+                super.onPostExecute(b);
                 makeEvent(input);
             }else{
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new CreateEventFragment());
-                ft.commit();
+                showProgress(false);
+                createEvent.setError("Failed to create event.");
+                createEvent.requestFocus();
             }
         }
 
         @Override
         protected void onCancelled() {
-            super.onCancelled();
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mCreateEventView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mCreateEventView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mCreateEventView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mCreateEventView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 }

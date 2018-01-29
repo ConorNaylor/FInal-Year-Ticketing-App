@@ -56,8 +56,8 @@
                     android:id="@+id/revenue"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/revenue"
                     android:focusable="false"
+                    android:hint="@string/revenue"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
@@ -67,8 +67,16 @@
                     android:textColor="@android:color/black"
                     android:textSize="18sp" />
 
+                <GridLayout
+                    android:id="@+id/graphView"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp">
+
+                </GridLayout>
+
             </android.support.design.widget.TextInputLayout>
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

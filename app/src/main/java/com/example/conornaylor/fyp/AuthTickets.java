@@ -90,15 +90,18 @@ public class AuthTickets extends Fragment {
     }
 
     public void makeToast(String str){
-        try {
-            JSONObject obj = new JSONObject(str);
-            if(!obj.getString("id").isEmpty()){
-                Toast.makeText(getActivity(), "Ticket Verified!", Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(getActivity(), "Ticket Failed Verification!", Toast.LENGTH_SHORT).show();
+        if(str != null){
+            try {
+                JSONObject obj = new JSONObject(str);
+                if(!obj.getString("id").isEmpty()){
+                    Toast.makeText(getActivity(), "Ticket Verified!", Toast.LENGTH_SHORT).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        }else {
+            Toast.makeText(getActivity(), "Ticket Failed Verification!", Toast.LENGTH_SHORT).show();
         }
     }
 

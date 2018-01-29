@@ -12,7 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -29,6 +32,7 @@ public class ViewTicketFragment extends Fragment {
     private TextView seatText;
     private TextView priceText;
     private TextView locText;
+    private ImageView ticketImage;
     private Button button;
     private FloatingActionButton fab;
     private boolean isTicketOwner = true;
@@ -76,6 +80,7 @@ public class ViewTicketFragment extends Fragment {
         priceText = getActivity().findViewById(R.id.viewTicketPrice);
         seatText = getActivity().findViewById(R.id.viewTicketSeat);
         locText = getActivity().findViewById(R.id.viewEventLocation);
+        ticketImage = getActivity().findViewById(R.id.imageViewTicket);
 
         if(!isTicketOwner) {
             fab.setVisibility(View.INVISIBLE);
@@ -90,6 +95,8 @@ public class ViewTicketFragment extends Fragment {
         }else {
             priceText.setText("€" + ticket.getEvent().getPrice().toString());
         }
+        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,6 +118,7 @@ public class ViewTicketFragment extends Fragment {
                     }
                 }
         );
+
     }
 
 }

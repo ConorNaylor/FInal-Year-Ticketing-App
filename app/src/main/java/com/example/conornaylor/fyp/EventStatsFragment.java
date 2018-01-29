@@ -12,8 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,16 +100,26 @@ public class EventStatsFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Fragment fragment = AttendeeListFragment.newInstance(event);
-                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment).addToBackStack("users");
-                        ft.commit();
+                        if( numberTicks < 1 ){
+                            Toast.makeText(getActivity(), "No tickets sold.", Toast.LENGTH_SHORT).show();
+                        }else {
+                            Fragment fragment = AttendeeListFragment.newInstance(event);
+                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                            ft.replace(R.id.container, fragment).addToBackStack("users");
+                            ft.commit();
+                        }
                     }
                 }
         );
+
+//        GraphView graph = getActivity().findViewById(R.id.graphView);
+//        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
+//                new DataPoint(1, 4),
+//                new DataPoint(1, 5),
+//                new DataPoint(2, 3)
+//        });
+//        graph.addSeries(series);
     }
-
-
 
 
     public void parseInput(String in) {

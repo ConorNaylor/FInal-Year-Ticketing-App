@@ -3,6 +3,8 @@ package com.example.conornaylor.fyp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.Image;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.text.Layout;
@@ -72,14 +74,28 @@ public class EventAdaptor extends ArrayAdapter<Event> {
         eventName.setText(e.getTitle());
         eventAdd.setText(e.getAddress());
         eventDate.setText(date);
-//        new ImageHandler.DownloadImageTask(eventImage, token).execute("http://192.168.0.59:8000/eventphoto" + "/media/eventphotos/d046bdbf-eba.png");
-//        Picasso.with(context).load("http://192.168.0.59:8000/eventphoto"  + e.getImageURL()).into(eventImage);
-        Picasso.with(context).load("http://www.pngmart.com/image/29789").into(eventImage);
+
         if(e.getPrice() <= 0){
             eventPrice.setText("Free");
         }else {
             eventPrice.setText("€" + e.getPrice().toString());
         }
+
+        System.out.println(e.getImageURL());
+        Picasso.with(context).load("http://192.168.0.59:8000"  + e.getImageURL()).into(eventImage);
+
+        Picasso.Builder builder = new Picasso.Builder(context);
+
+        builder.listener(new Picasso.Listener()
+        {
+            @Override
+            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+            {
+                exception.printStackTrace();
+            }
+        });
+
+        builder.build().load("http://192.168.0.59:8000"  + e.getImageURL()).into(eventImage);
         return customView;
     }
 }

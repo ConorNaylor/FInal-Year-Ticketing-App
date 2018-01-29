@@ -4,7 +4,9 @@ package com.example.conornaylor.fyp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,10 +27,13 @@ import java.util.ArrayList;
 
 public class EventsListFragment extends Fragment {
 
-    private boolean isOrganiser;
-    private Bundle bundle;
-    private View mProgressView;
-    private View mLoginFormView;
+    public static final String MyPreferences = "preferences";
+    public static final String EventPreferences = "eventPreferences";
+    private SharedPreferences preferences;
+    private String userIdString = "id";
+    private String canMakeEventString = "canMakeEvent";
+    private String userID;
+    private boolean canMakeEvent;
 
 
     public EventsListFragment() {
@@ -43,46 +48,14 @@ public class EventsListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_event, container, false);
     }
 
-//    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-//    private void showProgress(final boolean show) {
-//        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-//        // for very easy animations. If available, use these APIs to fade-in
-//        // the progress spinner.
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-//            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-//
-//            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-//                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//                }
-//            });
-//
-//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//            mProgressView.animate().setDuration(shortAnimTime).alpha(
-//                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//                }
-//            });
-//        } else {
-//            // The ViewPropertyAnimator APIs are not available, so simply show
-//            // and hide the relevant UI components.
-//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//        }
-//    }
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("Events");
 
-        mProgressView = getActivity().findViewById(R.id.eventListProgress);
-        mLoginFormView = getActivity().findViewById(R.id.main_content);
+        preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+        userID = preferences.getString(userIdString, null);
+        canMakeEvent = preferences.getBoolean(canMakeEventString, false);
 
         ArrayList<Event> events =  Event.getEvents();
         ListView eventsList = view.findViewById(R.id.eventList);
@@ -114,7 +87,8 @@ public class EventsListFragment extends Fragment {
                 ft.commit();
             }
         });
-        if(isOrganiser) {
+        System.out.println("Can make events :" + canMakeEvent);
+        if(!canMakeEvent) {
             fab.hide();
         }
     }

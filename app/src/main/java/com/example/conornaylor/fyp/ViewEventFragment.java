@@ -15,7 +15,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -35,6 +38,7 @@ public class ViewEventFragment extends Fragment {
     private EditText locText;
     private Button button;
     private Button authButton;
+    private ImageView eventImageView;
     private boolean show = true;
     private FloatingActionButton fab;
     public static final String MyPreferences = "preferences";
@@ -102,7 +106,11 @@ public class ViewEventFragment extends Fragment {
         priceText = getActivity().findViewById(R.id.viewEventPrice);
         numTicksText = getActivity().findViewById(R.id.viewnumTickets);
         locText = getActivity().findViewById(R.id.viewEventLocation);
+        eventImageView = getActivity().findViewById(R.id.eventImage);
 
+        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + event.getImageURL()).into(eventImageView);
+
+        System.out.println("This is the id of this user"+event.getUserId());
         if (!event.getUserId().equals(userID)) {
             fab.setVisibility(View.INVISIBLE);
             fab.setEnabled(false);

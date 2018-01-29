@@ -19,9 +19,9 @@ public class Event implements Serializable{
     private String userId;
     private static ArrayList<Event> events = new ArrayList<>();
     private double price;
-    private String ImageURL;
+    private String imageURL;
 
-    public Event(String id, String title, String address, String description, Date date, int numTicks, String userId, LocationData loc, Double price){
+    public Event(String id, String title, String address, String description, Date date, int numTicks, String userId, LocationData loc, Double price, String imageURL){
         this.id = id;
         this.title = title;
         this.address = address;
@@ -32,6 +32,7 @@ public class Event implements Serializable{
         this.userId = userId;
         this.addToUniqueEvents(this);
         this.price = price;
+        this.imageURL = imageURL;
     }
 
     public static Event getEventByID(String id){
@@ -43,9 +44,9 @@ public class Event implements Serializable{
         return null;
     }
 
-    public String getImageURL() { return ImageURL; }
+    public String getImageURL() { return imageURL; }
 
-    public void setImageURL(String imageURL) { ImageURL = imageURL; }
+    public void setImageURL(String imageURL) { this.imageURL = imageURL; }
 
     public Double getPrice(){ return price; }
 

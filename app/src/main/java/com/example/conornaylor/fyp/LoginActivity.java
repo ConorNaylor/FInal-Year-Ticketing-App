@@ -79,6 +79,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private String usernameString = "username";
     private String userEmailString = "email";
     private String userIdString = "id";
+    private String canMakeEventString = "canMakeEvent";
 
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
@@ -395,7 +396,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             try {
                 String url = "http://192.168.0.59:8000/authenticate/"; //Galway
-//                String url = "http://192.168.1.2:8000/authenticate/";    //Mayo
+//                String url = "http://192.168.1.13:8000/authenticate/";    //Mayo
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -430,6 +431,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     }
                     br.close();
                     auth = sb.toString();
+                    System.out.println("Logging in information: " + auth);
+
                 } else {
                     System.out.println(con.getResponseMessage());
                 }
@@ -437,7 +440,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 Log.d("Uh Oh","No connection!, Check your network.");
                 return false;
             }
-            System.out.println(auth);
             if (auth == null){
                 return false;
             }else if(auth.contains("token")){
@@ -448,10 +450,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     e.putString(userIdString, obj.getString(userIdString));
                     e.putString(userEmailString, obj.getString(userEmailString));
                     e.putString(usernameString, obj.getString(usernameString));
+                    e.putBoolean(canMakeEventString, obj.getBoolean(canMakeEventString));
                 }catch(JSONException error){
                     error.printStackTrace();
                 }
-                e.commit();
+                e.apply();
                 return true;
             }
             else return false;
@@ -461,7 +464,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
 
             if (success) {
                 Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
@@ -469,6 +471,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 finish();
 
             } else {
+                showProgress(false);
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }

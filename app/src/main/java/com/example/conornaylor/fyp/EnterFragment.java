@@ -65,6 +65,30 @@ public class EnterFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        enableForegroundDispatchSystem();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
+        disableForegroundDispatchSystem();
+    }
+
+    public void enableForegroundDispatchSystem(){
+
+        Fragment fragment = new Fragment ();
+
+    }
+
+    public void disableForegroundDispatchSystem(){
+
+    }
+
     private void basicAlert(String message) {
         android.app.AlertDialog.Builder dialog = new android.app.AlertDialog.Builder(getActivity());
         dialog.setTitle("OnePass");

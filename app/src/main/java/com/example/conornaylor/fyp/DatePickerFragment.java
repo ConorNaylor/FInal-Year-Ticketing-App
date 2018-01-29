@@ -15,25 +15,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
+@RequiresApi(api = Build.VERSION_CODES.N)
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
-    public static String formattedDate;
+    public static Date formattedDate;
+    Calendar c = Calendar.getInstance();
+    static boolean dateSet = false;
+    static int year, month, day;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 // Use the current date as the default date in the picker
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
+        if(!dateSet) {
+            year = c.get(Calendar.YEAR);
+            month = c.get(Calendar.MONTH);
+            day = c.get(Calendar.DAY_OF_MONTH);
+        }
 // Create a new instance of DatePickerDialog and return it
         return new DatePickerDialog(getActivity(), this, year, month, day);
     }
@@ -41,10 +47,18 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        Calendar c = Calendar.getInstance();
+        this.year = year;
+        this.month = month;
+        this.day = day;
+
         c.set(year, month, day);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        formattedDate = sdf.format(c.getTime());
+        formattedDate = c.getTime();
+        try {
+            CreateEventFragment.dateEditied();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        dateSet = true;
     }
 }

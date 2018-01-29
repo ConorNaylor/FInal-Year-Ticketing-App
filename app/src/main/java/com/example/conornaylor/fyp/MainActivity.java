@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,6 +30,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
@@ -43,8 +45,10 @@ public class MainActivity extends AppCompatActivity
     private SharedPreferences.Editor e2;
     private String tokenString = "token";
     private String userIdString = "id";
+    private String canMakeEventString = "canMakeEvents";
     private String token;
     private String userID;
+    private boolean canMakeEvent;
     private getEventsTask mAuthTask;
     private getEventsTask mAuthTaskRefresh;
     private JSONObject obj;
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private Handler mHandler = new Handler();
     private SerializableManager sm = new SerializableManager();
     private Date date;
+    private Fragment fragment;
 
 
     @Override
@@ -64,8 +69,10 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+        e = preferences.edit();
         token = preferences.getString(tokenString, null);
         userID = preferences.getString(userIdString, null);
+        canMakeEvent = preferences.getBoolean(canMakeEventString, false);
 
         mAuthTask = new MainActivity.getEventsTask();
         try {
@@ -75,8 +82,6 @@ public class MainActivity extends AppCompatActivity
         } catch (ExecutionException e1) {
             e1.printStackTrace();
         }
-
-        ImageHandler IH = new ImageHandler(token);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -113,6 +118,21 @@ public class MainActivity extends AppCompatActivity
 //        e2.commit();
 //    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        // Check if the fragment is an instance of the right fragment
+        if (fragment instanceof ConfirmFragment) {
+            ConfirmFragment my = (ConfirmFragment) fragment;
+            // Pass intent or its data to the fragment's method
+            my.processNFC(intent.getStringExtra("Attendee"));
+
+            Toast.makeText(this,"NFC INTENT RECEIVED!", Toast.LENGTH_SHORT);
+        }
+
+    }
+
     public void makeEvents(JSONArray jArray){
         try {
                 for (int i = 0; i < jArray.length(); i++) {
@@ -138,54 +158,65 @@ public class MainActivity extends AppCompatActivity
                             obj.getInt("num_tickets"),
                             obj.getString("user"),
                             loc,
-                            obj.getDouble("price"));
+                            obj.getDouble("price"),
+                            obj.getString("image"));
                 }
         } catch(JSONException e){
             e.printStackTrace();
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, new EventsListFragment()).addToBackStack("");
+        ft.replace(R.id.container, new EventsListFragment());
         ft.commit();
     }
 
     @Override
     public void onBackPressed() {
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
+        if (getVisibleFragment() instanceof EventsListFragment){
+            if (doubleBackToExitPressedOnce) {
+                Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(logoutIntent);
+                finish();
+                SharedPreferences settings = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+                settings.edit().clear().apply();
+                Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            this.doubleBackToExitPressedOnce = true;
+            Toast.makeText(this, "Click BACK again to Log Out", Toast.LENGTH_SHORT).show();
+
+            mHandler.postDelayed(mRunnable, 2000);
+        }else if(getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();
         } else {
             super.onBackPressed();
-//
-//            if (doubleBackToExitPressedOnce) {
-//                Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
-//                startActivity(logoutIntent);
-//                finish();
-//                SharedPreferences settings = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
-//                settings.edit().clear().apply();
-//                Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
-//                return;
-//            }
-//
-//            this.doubleBackToExitPressedOnce = true;
-//            Toast.makeText(this, "Click BACK again to Log Out", Toast.LENGTH_SHORT).show();
-//
-//            mHandler.postDelayed(mRunnable, 1000);
         }
     }
-//    private final Runnable mRunnable = new Runnable() {
-//        @Override
-//        public void run() {
-//            doubleBackToExitPressedOnce = false;
-//        }
-//    };
-//
-//    @Override
-//    protected void onDestroy()
-//    {
-//        super.onDestroy();
-//
-//        if (mHandler != null) { mHandler.removeCallbacks(mRunnable); }
-//    }
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            doubleBackToExitPressedOnce = false;
+        }
+    };
 
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        if (mHandler != null) { mHandler.removeCallbacks(mRunnable); }
+    }
+
+    public Fragment getVisibleFragment(){
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if(fragments != null){
+            for(Fragment fragment : fragments){
+                if(fragment != null && fragment.isVisible())
+                    return fragment;
+            }
+        }
+        return null;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -253,7 +284,7 @@ public class MainActivity extends AppCompatActivity
         protected Boolean doInBackground(Void...params) {
                 try {
                     String url = "http://192.168.0.59:8000/events/"; // Galway
-//                    String url = "http://192.168.1.2:8000/events/"; //Mayo
+//                    String url = "http://192.168.1.13:8000/events/"; //Mayo
                     URL object = new URL(url);
 
                     HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -273,8 +304,8 @@ public class MainActivity extends AppCompatActivity
                         }
                         br.close();
                         if (sb.toString() != null) {
-                            System.out.println(sb.toString());
                             jArray = new JSONArray(sb.toString());
+                            System.out.println(jArray);
                             makeEvents(jArray);
                         }
                     } else {
@@ -288,7 +319,10 @@ public class MainActivity extends AppCompatActivity
             }
 
         @Override
-        protected void onPostExecute(Boolean b) { super.onPostExecute(b); }
+        protected void onPostExecute(Boolean b) {
+            makeEvents(jArray);
+            super.onPostExecute(b);
+        }
 
         @Override
         protected void onCancelled() {

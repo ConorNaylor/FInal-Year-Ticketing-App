@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -25,9 +27,12 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
     private ImageView eventImage;
     private Ticket t;
     private String date;
+    private Context context;
 
     public TicketAdaptor(Context context, ArrayList<Ticket> tickets) {
         super(context, R.layout.custom_ticket_row, tickets);
+
+        this.context = context;
     }
 
     @Override
@@ -48,7 +53,7 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
         ticketName.setText(t.getEvent().getTitle());
         ticketDate.setText(date);
         ticketSeat.setText(t.getSeat());
-        eventImage.setImageResource(R.drawable.boltmess);
+        Picasso.with(context).load("http://192.168.1.5:8000"  + t.getEvent().getImageURL()).into(eventImage);
         if(t.getEvent().getPrice() <= 0){
             ticketPrice.setText("Free");
         }else {
