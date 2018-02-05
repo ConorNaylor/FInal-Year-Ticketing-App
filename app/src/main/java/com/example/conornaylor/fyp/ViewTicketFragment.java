@@ -95,7 +95,7 @@ public class ViewTicketFragment extends Fragment {
         }else {
             priceText.setText("€" + ticket.getEvent().getPrice().toString());
         }
-        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
+        Picasso.with(getActivity()).load("http://192.168.0.59:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
 
 
         fab.setOnClickListener(new View.OnClickListener() {

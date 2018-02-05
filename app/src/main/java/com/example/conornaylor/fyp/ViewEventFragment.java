@@ -106,11 +106,10 @@ public class ViewEventFragment extends Fragment {
         priceText = getActivity().findViewById(R.id.viewEventPrice);
         numTicksText = getActivity().findViewById(R.id.viewnumTickets);
         locText = getActivity().findViewById(R.id.viewEventLocation);
-        eventImageView = getActivity().findViewById(R.id.eventImage);
+        eventImageView = getActivity().findViewById(R.id.viewEventImage);
 
-        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + event.getImageURL()).into(eventImageView);
+        Picasso.with(getActivity()).load("http://192.168.0.59:8000"  + event.getImageURL()).into(eventImageView);
 
-        System.out.println("This is the id of this user"+event.getUserId());
         if (!event.getUserId().equals(userID)) {
             fab.setVisibility(View.INVISIBLE);
             fab.setEnabled(false);

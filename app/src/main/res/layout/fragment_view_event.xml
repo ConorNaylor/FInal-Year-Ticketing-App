@@ -39,7 +39,7 @@
                     android:layout_height="match_parent">
 
                     <ImageView
-                        android:id="@+id/eventImage"
+                        android:id="@+id/viewEventImage"
                         android:layout_width="179dp"
                         android:layout_height="181dp" />
 

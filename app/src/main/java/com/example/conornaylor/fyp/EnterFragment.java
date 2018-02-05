@@ -10,7 +10,10 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -31,6 +34,7 @@ import java.util.List;
 public class EnterFragment extends Fragment {
 
     private NfcAdapter nfcAdapter;
+    private Ticket ticket;
 
 
     public EnterFragment() {
@@ -85,6 +89,13 @@ public class EnterFragment extends Fragment {
 
     }
 
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+        String message = ticket.getId();
+        NdefRecord ndefRecord = NdefRecord.createMime("text/plain", message.getBytes());
+        NdefMessage ndefMessage = new NdefMessage(ndefRecord);
+        return ndefMessage;
+    }
+
     public void disableForegroundDispatchSystem(){
 
     }
@@ -117,4 +128,6 @@ public class EnterFragment extends Fragment {
         });
         dialog.show();
     }
+
+
 }
