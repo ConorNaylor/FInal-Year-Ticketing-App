@@ -118,20 +118,20 @@ public class MainActivity extends AppCompatActivity
 //        e2.commit();
 //    }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        // Check if the fragment is an instance of the right fragment
-        if (fragment instanceof ConfirmFragment) {
-            ConfirmFragment my = (ConfirmFragment) fragment;
-            // Pass intent or its data to the fragment's method
-            my.processNFC(intent.getStringExtra("Attendee"));
-
-            Toast.makeText(this,"NFC INTENT RECEIVED!", Toast.LENGTH_SHORT);
-        }
-
-    }
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+//        super.onNewIntent(intent);
+//
+//        // Check if the fragment is an instance of the right fragment
+//        if (fragment instanceof EnterFragment) {
+//            E my = (ConfirmFragment) fragment;
+//            // Pass intent or its data to the fragment's method
+//            my.processNFC(intent.getStringExtra("Attendee"));
+//
+//            Toast.makeText(this,"NFC INTENT RECEIVED!", Toast.LENGTH_SHORT);
+//        }
+//
+//    }
 
     public void makeEvents(JSONArray jArray){
         try {
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected Boolean doInBackground(Void...params) {
                 try {
-                    String url = "http://192.168.0.59:8000/events/"; // Galway
+                    String url = "http://192.168.1.5:8000/events/"; // Galway
 //                    String url = "http://192.168.1.13:8000/events/"; //Mayo
                     URL object = new URL(url);
 

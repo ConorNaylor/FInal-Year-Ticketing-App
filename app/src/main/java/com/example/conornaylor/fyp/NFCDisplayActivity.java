@@ -1,28 +1,24 @@
 package com.example.conornaylor.fyp;
 
-
-import android.app.PendingIntent;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
 import android.os.AsyncTask;
-import android.os.Bundle;
+import android.os.Build;
+import android.os.Handler;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
+import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,107 +28,72 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Timer;
+
+public class NFCDisplayActivity extends AppCompatActivity {
 
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class AuthTickets extends AppCompatActivity {
-
+    private TextView mTextView;
+    private NFCDisplayActivity.authTicketsTask mAuthTask;
+    private String out;
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private String tk = "token";
-    private String userId = "id";
-    private String token;
-    private String userID;
-    private Event event;
-    private AuthTickets.authTicketsTask mAuthTask;
-    private String out;
-    private ImageView iv;
     private String ticketID;
-    private NfcAdapter mAdapter;
-    private PendingIntent mPendingIntent;
+    private String token;
+    private View mProgressView;
+    private ImageView enterView;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_auth_tickets);
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_nfcdisplay);
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            event = Event.getEventByID(extras.getString("event_id"));
+            mTextView = (TextView) findViewById(R.id.textView2);
+            mProgressView = findViewById(R.id.progressBar);
+            enterView = (ImageView) findViewById(R.id.enterView);
+
+            enterView.setVisibility(View.INVISIBLE);
+            mTextView.setText("Waiting for ticket...");
+
+            preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+            token = preferences.getString(tk, null);
+
+            mAuthTask = new NFCDisplayActivity.authTicketsTask();
         }
 
-        mAdapter = NfcAdapter.getDefaultAdapter(this);
-        mAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (mAdapter == null) {
-            //nfc not support your device.
-            return;
-        }
+        @Override
+        protected void onResume(){
+            super.onResume();
+            Intent intent = getIntent();
+            if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
+                Parcelable[] rawMessages = intent.getParcelableArrayExtra(
+                        NfcAdapter.EXTRA_NDEF_MESSAGES);
 
-        mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this,
-                getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-
-        preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
-        token = preferences.getString(tk, null);
-        userID = preferences.getString(userId, null);
-
-        iv = (ImageView)findViewById(R.id.go);
-        iv.setVisibility(View.INVISIBLE);
-
-        mAuthTask = new authTicketsTask();
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        mAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
-//        Intent intent = new Intent(this.getApplicationContext(), this.getClass());
-//        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-//            Parcelable[] rawMessages = intent.getParcelableArrayExtra(
-//                    NfcAdapter.EXTRA_NDEF_MESSAGES);
-//
-//            NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
-//            makeToast(new String(message.getRecords()[0].getPayload()));
-//        } else
-//            makeToast("Waiting for ticket");
-
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        if (intent != null && NfcAdapter.ACTION_NDEF_DISCOVERED.equals(intent.getAction())) {
-            Parcelable[] rawMessages =
-                    intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            if (rawMessages != null) {
-                NdefMessage[] messages = new NdefMessage[rawMessages.length];
-                for (int i = 0; i < rawMessages.length; i++) {
-                    messages[i] = (NdefMessage) rawMessages[i];
-                    System.out.println(messages[i]);
-                }
+                NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
+                ticketID = new String(message.getRecords()[0].getPayload());
                 mAuthTask.execute();
             }
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mAdapter != null) {
-            mAdapter.disableForegroundDispatch(this);
-        }
-    }
 
     public void makeToast(String str){
         if(str != null){
             try {
                 JSONObject obj = new JSONObject(str);
                 if(!obj.getString("id").isEmpty()){
+                    showProgress(false);
+                    enterView.setVisibility(View.VISIBLE);
+                    mTextView.setText("Ticket: " + ticketID + ", verified for seat: " + obj.getString("seat") + ".");
                     Toast.makeText(this, "Ticket Verified!", Toast.LENGTH_SHORT).show();
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTextView.setText("");
+                            showProgress(true);
+                            enterView.setVisibility(View.INVISIBLE);
+                        }
+                    }, 5000);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -143,11 +104,31 @@ public class AuthTickets extends AppCompatActivity {
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+
     public class authTicketsTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                    String url = "http://192.168.0.59:8000/checkticket/";
+//                String url = "http://192.168.0.59:8000/checkticket/";
                 String url = "http://192.168.1.5:8000/checkticket/";
                 URL object = new URL(url);
 
@@ -180,7 +161,7 @@ public class AuthTickets extends AppCompatActivity {
                     br.close();
                     if (sb.toString() != null) {
                         out = sb.toString();
-                        System.out.println(sb.toString());
+                        System.out.println(out);
                     }
                 } else {
                     System.out.println(con.getResponseMessage());

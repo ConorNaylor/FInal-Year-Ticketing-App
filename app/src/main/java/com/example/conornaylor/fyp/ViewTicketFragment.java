@@ -1,6 +1,7 @@
 package com.example.conornaylor.fyp;
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -95,15 +96,18 @@ public class ViewTicketFragment extends Fragment {
         }else {
             priceText.setText("€" + ticket.getEvent().getPrice().toString());
         }
-        Picasso.with(getActivity()).load("http://192.168.0.59:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
+        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
 
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new EnterFragment());
-                ft.commit();
+//                FragmentTransaction ft = getFragmentManager().beginTransaction();
+//                ft.replace(R.id.container, new EnterFragment());
+//                ft.commit();
+                Intent intent = new Intent(getActivity(), EnterActivity.class);
+                intent.putExtra("ticket_id", ticket.getId());
+                startActivity(intent);
             }
         });
 

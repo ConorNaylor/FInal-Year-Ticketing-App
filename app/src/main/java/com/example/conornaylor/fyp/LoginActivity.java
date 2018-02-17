@@ -100,9 +100,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
-
-
         if(NfcAdapter.getDefaultAdapter(this) == null){
             basicAlert("Your device is not NFC enabled.");
         }else if(!NfcAdapter.getDefaultAdapter(this).isEnabled()){
@@ -395,7 +392,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/authenticate/"; //Galway
+                String url = "http://192.168.1.5:8000/authenticate/"; //Galway
 //                String url = "http://192.168.1.13:8000/authenticate/";    //Mayo
                 URL object = new URL(url);
 

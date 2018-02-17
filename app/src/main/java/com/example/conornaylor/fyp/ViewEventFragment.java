@@ -2,6 +2,7 @@ package com.example.conornaylor.fyp;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -90,10 +91,8 @@ public class ViewEventFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Fragment fragment = AuthTickets.newInstance(event);
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment).addToBackStack("auth");
-                        ft.commit();
+                        Intent myIntent = new Intent(getActivity(), NFCDisplayActivity.class);
+                        getActivity().startActivity(myIntent);
                     }
                 }
         );
@@ -108,7 +107,7 @@ public class ViewEventFragment extends Fragment {
         locText = getActivity().findViewById(R.id.viewEventLocation);
         eventImageView = getActivity().findViewById(R.id.viewEventImage);
 
-        Picasso.with(getActivity()).load("http://192.168.0.59:8000"  + event.getImageURL()).into(eventImageView);
+        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + event.getImageURL()).into(eventImageView);
 
         if (!event.getUserId().equals(userID)) {
             fab.setVisibility(View.INVISIBLE);

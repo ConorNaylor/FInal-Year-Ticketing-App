@@ -82,7 +82,7 @@ public class EventAdaptor extends ArrayAdapter<Event> {
         }
 
         System.out.println(e.getImageURL());
-        Picasso.with(context).load("http://192.168.0.59:8000"  + e.getImageURL()).into(eventImage);
+        Picasso.with(context).load("http://192.168.1.5:8000"  + e.getImageURL()).into(eventImage);
 
         Picasso.Builder builder = new Picasso.Builder(context);
 
@@ -95,7 +95,7 @@ public class EventAdaptor extends ArrayAdapter<Event> {
             }
         });
 
-        builder.build().load("http://192.168.0.59:8000"  + e.getImageURL()).into(eventImage);
+        builder.build().load("http://192.168.1.5:8000"  + e.getImageURL()).into(eventImage);
         return customView;
     }
 }

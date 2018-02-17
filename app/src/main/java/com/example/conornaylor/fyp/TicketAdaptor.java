@@ -53,7 +53,7 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
         ticketName.setText(t.getEvent().getTitle());
         ticketDate.setText(date);
         ticketSeat.setText(t.getSeat());
-        Picasso.with(context).load("http://192.168.0.59:8000"  + t.getEvent().getImageURL()).into(eventImage);
+        Picasso.with(context).load("http://192.168.1.5:8000"  + t.getEvent().getImageURL()).into(eventImage);
         if(t.getEvent().getPrice() <= 0){
             ticketPrice.setText("Free");
         }else {

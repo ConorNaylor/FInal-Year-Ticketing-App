@@ -238,8 +238,8 @@ public class RegisteringActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/makeusers/"; //Galway
-//                String url = "http://192.168.1.2:8000/makeusers/";
+//                String url = "http://192.168.0.59:8000/makeusers/"; //Galway
+                String url = "http://192.168.1.5:8000/makeusers/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
