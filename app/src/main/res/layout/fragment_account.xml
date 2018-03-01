@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context="com.example.conornaylor.fyp.AccountFragment">
+    tools:context="com.example.conornaylor.fyp.utilities.AccountFragment">
 
     <ScrollView
         android:id="@+id/account_form"

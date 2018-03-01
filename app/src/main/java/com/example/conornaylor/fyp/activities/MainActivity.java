@@ -1,8 +1,9 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.activities;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.example.conornaylor.fyp.utilities.AccountFragment;
+import com.example.conornaylor.fyp.event.Event;
+import com.example.conornaylor.fyp.event.EventsListFragment;
+import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.ticket.DownloadTickets;
+import com.example.conornaylor.fyp.ticket.TicketsListFragment;
+import com.example.conornaylor.fyp.utilities.LocationData;
+import com.example.conornaylor.fyp.utilities.SerializableManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,11 +48,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String MyPreferences = "preferences";
-    public static final String EventPreferences = "eventPreferences";
     private SharedPreferences preferences;
-    private SharedPreferences eventPreferences;
-    private SharedPreferences.Editor e;
-    private SharedPreferences.Editor e2;
     private String tokenString = "token";
     private String userIdString = "id";
     private String canMakeEventString = "canMakeEvents";
@@ -59,17 +65,25 @@ public class MainActivity extends AppCompatActivity
     private SerializableManager sm = new SerializableManager();
     private Date date;
     private Fragment fragment;
+    private DownloadTickets dt;
+    private NfcAdapter nfcAdaptor;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        if(NfcAdapter.getDefaultAdapter(this) != null){
+        nfcAdaptor = NfcAdapter.getDefaultAdapter(this);
+        nfcAdaptor.setNdefPushMessage(null, this);
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
-        e = preferences.edit();
         token = preferences.getString(tokenString, null);
         userID = preferences.getString(userIdString, null);
         canMakeEvent = preferences.getBoolean(canMakeEventString, false);
@@ -82,6 +96,8 @@ public class MainActivity extends AppCompatActivity
         } catch (ExecutionException e1) {
             e1.printStackTrace();
         }
+
+        dt = new DownloadTickets(this);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -118,29 +134,15 @@ public class MainActivity extends AppCompatActivity
 //        e2.commit();
 //    }
 
-//    @Override
-//    protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//
-//        // Check if the fragment is an instance of the right fragment
-//        if (fragment instanceof EnterFragment) {
-//            E my = (ConfirmFragment) fragment;
-//            // Pass intent or its data to the fragment's method
-//            my.processNFC(intent.getStringExtra("Attendee"));
-//
-//            Toast.makeText(this,"NFC INTENT RECEIVED!", Toast.LENGTH_SHORT);
-//        }
-//
-//    }
-
-    public void makeEvents(JSONArray jArray){
+    public void makeEvents(JSONArray jArray) {
         try {
+//            if (jArray != null) {
                 for (int i = 0; i < jArray.length(); i++) {
-                        try {
-                            obj = jArray.getJSONObject(i);
-                        } catch (JSONException e1) {
-                            e1.printStackTrace();
-                        }
+                    try {
+                        obj = jArray.getJSONObject(i);
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
 
                     LocationData loc = new LocationData(0, 0);
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
@@ -161,6 +163,7 @@ public class MainActivity extends AppCompatActivity
                             obj.getDouble("price"),
                             obj.getString("image"));
                 }
+//            }
         } catch(JSONException e){
             e.printStackTrace();
         }
@@ -283,7 +286,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected Boolean doInBackground(Void...params) {
                 try {
-                    String url = "http://192.168.1.5:8000/events/"; // Galway
+                    String url = "http://18.218.18.192:8000/events/"; // Galway
 //                    String url = "http://192.168.1.13:8000/events/"; //Mayo
                     URL object = new URL(url);
 

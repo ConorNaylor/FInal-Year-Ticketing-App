@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.event;
 
 
 import android.animation.Animator;
@@ -29,6 +29,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.conornaylor.fyp.utilities.DatePickerFragment;
+import com.example.conornaylor.fyp.utilities.ImageHandler;
+import com.example.conornaylor.fyp.utilities.LocationData;
+import com.example.conornaylor.fyp.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +44,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
@@ -295,7 +299,7 @@ public class CreateEventFragment extends Fragment{
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/events/";
+                String url = "http://18.218.18.192:8000/events/";
 //                String url = "http://192.168.1.5:8000/events/";
                 URL object = new URL(url);
 

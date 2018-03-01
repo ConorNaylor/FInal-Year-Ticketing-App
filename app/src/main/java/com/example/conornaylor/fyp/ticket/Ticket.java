@@ -1,4 +1,6 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.ticket;
+
+import com.example.conornaylor.fyp.event.Event;
 
 import java.io.Serializable;
 import java.util.ArrayList;

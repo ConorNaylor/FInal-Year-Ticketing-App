@@ -1,41 +1,38 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.utilities;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.conornaylor.fyp.event.Event;
+import com.example.conornaylor.fyp.event.EventAdaptor;
+import com.example.conornaylor.fyp.event.ViewEventFragment;
+import com.example.conornaylor.fyp.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-
-import static android.R.attr.onClick;
 
 
 /**
@@ -148,7 +145,7 @@ public class AccountFragment extends Fragment {
         protected Boolean doInBackground(Void... params) {
             try {
 //                String url = "http://192.168.0.59:8000/event/";
-                String url = "http://192.168.1.13:8000/profile/";
+                String url = "http://18.218.18.192:8000/profile/";
                 URL object = new URL(url);
 
                 HttpURLConnection c = (HttpURLConnection) object.openConnection();

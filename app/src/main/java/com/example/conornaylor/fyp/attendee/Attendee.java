@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.attendee;
 
 import java.util.ArrayList;
 import java.util.Date;

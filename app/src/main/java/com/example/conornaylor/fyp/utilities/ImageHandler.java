@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.utilities;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -6,7 +6,7 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.example.conornaylor.fyp.event.Event;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -95,7 +95,7 @@ public class ImageHandler {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.0.59:8000/events/";
+                String url = "http://18.218.18.192:8000/events/";
 //                String url = "http://192.168.1.5:8000/events/";
                 URL object = new URL(url);
 
@@ -201,7 +201,7 @@ public class ImageHandler {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.1.5:8000/eventphoto/";
+                String url = "http://18.218.18.192:8000/eventphoto/";
 //                String url = "http://192.168.1.2:8000/eventphoto/";
                 URL object = new URL(url);
 

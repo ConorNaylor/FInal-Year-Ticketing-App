@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.ticket;
 
 
 import android.app.PendingIntent;
@@ -7,22 +7,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.TabHost;
 import android.widget.Toast;
 
-import org.json.JSONArray;
+import com.example.conornaylor.fyp.event.Event;
+import com.example.conornaylor.fyp.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,7 +28,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Timer;
 
 
 /**
@@ -148,7 +143,7 @@ public class AuthTickets extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
             try {
 //                    String url = "http://192.168.0.59:8000/checkticket/";
-                String url = "http://192.168.1.5:8000/checkticket/";
+                String url = "http://18.218.18.192:8000/checkticket/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

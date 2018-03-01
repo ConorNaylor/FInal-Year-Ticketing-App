@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.ticket;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.conornaylor.fyp.event.Event;
+import com.example.conornaylor.fyp.R;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -25,6 +27,7 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
     private TextView ticketPrice;
     private TextView ticketSeat;
     private ImageView eventImage;
+    private TextView ticketQty;
     private Ticket t;
     private String date;
     private Context context;
@@ -33,6 +36,16 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
         super(context, R.layout.custom_ticket_row, tickets);
 
         this.context = context;
+    }
+
+    public int getQuantity(Event event){
+        int count = 0;
+        for(Ticket tick: Ticket.getTickets()){
+            if(tick.getEvent().getId().equals(event.getId())){
+                count++;
+            }
+        }
+        return count;
     }
 
     @Override
@@ -47,13 +60,15 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
         ticketPrice = customView.findViewById(R.id.customTicketPrice);
         ticketSeat = customView.findViewById(R.id.customTicketSeat);
         eventImage = customView.findViewById(R.id.customeventImage);
+        ticketQty = customView.findViewById(R.id.customTicketQuantity);
 
         date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(t.getEvent().getDate());
 
+        ticketQty.setText("Qty: "+getQuantity(t.getEvent()));
         ticketName.setText(t.getEvent().getTitle());
         ticketDate.setText(date);
         ticketSeat.setText(t.getSeat());
-        Picasso.with(context).load("http://192.168.1.5:8000"  + t.getEvent().getImageURL()).into(eventImage);
+        Picasso.with(context).load("http://18.218.18.192:8000"  + t.getEvent().getImageURL()).into(eventImage);
         if(t.getEvent().getPrice() <= 0){
             ticketPrice.setText("Free");
         }else {

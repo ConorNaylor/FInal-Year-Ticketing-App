@@ -3,14 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.conornaylor.fyp.AuthTickets">
+    tools:context="com.example.conornaylor.fyp.ticket.AuthTickets">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ProgressBar
-            android:id="@+id/progressBar"
+            android:id="@+id/progressBarAuth"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="0dp"
             android:layout_height="204dp"
@@ -32,8 +32,8 @@
             android:layout_marginTop="8dp"
             android:tint="@android:color/holo_green_light"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="@+id/progressBar"
-            app:layout_constraintRight_toRightOf="@+id/progressBar"
+            app:layout_constraintLeft_toLeftOf="@+id/progressBarAuth"
+            app:layout_constraintRight_toRightOf="@+id/progressBarAuth"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_media_play" />
 

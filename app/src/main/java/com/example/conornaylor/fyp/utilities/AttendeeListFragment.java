@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.utilities;
 
 
 import android.content.Context;
@@ -7,18 +7,20 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import com.example.conornaylor.fyp.attendee.Attendee;
+import com.example.conornaylor.fyp.attendee.AttendeeAdaptor;
+import com.example.conornaylor.fyp.event.Event;
+import com.example.conornaylor.fyp.R;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,34 +30,46 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class EventStatsFragment extends Fragment {
+public class AttendeeListFragment extends Fragment {
+
 
     private static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private String token;
     private String tk = "token";
-    private EventStatsFragment.getStats mAuthTask = null;
+    private AttendeeListFragment.getUsers mAuthTask = null;
     private Event event;
-    private TextView numTickets;
-    private TextView revenue;
-    private Double rev;
-    private int numberTicks;
+    private TextView userView;
     private String input;
-    private Gson gson;
+    private ArrayList<Attendee> attendees;
+    private JSONArray jArray;
+    private JSONObject obj;
+    private Bundle bundle;
+    private View mProgressView;
+    private View mLoginFormView;
+    private ListView attendeeList;
+    private ListAdapter myAdapter;
+    private Date date;
 
-    public EventStatsFragment() {
+
+    public AttendeeListFragment() {
         // Required empty public constructor
     }
 
-    public static EventStatsFragment newInstance(Event e) {
+    public static AttendeeListFragment newInstance(Event e) {
         Bundle bundle = new Bundle();
         bundle.putSerializable("event", e);
-        EventStatsFragment fragment = new EventStatsFragment();
+        AttendeeListFragment fragment = new AttendeeListFragment();
         fragment.setArguments(bundle);
 
         return fragment;
@@ -71,7 +85,7 @@ public class EventStatsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_event_stats, container, false);
+        return inflater.inflate(R.layout.fragment_event_attendee, container, false);
     }
 
     @Override
@@ -83,67 +97,62 @@ public class EventStatsFragment extends Fragment {
         preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
         token = preferences.getString(tk, null);
 
-        mAuthTask = new EventStatsFragment.getStats();
+        mAuthTask = new AttendeeListFragment.getUsers();
         mAuthTask.execute();
 
-        numTickets = getActivity().findViewById(R.id.num_sold);
-        revenue = getActivity().findViewById(R.id.revenue);
+        mProgressView = getActivity().findViewById(R.id.eventListProgress);
+        mLoginFormView = getActivity().findViewById(R.id.main_content);
 
-        numTickets.setSelected(false);
-        revenue.setSelected(false);
+        attendees = new ArrayList<>();
 
-//        numTickets.setEnabled(false);
-//        revenue.setEnabled(false);
+        attendeeList = view.findViewById(R.id.attendeeList);
+
+        String a = AttendeeAdaptor.clickedUserID;
+//        basicAlert(a);
+    }
 
 
-        numTickets.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if( numberTicks < 1 ){
-                            Toast.makeText(getActivity(), "No tickets sold.", Toast.LENGTH_SHORT).show();
-                        }else {
-                            Fragment fragment = AttendeeListFragment.newInstance(event);
-                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                            ft.replace(R.id.container, fragment).addToBackStack("users");
-                            ft.commit();
-                        }
+    public void makeUsers(String in) {
+        try {
+            jArray = new JSONArray(in);
+            for (int i = 0; i < jArray.length(); i++) {
+                try {
+                    obj = jArray.getJSONObject(i);
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    try {
+                        date = formatter.parse(obj.getString("purchase_date"));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
+                    Attendee a = new Attendee(
+                            obj.getString("username"),
+                            obj.getString("user_id"),
+                            obj.getString("ticket_id"),
+                            date);
+                    attendees.add(a);
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
                 }
-        );
-
-//        GraphView graph = getActivity().findViewById(R.id.graphView);
-//        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[] {
-//                new DataPoint(1, 4),
-//                new DataPoint(1, 5),
-//                new DataPoint(2, 3)
-//        });
-//        graph.addSeries(series);
-    }
-
-
-    public void parseInput(String in) {
-        if (!in.isEmpty()) {
-            try {
-                gson = new Gson();
-                JSONObject obj = new JSONObject(in);
-                numberTicks = Integer.valueOf(obj.getString("count"));
-                rev = numberTicks * event.getPrice();
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-            numTickets.setText(Integer.toString(numberTicks));
-            revenue.setText("€" + rev.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        makeAdaptor();
+    }
+
+    public void makeAdaptor(){
+        myAdapter = new AttendeeAdaptor(getActivity(), attendees);
+        attendeeList.setAdapter(myAdapter);
+        ((BaseAdapter) myAdapter).notifyDataSetChanged();
     }
 
 
-    public class getStats extends AsyncTask<Void, Void, Boolean> {
+        public class getUsers extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void...params) {
             try {
-                String url = "http://192.168.0.59:8000/numtickets/";
-//                    String url = "http://192.168.1.2:8000/numtickets/";
+//                String url = "http://192.168.0.59:8000/getusers/";
+                    String url = "http://18.218.18.192:8000/getusers/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -177,6 +186,7 @@ public class EventStatsFragment extends Fragment {
                     br.close();
                     if (sb.toString() != null) {
                         input = sb.toString();
+                        System.out.println(input);
                     }
                 } else {
                     System.out.println(con.getResponseMessage());
@@ -191,7 +201,7 @@ public class EventStatsFragment extends Fragment {
         @Override
         protected void onPostExecute(Boolean b) {
             if(b) {
-                parseInput(input);
+                makeUsers(input);
             }else{
                 super.onPostExecute(b);
             }
@@ -202,5 +212,4 @@ public class EventStatsFragment extends Fragment {
             super.onCancelled();
         }
     }
-
 }

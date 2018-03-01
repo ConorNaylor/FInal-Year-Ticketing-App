@@ -1,26 +1,13 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -28,15 +15,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
+import com.example.conornaylor.fyp.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,8 +30,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RegisteringActivity extends AppCompatActivity {
 
@@ -238,8 +221,8 @@ public class RegisteringActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/makeusers/"; //Galway
-                String url = "http://192.168.1.5:8000/makeusers/";
+                String url = "http://18.218.18.192:8000/makeusers/"; //Galway
+//                String url = "http://192.168.1.5:8000/makeusers/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

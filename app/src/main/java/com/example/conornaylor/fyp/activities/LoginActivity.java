@@ -1,9 +1,8 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,7 +25,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -41,19 +39,17 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
+
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import android.os.Handler;
+
+import com.example.conornaylor.fyp.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -92,6 +88,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private TextView register;
     private JSONObject obj;
+    private String token;
 
     private NfcAdapter nfcAdapter;
 
@@ -100,17 +97,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        if(NfcAdapter.getDefaultAdapter(this) == null){
-            basicAlert("Your device is not NFC enabled.");
-        }else if(!NfcAdapter.getDefaultAdapter(this).isEnabled()){
-            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-            Intent NFCSettingsintent = new Intent(Settings.ACTION_NFC_SETTINGS);
-            Intent closeAppIntent = new Intent(Intent.ACTION_MAIN);
-            closeAppIntent.addCategory(Intent.CATEGORY_HOME);
-            settingsAlert("Enable your NFC chip to continue.", NFCSettingsintent,closeAppIntent);
-        }else{
-            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        }
+//        if(NfcAdapter.getDefaultAdapter(this) == null){
+//            basicAlert("Your device is not NFC enabled.");
+//        }else if(!NfcAdapter.getDefaultAdapter(this).isEnabled()){
+//            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+//            Intent NFCSettingsintent = new Intent(Settings.ACTION_NFC_SETTINGS);
+//            Intent closeAppIntent = new Intent(Intent.ACTION_MAIN);
+//            closeAppIntent.addCategory(Intent.CATEGORY_HOME);
+//            settingsAlert("Enable your NFC chip to continue.", NFCSettingsintent,closeAppIntent);
+//        }else{
+//            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+//        }
 
 
         // Set up the login form.
@@ -149,7 +146,21 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        preferences = this.getSharedPreferences(MyPreferences,Context.MODE_PRIVATE);
+        preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
+        token = preferences.getString(tokenString, null);
+        if(token != null) {
+            Toast.makeText(this, "Auto logging you in...", Toast.LENGTH_LONG).show();
+            showProgress(true);
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    Intent myIntent = new Intent(LoginActivity.this, MainActivity.class);
+                    LoginActivity.this.startActivity(myIntent);
+                    finish();
+                }
+            }, 1500);
+        }
     }
 
     @Override
@@ -392,8 +403,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                String url = "http://192.168.1.5:8000/authenticate/"; //Galway
-//                String url = "http://192.168.1.13:8000/authenticate/";    //Mayo
+                String url = "http://18.218.18.192:8000/authenticate/"; //Galway
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

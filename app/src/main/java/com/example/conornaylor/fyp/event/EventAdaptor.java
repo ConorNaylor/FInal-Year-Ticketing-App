@@ -1,31 +1,21 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.event;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.conornaylor.fyp.R;
 import com.squareup.picasso.Picasso;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Locale;
-
-import static com.example.conornaylor.fyp.ImageHandler.*;
 
 /**
  * Created by conornaylor on 20/10/2017.
@@ -81,9 +71,6 @@ public class EventAdaptor extends ArrayAdapter<Event> {
             eventPrice.setText("€" + e.getPrice().toString());
         }
 
-        System.out.println(e.getImageURL());
-        Picasso.with(context).load("http://192.168.1.5:8000"  + e.getImageURL()).into(eventImage);
-
         Picasso.Builder builder = new Picasso.Builder(context);
 
         builder.listener(new Picasso.Listener()
@@ -95,7 +82,7 @@ public class EventAdaptor extends ArrayAdapter<Event> {
             }
         });
 
-        builder.build().load("http://192.168.1.5:8000"  + e.getImageURL()).into(eventImage);
+        builder.build().load("http://18.218.18.192:8000"  + e.getImageURL()).into(eventImage);
         return customView;
     }
 }

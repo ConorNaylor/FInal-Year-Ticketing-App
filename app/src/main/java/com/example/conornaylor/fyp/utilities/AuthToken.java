@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.utilities;
 
 /**
  * Created by conornaylor on 16/10/2017.
@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 import org.json.JSONException;
@@ -28,7 +26,7 @@ public class AuthToken {
     }
 
     public String Login() throws IOException, JSONException {
-        String url = "http://127.0.0.1:8000/api-token-auth/";
+        String url = "http://18.218.18.192:8000/api-token-auth/";
         URL object = new URL(url);
 
         HttpURLConnection con = (HttpURLConnection) object.openConnection();

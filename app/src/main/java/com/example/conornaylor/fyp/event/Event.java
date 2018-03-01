@@ -1,4 +1,6 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.event;
+
+import com.example.conornaylor.fyp.utilities.LocationData;
 
 import java.io.Serializable;
 import java.util.ArrayList;

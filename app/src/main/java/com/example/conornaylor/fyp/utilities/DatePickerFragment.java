@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.utilities;
 
 
 import android.app.DatePickerDialog;
@@ -6,17 +6,14 @@ import android.app.Dialog;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.DatePicker;
 
+import com.example.conornaylor.fyp.event.CreateEventFragment;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 

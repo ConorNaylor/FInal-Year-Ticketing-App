@@ -1,9 +1,7 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.ticket;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,24 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
-import android.widget.Toast;
+
+import com.example.conornaylor.fyp.R;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 
 /**
@@ -45,7 +36,6 @@ public class TicketsListFragment extends Fragment {
     private String userId = "id";
     private String token;
     private String userID;
-    private getTicketsTask mAuthTask;
     private JSONObject obj;
     private JSONArray jArray;
     private ListAdapter myUpcomingAdapter;
@@ -67,19 +57,6 @@ public class TicketsListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
-        token = preferences.getString(tk, null);
-        userID = preferences.getString(userId, null);
-
-        mAuthTask = new getTicketsTask();
-        try {
-            Boolean done = mAuthTask.execute().get();
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        } catch (ExecutionException e1) {
-            e1.printStackTrace();
-        }
 
         getActivity().setTitle("Tickets");
 
@@ -103,12 +80,38 @@ public class TicketsListFragment extends Fragment {
         // Inflate the layout for this fragment
         ArrayList<Ticket> myUpcomingTickets = new ArrayList<>();
         ArrayList<Ticket> myPastTickets = new ArrayList<>();
+        ArrayList<String> myUpcomingTicketsforAdding = new ArrayList<>();
+        ArrayList<String> myPastTicketsforAdding = new ArrayList<>();
 
-        for(Ticket t: Ticket.getTickets()){
-            if(t.getEvent().getDate().after(date)){
-                myUpcomingTickets.add(t);
-            }else{
-                myPastTickets.add(t);
+        for (Ticket t : Ticket.getTickets()) {
+            if (t.getEvent().getDate().after(date)) {
+                if(myUpcomingTickets.isEmpty()){
+                    myUpcomingTickets.add(t);
+                }else {
+                    for(int i = 0; i < myUpcomingTicketsforAdding.size(); i++) {
+                        System.out.println(myUpcomingTickets.size() + " is the size of the upcoming events array");
+                        System.out.println(myUpcomingTickets.get(i).getEvent().getId());
+                        if (!myUpcomingTicketsforAdding.get(i).equals(t.getEvent().getId())) {
+                            System.out.println(myUpcomingTickets.get(i).getEvent().getId().equals(t.getEvent().getId()) +" blah blah blah blah blah Different Event upcoming");
+//                            myUpcomingTickets.add(t);
+                            myUpcomingTicketsforAdding.add(t.getEvent().getId());
+                        } else System.out.println(myUpcomingTickets.get(i).getEvent().getId().equals(t.getEvent().getId()) + "  blah blah blah blah blah  Same Event upcoming ");
+                    }
+                }
+            } else {
+                if(myPastTickets.isEmpty()){
+                    myPastTickets.add(t);
+                } else {
+                    for (int i = 0; i < myPastTicketsforAdding.size(); i++) {
+                        System.out.println(myPastTickets.size() + " is the size of the past events array");
+                        System.out.println(myPastTickets.get(i).getEvent().getId());
+                        if (!myPastTicketsforAdding.get(i).equals(t.getEvent().getId())) {
+                            System.out.println(" blah blah blah blah blah Different Event past");
+//                            myPastTickets.add(t);
+                            myPastTicketsforAdding.add(t.getEvent().getId());
+                        } else System.out.println(" blah blah blah blah blah Same Event past");
+                    }
+                }
             }
         }
 
@@ -126,7 +129,7 @@ public class TicketsListFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
 //                        showProgress(true);
 //                        String ticket = String.valueOf((parent.getItemAtPosition(pos)));
-                        Fragment fragment = ViewTicketFragment.newInstance((Ticket)parent.getItemAtPosition(pos));
+                        Fragment fragment = ViewTicketFragment.newInstance((Ticket) parent.getItemAtPosition(pos));
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
                         ft.replace(R.id.container, fragment).addToBackStack("viewTicket");
                         ft.commit();
@@ -140,7 +143,7 @@ public class TicketsListFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
 //                        showProgress(true);
 //                        String ticket = String.valueOf((parent.getItemAtPosition(pos)));
-                        Fragment fragment = ViewTicketFragment.newInstance((Ticket)parent.getItemAtPosition(pos));
+                        Fragment fragment = ViewTicketFragment.newInstance((Ticket) parent.getItemAtPosition(pos));
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
                         ft.replace(R.id.container, fragment).addToBackStack("viewTicket");
                         ft.commit();
@@ -149,72 +152,4 @@ public class TicketsListFragment extends Fragment {
         );
     }
 
-    public void makeTickets(JSONArray jArray){
-        try {
-            for (int i = 0; i < jArray.length(); i++) {
-                try {
-                    obj = jArray.getJSONObject(i);
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                }
-
-                Ticket tk = new Ticket(
-                        obj.getString("id"),
-                        obj.getString("seat"),
-                        obj.getString("user"),
-                        Event.getEventByID(obj.getString("event")));
-            }
-        } catch(JSONException e){
-            e.printStackTrace();
-        }
-    }
-
-
-    public class getTicketsTask extends AsyncTask<Void, Void, Boolean> {
-        @Override
-        protected Boolean doInBackground(Void...params) {
-            try {
-//                    String url = "http://192.168.0.59:8000/tickets/";
-                String url = "http://192.168.1.5:8000/tickets/";
-                URL object = new URL(url);
-
-                HttpURLConnection con = (HttpURLConnection) object.openConnection();
-                con.setDoInput(true);
-                con.setRequestMethod("GET");
-                con.setRequestProperty("Accept", "application/json");
-                con.setRequestProperty("Authorization", "Token " + token);
-
-                StringBuilder sb = new StringBuilder();
-                int HttpResult = con.getResponseCode();
-                if (HttpResult == HttpURLConnection.HTTP_OK) {
-                    BufferedReader br = new BufferedReader(
-                            new InputStreamReader(con.getInputStream(), "utf-8"));
-                    String line = null;
-                    while ((line = br.readLine()) != null) {
-                        sb.append(line + "\n");
-                    }
-                    br.close();
-                    if (sb.toString() != null) {
-                        System.out.println(sb.toString());
-                        jArray = new JSONArray(sb.toString());
-                        makeTickets(jArray);
-                    }
-                } else {
-                    System.out.println(con.getResponseMessage());
-                    return false;
-                }
-            } catch (IOException | JSONException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean b) { super.onPostExecute(b); }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-    }
 }

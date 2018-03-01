@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.utilities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.conornaylor.fyp.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,7 +34,7 @@ import java.net.URL;
 public class NFCDisplayActivity extends AppCompatActivity {
 
 
-    private TextView mTextView;
+    private TextView mStatusView;
     private NFCDisplayActivity.authTicketsTask mAuthTask;
     private String out;
     public static final String MyPreferences = "preferences";
@@ -49,12 +51,12 @@ public class NFCDisplayActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_nfcdisplay);
 
-            mTextView = (TextView) findViewById(R.id.textView2);
-            mProgressView = findViewById(R.id.progressBar);
+            mStatusView = (TextView) findViewById(R.id.eventStatus);
+            mProgressView = findViewById(R.id.progressBarAuth);
             enterView = (ImageView) findViewById(R.id.enterView);
 
             enterView.setVisibility(View.INVISIBLE);
-            mTextView.setText("Waiting for ticket...");
+            mStatusView.setText("Waiting for ticket...");
 
             preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
             token = preferences.getString(tk, null);
@@ -83,13 +85,13 @@ public class NFCDisplayActivity extends AppCompatActivity {
                 if(!obj.getString("id").isEmpty()){
                     showProgress(false);
                     enterView.setVisibility(View.VISIBLE);
-                    mTextView.setText("Ticket: " + ticketID + ", verified for seat: " + obj.getString("seat") + ".");
+                    mStatusView.setText("Ticket: " + ticketID + ", verified for seat: " + obj.getString("seat") + ".");
                     Toast.makeText(this, "Ticket Verified!", Toast.LENGTH_SHORT).show();
                     final Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            mTextView.setText("");
+                            mStatusView.setText("");
                             showProgress(true);
                             enterView.setVisibility(View.INVISIBLE);
                         }
@@ -128,8 +130,8 @@ public class NFCDisplayActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/checkticket/";
-                String url = "http://192.168.1.5:8000/checkticket/";
+                String url = "http://18.218.18.192:8000/checkticket/";
+//                String url = "http://192.168.1.5:8000/checkticket/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

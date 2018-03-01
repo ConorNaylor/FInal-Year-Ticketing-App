@@ -1,8 +1,7 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.ticket;
 
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -12,10 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.conornaylor.fyp.activities.EnterActivity;
+import com.example.conornaylor.fyp.event.ViewEventFragment;
+import com.example.conornaylor.fyp.R;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -96,7 +97,7 @@ public class ViewTicketFragment extends Fragment {
         }else {
             priceText.setText("€" + ticket.getEvent().getPrice().toString());
         }
-        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
+        Picasso.with(getActivity()).load("http://18.218.18.192:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
 
 
         fab.setOnClickListener(new View.OnClickListener() {

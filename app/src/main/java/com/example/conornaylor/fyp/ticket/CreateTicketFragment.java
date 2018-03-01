@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.ticket;
 
 
 import android.animation.Animator;
@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.conornaylor.fyp.event.Event;
+import com.example.conornaylor.fyp.R;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -171,7 +173,7 @@ public class CreateTicketFragment extends Fragment {
         protected Boolean doInBackground(Void... params) {
             try {
 //                String url = "http://192.168.0.59:8000/tickets/";
-                String url = "http://192.168.1.5:8000/tickets/";
+                String url = "http://18.218.18.192:8000/tickets/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

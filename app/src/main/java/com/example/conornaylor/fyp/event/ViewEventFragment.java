@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp;
+package com.example.conornaylor.fyp.event;
 
 
 import android.content.Context;
@@ -14,11 +14,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.conornaylor.fyp.ticket.CreateTicketFragment;
+import com.example.conornaylor.fyp.utilities.EventStatsFragment;
+import com.example.conornaylor.fyp.utilities.NFCDisplayActivity;
+import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.ticket.Ticket;
+import com.example.conornaylor.fyp.ticket.ViewTicketFragment;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -40,13 +45,14 @@ public class ViewEventFragment extends Fragment {
     private Button button;
     private Button authButton;
     private ImageView eventImageView;
-    private boolean show = true;
+    private boolean show = false;
     private FloatingActionButton fab;
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private String userIdString = "id";
     private String userID;
     private String date;
+    private Ticket ticket;
 
 
     public ViewEventFragment() {
@@ -87,16 +93,6 @@ public class ViewEventFragment extends Fragment {
 
 //        show = false;
         authButton = getActivity().findViewById(R.id.auth_button);
-        authButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent myIntent = new Intent(getActivity(), NFCDisplayActivity.class);
-                        getActivity().startActivity(myIntent);
-                    }
-                }
-        );
-
         fab = getActivity().findViewById(R.id.fab2);
         button = getActivity().findViewById(R.id.viewStatsButton);
         nameText = getActivity().findViewById(R.id.viewEventName);
@@ -107,15 +103,19 @@ public class ViewEventFragment extends Fragment {
         locText = getActivity().findViewById(R.id.viewEventLocation);
         eventImageView = getActivity().findViewById(R.id.viewEventImage);
 
-        Picasso.with(getActivity()).load("http://192.168.1.5:8000"  + event.getImageURL()).into(eventImageView);
+        Picasso.with(getActivity()).load("http://18.218.18.192:8000"  + event.getImageURL()).into(eventImageView);
 
         if (!event.getUserId().equals(userID)) {
             fab.setVisibility(View.INVISIBLE);
             fab.setEnabled(false);
             numTicksText.setVisibility(View.INVISIBLE);
-            authButton.setVisibility(View.INVISIBLE);
-            authButton.setEnabled(false);
             button.setText("Buy Ticket");
+            if(hasTicket()) {
+                authButton.setText("View Ticket(s)");
+            }else{
+                authButton.setVisibility(View.INVISIBLE);
+                authButton.setEnabled(false);
+            }
         }
 
         nameText.setEnabled(show);
@@ -139,9 +139,10 @@ public class ViewEventFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (show == true) {
+                if (show) {
                     show = false;
                     fab.setBackgroundColor(Color.GREEN);
+                    updateEvent();
                 } else {
                     nameText.requestFocus();
                     show = true;
@@ -155,6 +156,30 @@ public class ViewEventFragment extends Fragment {
                 numTicksText.setEnabled(show);
             }
         });
+
+        if (event.getUserId().equals(userID)) {
+            authButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent myIntent = new Intent(getActivity(), NFCDisplayActivity.class);
+                            getActivity().startActivity(myIntent);
+                        }
+                    }
+            );
+        }else {
+            authButton.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Fragment fragment = ViewTicketFragment.newInstance(ticket);
+                            FragmentTransaction ft = getFragmentManager().beginTransaction();
+                            ft.replace(R.id.container, fragment).addToBackStack("createTicket");
+                            ft.commit();
+                        }
+                    }
+            );
+        }
 
         if (!event.getUserId().equals(userID)) {
             button.setOnClickListener(
@@ -180,5 +205,26 @@ public class ViewEventFragment extends Fragment {
                 }
         );
 
+    }
+
+    private void updateEvent() {
+        if(!event.getTitle().equals(nameText.getText().toString()) || !event.getDescription().equals(descText.getText().toString()) || !new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate()).equals(dateText.getText().toString()) || !event.getAddress().equals(locText.getText().toString()) || !event.getPrice().equals(Double.parseDouble(priceText.getText().toString().substring(1))) || event.getNumTicks() != Integer.parseInt(numTicksText.getText().toString())){
+            event.setTitle(nameText.getText().toString());
+            event.setDescription(descText.getText().toString());
+            event.setAddress(locText.getText().toString());
+            event.setNumTicks(Integer.parseInt(numTicksText.getText().toString()));
+            event.setPrice(Double.parseDouble(priceText.getText().toString().substring(1)));
+        }
+
+    }
+
+    private boolean hasTicket(){
+        for(Ticket t: Ticket.getTickets()){
+            if(t.getEvent().getId().equals(event.getId())){
+                ticket = t;
+                return true;
+            }
+        }
+        return false;
     }
 }
