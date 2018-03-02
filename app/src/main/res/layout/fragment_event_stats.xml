@@ -42,7 +42,7 @@
                         android:imeOptions="actionUnspecified"
                         android:inputType="text"
                         android:maxLines="1"
-                        android:textColor="@android:color/black"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="18sp" />
 
                 </android.support.design.widget.TextInputLayout>

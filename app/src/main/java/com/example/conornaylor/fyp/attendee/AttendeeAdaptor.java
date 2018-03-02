@@ -47,6 +47,7 @@ public class AttendeeAdaptor extends ArrayAdapter<Attendee> {
         usernameIDView  = customView.findViewById(R.id.customUsernameID);
         purchaseDateView = customView.findViewById(R.id.customPurchaseDate);
         blockButton = customView.findViewById(R.id.blockButton);
+        blockButton.setVisibility(View.INVISIBLE);
 
         String date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(a.getPruchaseDate());
 

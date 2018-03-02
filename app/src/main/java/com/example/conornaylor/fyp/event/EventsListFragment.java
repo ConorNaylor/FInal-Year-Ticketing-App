@@ -84,7 +84,6 @@ public class EventsListFragment extends Fragment {
                 ft.commit();
             }
         });
-        System.out.println("Can make events :" + canMakeEvent);
         if(!canMakeEvent) {
             fab.hide();
         }

@@ -38,7 +38,8 @@
                     <ImageView
                         android:id="@+id/viewEventImage"
                         android:layout_width="179dp"
-                        android:layout_height="181dp" />
+                        android:layout_height="181dp"
+                        android:padding="10dp" />
 
                     <LinearLayout
                         android:layout_width="175dp"
@@ -139,7 +140,8 @@
                         android:id="@+id/mapImage"
                         android:layout_width="64dp"
                         android:layout_height="match_parent"
-                        android:src="@drawable/map" />
+                        android:src="@drawable/map"
+                        android:tint="@color/colorPrimary" />
 
                     <EditText
                         android:id="@+id/viewEventLocation"
@@ -167,19 +169,24 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:layout_weight="3.63"
+                        android:backgroundTint="@color/colorPrimary"
                         android:drawableRight="@drawable/ic_menu_send"
-                        android:drawableTint="@android:color/background_dark"
+                        android:drawableTint="@android:color/background_light"
                         android:elevation="0dp"
-                        android:text="View Statistics" />
+                        android:text="View Statistics"
+                        android:textColor="@android:color/background_light" />
 
                     <Button
                         android:id="@+id/auth_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="3.63"
+                        android:backgroundTint="@color/colorPrimary"
                         android:drawableRight="?android:attr/actionModeFindDrawable"
-                        android:drawableTint="@android:color/black"
-                        android:text="Authenticate Tickets" />
+                        android:drawableTint="@android:color/background_light"
+                        android:text="Authenticate Tickets"
+                        android:textColor="@android:color/background_light"
+                        tools:targetApi="lollipop" />
 
                 </LinearLayout>
 
@@ -188,12 +195,24 @@
         </ScrollView>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab2"
+            android:id="@+id/editFab"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="bottom|right"
             android:layout_margin="5dp"
             android:src="@drawable/ic_menu_manage"
+            android:tint="@color/colorPrimary"
+            app:backgroundTint="@android:color/background_light"
+            app:layout_anchorGravity="bottom|right|end" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/deleteFab"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|left"
+            android:layout_margin="5dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:tint="@color/colorPrimary"
             app:backgroundTint="@android:color/background_light"
             app:layout_anchorGravity="bottom|right|end" />
 

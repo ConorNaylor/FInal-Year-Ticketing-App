@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.conornaylor.fyp.ticket.Ticket;
 import com.example.conornaylor.fyp.utilities.AccountFragment;
 import com.example.conornaylor.fyp.event.Event;
 import com.example.conornaylor.fyp.event.EventsListFragment;
@@ -136,7 +137,7 @@ public class MainActivity extends AppCompatActivity
 
     public void makeEvents(JSONArray jArray) {
         try {
-//            if (jArray != null) {
+            if (jArray != null) {
                 for (int i = 0; i < jArray.length(); i++) {
                     try {
                         obj = jArray.getJSONObject(i);
@@ -163,7 +164,7 @@ public class MainActivity extends AppCompatActivity
                             obj.getDouble("price"),
                             obj.getString("image"));
                 }
-//            }
+            }
         } catch(JSONException e){
             e.printStackTrace();
         }
@@ -179,6 +180,7 @@ public class MainActivity extends AppCompatActivity
                 Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(logoutIntent);
                 finish();
+                Ticket.deleteTickets();
                 SharedPreferences settings = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
                 settings.edit().clear().apply();
                 Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
@@ -237,6 +239,7 @@ public class MainActivity extends AppCompatActivity
             Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(logoutIntent);
             finish();
+            Ticket.deleteTickets();
             Toast.makeText(MainActivity.this, "Logged Out", Toast.LENGTH_SHORT).show();
             SharedPreferences settings = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
             settings.edit().clear().apply();
@@ -287,7 +290,6 @@ public class MainActivity extends AppCompatActivity
         protected Boolean doInBackground(Void...params) {
                 try {
                     String url = "http://18.218.18.192:8000/events/"; // Galway
-//                    String url = "http://192.168.1.13:8000/events/"; //Mayo
                     URL object = new URL(url);
 
                     HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -308,7 +310,6 @@ public class MainActivity extends AppCompatActivity
                         br.close();
                         if (sb.toString() != null) {
                             jArray = new JSONArray(sb.toString());
-                            System.out.println(jArray);
                             makeEvents(jArray);
                         }
                     } else {

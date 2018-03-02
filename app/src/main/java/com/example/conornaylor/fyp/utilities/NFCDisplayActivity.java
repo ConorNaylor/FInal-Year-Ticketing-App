@@ -95,7 +95,7 @@ public class NFCDisplayActivity extends AppCompatActivity {
                             showProgress(true);
                             enterView.setVisibility(View.INVISIBLE);
                         }
-                    }, 5000);
+                    }, 10000);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

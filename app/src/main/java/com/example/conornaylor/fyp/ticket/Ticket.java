@@ -29,6 +29,8 @@ public class Ticket implements Serializable{
         return tickets;
     }
 
+    public static void deleteTickets(){ tickets.clear(); }
+
     public String getId() {
         return ticketId;
     }
@@ -55,6 +57,21 @@ public class Ticket implements Serializable{
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        final Ticket tick = (Ticket ) obj;
+        return tick.getEvent().getId() == this.getEvent().getId();
     }
 
     public void addUniqueTickets(Ticket t) {

@@ -30,10 +30,12 @@
             android:layout_height="50dp"
             android:layout_gravity="bottom|right"
             android:layout_margin="16dp"
+            android:longClickable="true"
             android:src="@android:drawable/ic_input_add"
-            android:tint="@android:color/background_dark"
+            android:tint="@color/colorPrimary"
             app:backgroundTint="@android:color/background_light"
-            app:layout_anchorGravity="bottom|right|end" />
+            app:layout_anchorGravity="bottom|right|end"
+            android:scaleType="center" />
 
     </android.support.design.widget.CoordinatorLayout>
 

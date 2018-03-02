@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -29,6 +30,9 @@ import com.squareup.picasso.Picasso;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import static android.R.drawable.ic_menu_manage;
+import static android.R.drawable.ic_menu_save;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,7 +50,8 @@ public class ViewEventFragment extends Fragment {
     private Button authButton;
     private ImageView eventImageView;
     private boolean show = false;
-    private FloatingActionButton fab;
+    private FloatingActionButton editFab;
+    private FloatingActionButton deleteFab;
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private String userIdString = "id";
@@ -93,7 +98,8 @@ public class ViewEventFragment extends Fragment {
 
 //        show = false;
         authButton = getActivity().findViewById(R.id.auth_button);
-        fab = getActivity().findViewById(R.id.fab2);
+        editFab = getActivity().findViewById(R.id.editFab);
+        deleteFab = getActivity().findViewById(R.id.deleteFab);
         button = getActivity().findViewById(R.id.viewStatsButton);
         nameText = getActivity().findViewById(R.id.viewEventName);
         descText = getActivity().findViewById(R.id.viewEventDescription);
@@ -103,11 +109,16 @@ public class ViewEventFragment extends Fragment {
         locText = getActivity().findViewById(R.id.viewEventLocation);
         eventImageView = getActivity().findViewById(R.id.viewEventImage);
 
+        deleteFab.setVisibility(View.INVISIBLE);
+        editFab.setImageResource(ic_menu_manage);
+
         Picasso.with(getActivity()).load("http://18.218.18.192:8000"  + event.getImageURL()).into(eventImageView);
 
         if (!event.getUserId().equals(userID)) {
-            fab.setVisibility(View.INVISIBLE);
-            fab.setEnabled(false);
+            editFab.setVisibility(View.INVISIBLE);
+            editFab.setEnabled(false);
+            deleteFab.setVisibility(View.INVISIBLE);
+            deleteFab.setEnabled(false);
             numTicksText.setVisibility(View.INVISIBLE);
             button.setText("Buy Ticket");
             if(hasTicket()) {
@@ -122,7 +133,7 @@ public class ViewEventFragment extends Fragment {
         descText.setEnabled(show);
         dateText.setEnabled(show);
         locText.setEnabled(show);
-        priceText.setEnabled(show);
+        priceText.setEnabled(false);
         numTicksText.setEnabled(show);
 
         nameText.setText(event.getTitle());
@@ -136,23 +147,42 @@ public class ViewEventFragment extends Fragment {
         }
         numTicksText.setText(event.getNumTicks() + "");
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        deleteFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                show = false;
+                deleteFab.setVisibility(View.INVISIBLE);
+                editFab.setImageResource(ic_menu_manage);
+                nameText.setEnabled(show);
+                descText.setEnabled(show);
+                dateText.setEnabled(show);
+                locText.setEnabled(show);
+                numTicksText.setEnabled(show);
+            }
+        });
+
+        editFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (show) {
                     show = false;
-                    fab.setBackgroundColor(Color.GREEN);
+                    editFab.setImageResource(ic_menu_manage);
                     updateEvent();
                 } else {
                     nameText.requestFocus();
                     show = true;
-                    fab.setBackgroundColor(Color.BLACK);
+                    editFab.setImageResource(ic_menu_save);
+                }
+                if(show) {
+                    deleteFab.setVisibility(View.VISIBLE);
+                }
+                else{
+                        deleteFab.setVisibility(View.INVISIBLE);
                 }
                 nameText.setEnabled(show);
                 descText.setEnabled(show);
                 dateText.setEnabled(show);
                 locText.setEnabled(show);
-                priceText.setEnabled(show);
                 numTicksText.setEnabled(show);
             }
         });
@@ -208,12 +238,11 @@ public class ViewEventFragment extends Fragment {
     }
 
     private void updateEvent() {
-        if(!event.getTitle().equals(nameText.getText().toString()) || !event.getDescription().equals(descText.getText().toString()) || !new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate()).equals(dateText.getText().toString()) || !event.getAddress().equals(locText.getText().toString()) || !event.getPrice().equals(Double.parseDouble(priceText.getText().toString().substring(1))) || event.getNumTicks() != Integer.parseInt(numTicksText.getText().toString())){
+        if(!event.getTitle().equals(nameText.getText().toString()) || !event.getDescription().equals(descText.getText().toString()) || !new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate()).equals(dateText.getText().toString()) || !event.getAddress().equals(locText.getText().toString()) || event.getNumTicks() != Integer.parseInt(numTicksText.getText().toString())){
             event.setTitle(nameText.getText().toString());
             event.setDescription(descText.getText().toString());
             event.setAddress(locText.getText().toString());
             event.setNumTicks(Integer.parseInt(numTicksText.getText().toString()));
-            event.setPrice(Double.parseDouble(priceText.getText().toString().substring(1)));
         }
 
     }

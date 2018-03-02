@@ -10,7 +10,7 @@
         android:id="@+id/customeventImage"
         android:layout_width="175dp"
         android:layout_height="148dp"
-        android:padding="5dp"
+        android:padding="10dp"
         app:srcCompat="@drawable/boltmess" />
 
     <RelativeLayout

@@ -19,6 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        android:indeterminateTint="@color/colorPrimary"
         android:visibility="gone" />
 
     <ScrollView
@@ -58,7 +59,8 @@
                     android:id="@+id/mapImage"
                     android:layout_width="93dp"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/map" />
+                    android:src="@drawable/map"
+                    android:tint="@color/colorPrimary" />
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="wrap_content"
@@ -132,9 +134,11 @@
                         android:id="@+id/eventDate"
                         android:layout_width="183dp"
                         android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimary"
                         android:hint="@string/date"
                         android:maxLines="1"
-                        android:text="Date" />
+                        android:text="Date"
+                        android:textColor="@android:color/background_light" />
 
                     <TextView
                         android:id="@+id/dateText"
@@ -160,8 +164,11 @@
                     android:id="@+id/button_image"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorPrimary"
                     android:drawableRight="@drawable/ic_menu_gallery"
-                    android:text="Choose Event Image" />
+                    android:drawableTint="@android:color/background_light"
+                    android:text="Choose Event Image"
+                    android:textColor="@android:color/background_light" />
 
                 <ImageView
                     android:id="@+id/imageView"
@@ -180,10 +187,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/colorPrimary"
                     android:drawableRight="@drawable/ic_menu_send"
-                    android:drawableTint="@android:color/background_dark"
+                    android:drawableTint="@android:color/background_light"
                     android:elevation="0dp"
-                    android:text="@string/create_event" />
+                    android:text="@string/create_event"
+                    android:textColor="@android:color/background_light" />
 
             </LinearLayout>
 
