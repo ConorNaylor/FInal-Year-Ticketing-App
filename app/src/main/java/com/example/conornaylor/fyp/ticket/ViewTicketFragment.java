@@ -126,7 +126,7 @@ public class ViewTicketFragment extends Fragment {
                     public void onClick(View view) {
                         Fragment fragment = ViewEventFragment.newInstance(ticket.getEvent());
                         FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment);
+                        ft.replace(R.id.container, fragment).addToBackStack("viewEventforTicket");;
                         ft.commit();
                     }
                 }

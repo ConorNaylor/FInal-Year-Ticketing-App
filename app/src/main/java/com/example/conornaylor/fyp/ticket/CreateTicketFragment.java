@@ -228,7 +228,7 @@ public class CreateTicketFragment extends Fragment {
             showProgress(false);
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new TicketsListFragment()).addToBackStack("ticketList");
+                ft.replace(R.id.container, new TicketsListFragment());//.addToBackStack("buyTicket");
                 ft.commit();
                 makeTicket(input);
             }else{

@@ -151,7 +151,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (getVisibleFragment() instanceof EventsListFragment){
+        if (getVisibleFragment() instanceof TicketsListFragment){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, new EventsListFragment());
+            ft.commitAllowingStateLoss();
+        }else if (getVisibleFragment() instanceof EventsListFragment){
             if (doubleBackToExitPressedOnce) {
                 Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(logoutIntent);
