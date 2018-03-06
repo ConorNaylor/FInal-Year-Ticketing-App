@@ -86,7 +86,8 @@ public class CreateTicketFragment extends Fragment {
                     obj.getString("id"),
                     obj.getString("seat"),
                     obj.getString("user"),
-                    event
+                    event,
+                    false
             );
         }catch(JSONException e ) {
             e.printStackTrace();

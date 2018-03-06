@@ -19,7 +19,10 @@ import android.widget.Toast;
 
 import com.example.conornaylor.fyp.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class EventsListFragment extends Fragment {
@@ -31,6 +34,8 @@ public class EventsListFragment extends Fragment {
     private String canMakeEventString = "canMakeEvent";
     private String userID;
     private boolean canMakeEvent;
+    private String dateString;
+    private String todayString;
 
 
     public EventsListFragment() {
@@ -54,7 +59,17 @@ public class EventsListFragment extends Fragment {
         userID = preferences.getString(userIdString, null);
         canMakeEvent = preferences.getBoolean(canMakeEventString, false);
 
-        ArrayList<Event> events =  Event.getEvents();
+        Date date = new Date();
+        todayString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(date);
+
+        ArrayList<Event> allEvents =  Event.getEvents();
+        ArrayList<Event> events =  new ArrayList<>();
+        for(Event e: allEvents){
+            dateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(e.getDate());
+            if(e.getDate().after(date) || todayString.equals(dateString)){
+                events.add(e);
+            }
+        }
         ListView eventsList = view.findViewById(R.id.eventList);
         ListAdapter myAdapter = new EventAdaptor(getActivity(), events);
         eventsList.setAdapter(myAdapter);

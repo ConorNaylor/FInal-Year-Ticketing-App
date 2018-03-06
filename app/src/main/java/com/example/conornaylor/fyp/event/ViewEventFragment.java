@@ -4,8 +4,6 @@ package com.example.conornaylor.fyp.event;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -20,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.conornaylor.fyp.ticket.CreateTicketFragment;
-import com.example.conornaylor.fyp.utilities.EventStatsFragment;
 import com.example.conornaylor.fyp.utilities.NFCDisplayActivity;
 import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.ticket.Ticket;
@@ -28,6 +25,7 @@ import com.example.conornaylor.fyp.ticket.ViewTicketFragment;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import static android.R.drawable.ic_menu_manage;
@@ -56,8 +54,10 @@ public class ViewEventFragment extends Fragment {
     private SharedPreferences preferences;
     private String userIdString = "id";
     private String userID;
-    private String date;
+    private String dateString;
+    private String todayString;
     private Ticket ticket;
+    private Date date;
 
 
     public ViewEventFragment() {
@@ -94,8 +94,6 @@ public class ViewEventFragment extends Fragment {
 
         getActivity().setTitle(event.getTitle());
 
-        date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate());
-
 //        show = false;
         authButton = getActivity().findViewById(R.id.auth_button);
         editFab = getActivity().findViewById(R.id.editFab);
@@ -114,6 +112,10 @@ public class ViewEventFragment extends Fragment {
 
         Picasso.with(getActivity()).load("http://18.218.18.192:8000"  + event.getImageURL()).into(eventImageView);
 
+        date = new Date();
+        todayString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(date);
+        dateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate());
+
         if (!event.getUserId().equals(userID)) {
             editFab.setVisibility(View.INVISIBLE);
             editFab.setEnabled(false);
@@ -121,6 +123,7 @@ public class ViewEventFragment extends Fragment {
             deleteFab.setEnabled(false);
             numTicksText.setVisibility(View.INVISIBLE);
             button.setText("Buy Ticket");
+
             if(hasTicket()) {
                 authButton.setText("View Ticket(s)");
             }else{
@@ -138,7 +141,7 @@ public class ViewEventFragment extends Fragment {
 
         nameText.setText(event.getTitle());
         descText.setText(event.getDescription());
-        dateText.setText(date);
+        dateText.setText(dateString);
         locText.setText(event.getAddress());
         if (event.getPrice() <= 0) {
             priceText.setText("Free");
@@ -177,7 +180,7 @@ public class ViewEventFragment extends Fragment {
                     deleteFab.setVisibility(View.VISIBLE);
                 }
                 else{
-                        deleteFab.setVisibility(View.INVISIBLE);
+                    deleteFab.setVisibility(View.INVISIBLE);
                 }
                 nameText.setEnabled(show);
                 descText.setEnabled(show);
@@ -187,50 +190,48 @@ public class ViewEventFragment extends Fragment {
             }
         });
 
-        if (event.getUserId().equals(userID)) {
+        {
+
             authButton.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent myIntent = new Intent(getActivity(), NFCDisplayActivity.class);
-                            getActivity().startActivity(myIntent);
-                        }
-                    }
-            );
-        }else {
-            authButton.setOnClickListener(
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Fragment fragment = ViewTicketFragment.newInstance(ticket);
-                            FragmentTransaction ft = getFragmentManager().beginTransaction();
-                            ft.replace(R.id.container, fragment).addToBackStack("createTicket");
-                            ft.commit();
+                            if (event.getUserId().equals(userID)) {
+                                if (dateString.equals(todayString)) {
+                                    Intent myIntent = new Intent(getActivity(), NFCDisplayActivity.class);
+                                    getActivity().startActivity(myIntent);
+                                } else{
+                                    Toast.makeText(getActivity(), "Only available on day of event.", Toast.LENGTH_SHORT).show();
+                                }
+                            } else {
+                                    Fragment fragment = ViewTicketFragment.newInstance(ticket);
+                                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                                    ft.replace(R.id.container, fragment).addToBackStack("viewTicket");
+                                    ft.commit();
+                            }
                         }
                     }
             );
         }
 
-        if (!event.getUserId().equals(userID)) {
-            button.setOnClickListener(
-                    new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Fragment fragment = CreateTicketFragment.newInstance(event);
-                            FragmentTransaction ft = getFragmentManager().beginTransaction();
-                            ft.replace(R.id.container, fragment).addToBackStack("createTicket");
-                            ft.commit();
-                        }
-                    }
-            );
-        }else button.setOnClickListener(
+        button.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Fragment fragment = EventStatsFragment.newInstance(event);
-                        FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.replace(R.id.container, fragment).addToBackStack("createTicket");
-                        ft.commit();
+                        if (event.getUserId().equals(userID)) {
+                                Fragment fragment = EventStatsFragment.newInstance(event);
+                                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                                ft.replace(R.id.container, fragment).addToBackStack("stats");
+                                ft.commit();
+                        } else {
+                            if(date.before(event.getDate()) || dateString.equals(todayString)){
+                                Fragment fragment = CreateTicketFragment.newInstance(event);
+                                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                                ft.replace(R.id.container, fragment).addToBackStack("createTicket");
+                                ft.commit();
+                            }else
+                                Toast.makeText(getActivity(), "Only available before event.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
         );

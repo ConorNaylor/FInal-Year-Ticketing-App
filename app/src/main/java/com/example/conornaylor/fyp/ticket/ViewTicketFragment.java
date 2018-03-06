@@ -11,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.example.conornaylor.fyp.activities.EnterActivity;
@@ -20,6 +22,7 @@ import com.example.conornaylor.fyp.R;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 
@@ -36,9 +39,11 @@ public class ViewTicketFragment extends Fragment {
     private TextView locText;
     private ImageView ticketImage;
     private Button button;
+    private CheckBox enteredBox;
     private FloatingActionButton fab;
     private boolean isTicketOwner = true;
     private String date;
+    private String todayString;
 
     public ViewTicketFragment() {
         // Required empty public constructor
@@ -72,9 +77,10 @@ public class ViewTicketFragment extends Fragment {
 
         getActivity().setTitle(ticket.getEvent().getTitle());
 
+        Date today = new Date();
         date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(ticket.getEvent().getDate());
+        todayString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(today);
 
-//        show = false;
         fab = getActivity().findViewById(R.id.enterEventFAB);
         button = getActivity().findViewById(R.id.viewEventButton);
         nameText = getActivity().findViewById(R.id.viewEventName);
@@ -83,8 +89,13 @@ public class ViewTicketFragment extends Fragment {
         seatText = getActivity().findViewById(R.id.viewTicketSeat);
         locText = getActivity().findViewById(R.id.viewEventLocation);
         ticketImage = getActivity().findViewById(R.id.imageViewTicket);
+        enteredBox = getActivity().findViewById(R.id.enteredRadio);
 
-        if(!isTicketOwner) {
+        enteredBox.setChecked(ticket.isEntered());
+        enteredBox.setClickable(false);
+
+
+        if(!isTicketOwner || !date.equals(todayString) || ticket.isEntered() ) {
             fab.setVisibility(View.INVISIBLE);
         }
 
@@ -103,9 +114,6 @@ public class ViewTicketFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                FragmentTransaction ft = getFragmentManager().beginTransaction();
-//                ft.replace(R.id.container, new EnterFragment());
-//                ft.commit();
                 Intent intent = new Intent(getActivity(), EnterActivity.class);
                 intent.putExtra("ticket_id", ticket.getId());
                 startActivity(intent);

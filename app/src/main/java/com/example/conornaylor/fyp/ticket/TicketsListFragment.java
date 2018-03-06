@@ -42,6 +42,8 @@ public class TicketsListFragment extends Fragment {
     private JSONArray jArray;
     private ListAdapter myUpcomingAdapter;
     private ListAdapter myPastAdapter;
+    private String todayString;
+    private String dateString;
 
     public TicketsListFragment() {
         // Required empty public constructor
@@ -78,13 +80,15 @@ public class TicketsListFragment extends Fragment {
         tabHost.addTab(tab2);
 
         Date date = new Date();
+        todayString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(date);
 
         // Inflate the layout for this fragment
         ArrayList<Ticket> myUpcomingTickets = new ArrayList<>();
         ArrayList<Ticket> myPastTickets = new ArrayList<>();
 
         for (Ticket t : Ticket.getTickets()) {
-            if (t.getEvent().getDate().after(date)) {
+            dateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(t.getEvent().getDate());
+            if (t.getEvent().getDate().after(date) || todayString.equals(dateString)) {
                 if(!myUpcomingTickets.contains(t)){
                     myUpcomingTickets.add(t);
                 }

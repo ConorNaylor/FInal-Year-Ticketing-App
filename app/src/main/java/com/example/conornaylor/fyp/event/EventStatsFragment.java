@@ -1,4 +1,4 @@
-package com.example.conornaylor.fyp.utilities;
+package com.example.conornaylor.fyp.event;
 
 
 import android.content.Context;
@@ -14,8 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.conornaylor.fyp.event.Event;
 import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.utilities.AttendeeListFragment;
 import com.google.gson.Gson;
 
 import org.json.JSONException;

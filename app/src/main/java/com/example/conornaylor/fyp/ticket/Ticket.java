@@ -15,14 +15,20 @@ public class Ticket implements Serializable{
     private String seat;
     private String userId;
     private Event event;
+    private boolean entered;
     private static ArrayList<Ticket> tickets = new ArrayList<>();
 
-    public Ticket(String ticketId, String seat, String userId, Event event){
+    public Ticket(String ticketId, String seat, String userId, Event event, boolean entered){
         this.ticketId = ticketId;
         this.seat = seat;
         this.userId = userId;
         this.event = event;
+        this.entered = entered;
         addUniqueTickets(this);
+    }
+
+    public boolean isEntered() {
+        return entered;
     }
 
     public static ArrayList<Ticket> getTickets(){

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.conornaylor.fyp.utilities.EventStatsFragment">
+    tools:context="com.example.conornaylor.fyp.event.EventStatsFragment">
 
     <!-- TODO: Update blank fragment layout -->
 

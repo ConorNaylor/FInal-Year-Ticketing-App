@@ -3,6 +3,7 @@ package com.example.conornaylor.fyp.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -15,16 +16,22 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.ticket.DownloadTickets;
+import com.example.conornaylor.fyp.ticket.Ticket;
 
 public class EnterActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
 
     private String ticket;
     private View progressView;
+    private DownloadTickets dt;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter);
+
+        context = this;
 
         progressView = findViewById(R.id.progressBarAuth);
         showProgress(true);
@@ -49,6 +56,8 @@ public class EnterActivity extends AppCompatActivity implements NfcAdapter.Creat
             @Override
             public void run() {
                 onBackPressed();
+                Ticket.deleteTickets();
+                dt = new DownloadTickets(context);
             }
         }, 10000);
 

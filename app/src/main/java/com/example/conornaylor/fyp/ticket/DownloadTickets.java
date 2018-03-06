@@ -62,7 +62,8 @@ public class DownloadTickets {
                         obj.getString("id"),
                         obj.getString("seat"),
                         obj.getString("user"),
-                        Event.getEventByID(obj.getString("event")));
+                        Event.getEventByID(obj.getString("event")),
+                        obj.getBoolean("entered"));
             }
         } catch(JSONException e){
             e.printStackTrace();

@@ -110,30 +110,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-//    public JSONArray getEventPreferences() {
-//        String array = "";
-//        eventPreferences = getSharedPreferences(EventPreferences, Context.MODE_PRIVATE);
-//        Map<String, ?> allEntries = eventPreferences.getAll();
-//        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-//            array = array + entry.getValue().toString();
-//            System.out.println(array);
-//        }
-//        try {
-//            jsonArray = new JSONArray(array);
-//        } catch (JSONException e1) {
-//            e1.printStackTrace();
-//        }
-//        return jsonArray;
-//    }
-//
-//    public void saveEventPreferences(Event event){
-//        eventPreferences = getSharedPreferences(EventPreferences, Context.MODE_PRIVATE);
-//        e2 = eventPreferences.edit();
-//        Gson gson = new Gson();
-//        String json = gson.toJson(event);
-//        e2.putString(event.getId(), json);
-//        e2.commit();
-//    }
 
     public void makeEvents(JSONArray jArray) {
         try {
@@ -170,7 +146,7 @@ public class MainActivity extends AppCompatActivity
         }
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.container, new EventsListFragment());
-        ft.commit();
+        ft.commitAllowingStateLoss();
     }
 
     @Override
