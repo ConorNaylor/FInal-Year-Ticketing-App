@@ -3,7 +3,12 @@ package com.example.conornaylor.fyp.ticket;
 import com.example.conornaylor.fyp.event.Event;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by conornaylor on 10/11/2017.
@@ -45,16 +50,12 @@ public class Ticket implements Serializable{
         return seat;
     }
 
-    public void setSeat(String seat) {
-        this.seat = seat;
-    }
-
     public String getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public String toString(){
+        return this.getSeat();
     }
 
     public Event getEvent() {
@@ -80,7 +81,7 @@ public class Ticket implements Serializable{
         return tick.getEvent().getId() == this.getEvent().getId();
     }
 
-    public void addUniqueTickets(Ticket t) {
+    private void addUniqueTickets(Ticket t) {
         if(tickets.isEmpty()){
             tickets.add(t);
         }else{
@@ -91,5 +92,43 @@ public class Ticket implements Serializable{
             }
             tickets.add(t);
         }
+    }
+
+    public static ArrayList<Ticket> getOneTicketPerEvent(){
+        ArrayList<Ticket> list = new ArrayList<>();
+        for (Ticket t : getTickets()) {
+            if(!list.contains(t)){
+                list.add(t);
+            }
+        }
+        return list;
+    }
+
+    public static ArrayList<ArrayList<Ticket>> getAllTicketsPerEvent() {
+        Map<String, ArrayList<Ticket>> map = new HashMap<>();
+        ArrayList<Ticket> allTickets = Ticket.getTickets();
+
+        ArrayList<Ticket> tickets = getOneTicketPerEvent();
+        for (int i = 0; i < tickets.size(); i++) {
+            map.put(tickets.get(i).getEvent().getId(), new ArrayList<Ticket>());
+        }
+        for (int i = 0; i < allTickets.size(); i++) {
+            Ticket t = allTickets.get(i);
+            map.get(t.getEvent().getId()).add(t);
+        }
+        // Convert to list of lists
+        return new ArrayList<>(map.values());
+    }
+
+    public static ArrayList<Ticket> getAllTicketsForEvent(Event e) {
+        ArrayList<Ticket> allTickets = Ticket.getTickets();
+        ArrayList<Ticket> list = new ArrayList<>();
+
+        for(Ticket t: allTickets) {
+            if(t.getEvent().getId().equals(e.getId())){
+                list.add(t);
+            }
+        }
+        return list;
     }
 }

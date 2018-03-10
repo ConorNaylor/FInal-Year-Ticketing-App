@@ -72,6 +72,7 @@
                                 android:ems="10"
                                 android:fontFamily="sans-serif"
                                 android:inputType="textPersonName"
+                                android:paddingLeft="5dp"
                                 android:text="Name"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                                 android:textColor="@android:color/black"
@@ -85,23 +86,10 @@
                                 android:ems="10"
                                 android:inputType="textPersonName"
                                 android:maxLines="4"
+                                android:paddingLeft="5dp"
                                 android:paddingTop="5dp"
                                 android:text="Date"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                                android:textColor="@android:color/black"
-                                android:textSize="18sp" />
-
-                            <TextView
-                                android:id="@+id/viewTicketSeat"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:background="@android:color/transparent"
-                                android:ems="10"
-                                android:hint="@string/price"
-                                android:inputType="number"
-                                android:paddingTop="5dp"
-                                android:text="Seat"
-                                android:textAppearance="@style/TextAppearance.AppCompat.Large"
                                 android:textColor="@android:color/black"
                                 android:textSize="18sp" />
 
@@ -113,11 +101,17 @@
                                 android:ems="10"
                                 android:hint="@string/price"
                                 android:inputType="number"
+                                android:paddingLeft="5dp"
                                 android:paddingTop="5dp"
                                 android:text="Price"
                                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                                 android:textColor="@android:color/black"
                                 android:textSize="18sp" />
+
+                            <Spinner
+                                android:id="@+id/ticketSpinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="34dp" />
 
                             <CheckBox
                                 android:id="@+id/enteredRadio"

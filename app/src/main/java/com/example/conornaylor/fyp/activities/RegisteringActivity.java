@@ -42,6 +42,7 @@ public class RegisteringActivity extends AppCompatActivity {
     private String usernameString = "username";
     private String userEmailString = "email";
     private String userIdString = "id";
+    private String passwordString = "password";
     private View focusView;
 
     // UI references.
@@ -134,6 +135,12 @@ public class RegisteringActivity extends AppCompatActivity {
             cancel = true;
         }
 
+        if ((name.contains(" "))) {
+            mNameView.setError("Username cannot contain any spaces.");
+            focusView = mNameView;
+            cancel = true;
+        }
+
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -222,7 +229,6 @@ public class RegisteringActivity extends AppCompatActivity {
         protected Boolean doInBackground(Void... params) {
             try {
                 String url = "http://18.218.18.192:8000/makeusers/"; //Galway
-//                String url = "http://192.168.1.5:8000/makeusers/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -258,7 +264,6 @@ public class RegisteringActivity extends AppCompatActivity {
                     }
                     br.close();
                     auth = sb.toString();
-                    System.out.println(sb.toString());
                 } else {
                     System.out.println(con.getResponseMessage());
                 }
@@ -276,10 +281,11 @@ public class RegisteringActivity extends AppCompatActivity {
                     e.putString(userIdString, jsonObject.getJSONObject("user").getString(userIdString));
                     e.putString(userEmailString, jsonObject.getJSONObject("user").getString(userEmailString));
                     e.putString(usernameString, jsonObject.getJSONObject("user").getString(usernameString));
+                    e.putString(passwordString, mPassword);
                 }catch(JSONException error){
                     error.printStackTrace();
                 }
-                e.commit();
+                e.apply();
                 return true;
             }
             else return false;
@@ -289,22 +295,8 @@ public class RegisteringActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
 
             if (success) {
-                if (auth.contains("token")) {
-                    e = preferences.edit();
-                    try {
-                        jsonObject = new JSONObject(auth);
-                        e.putString(tokenString, jsonObject.getString(tokenString));
-                        e.putString(userIdString, jsonObject.getJSONObject("user").getString(userIdString));
-                        e.putString(userEmailString, jsonObject.getJSONObject("user").getString(userEmailString));
-                        e.putString(usernameString, jsonObject.getJSONObject("user").getString(usernameString));
-                    } catch (JSONException error) {
-                        error.printStackTrace();
-                    }
-                    e.commit();
-                }
                 Intent myIntent = new Intent(RegisteringActivity.this, MainActivity.class);
                 RegisteringActivity.this.startActivity(myIntent);
                 finish();

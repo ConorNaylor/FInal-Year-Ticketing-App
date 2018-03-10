@@ -65,7 +65,7 @@ public class CreateEventFragment extends Fragment{
     private String tk = "token";
     private String userId = "id";
     private String userID;
-    private getEventsTask mAuthTask = null;
+    private putEventsTask mAuthTask = null;
     private View mCreateEventView;
     private View mProgressView;
     private EditText eventName;
@@ -122,7 +122,7 @@ public class CreateEventFragment extends Fragment{
         token = preferences.getString(tk, null);
         userID = preferences.getString(userId, null);
 
-        mAuthTask = new getEventsTask();
+        mAuthTask = new putEventsTask();
 
         mCreateEventView = getActivity().findViewById(R.id.event_form);
         mProgressView = getActivity().findViewById(R.id.create_event_progress);
@@ -184,11 +184,17 @@ public class CreateEventFragment extends Fragment{
                     focusView = eventDesc;
                 } else if (TextUtils.isEmpty(eventPrice.getText().toString())) {
                     eventPrice.setError(getString(R.string.error_field_required));
-                    focusView = eventNumTicks;
+                    focusView = eventPrice;
+                } else if(Double.valueOf(eventPrice.getText().toString()) > 999){
+                    eventPrice.setError("Price must not exceed €999");
+                    focusView = eventPrice;
                 } else if (TextUtils.isEmpty(eventNumTicks.getText().toString())) {
                     eventNumTicks.setError(getString(R.string.error_field_required));
                     focusView = eventNumTicks;
-                } else if (TextUtils.isEmpty(eventDateString)) {
+                } else if(Integer.valueOf(eventNumTicks.getText().toString()) == 0){
+                    eventNumTicks.setError("Must be greater than 0");
+                    focusView = eventNumTicks;
+                }else if (TextUtils.isEmpty(eventDateString)) {
                     eventDate.setError(getString(R.string.error_field_required));
                     focusView = eventDate;
                 } else if (!pictureChosen) {
@@ -197,16 +203,15 @@ public class CreateEventFragment extends Fragment{
                 } else {
                     eventNumTicksInt = Integer.valueOf(eventNumTicks.getText().toString());
                     eventPriceD = Double.valueOf(eventPrice.getText().toString());
-                    mAuthTask = new getEventsTask();
+                    mAuthTask = new putEventsTask();
                     mAuthTask.execute();
-//                    ImageHandler im = new ImageHandler(token, bitmap, eventNameString, eventDescString, eventPriceD, eventNumTicksInt, eventLocString, eventDateString, userId);
                     showProgress(true);
                 }
             }
         });
     }
 
-    public static void dateEditied() throws ParseException {
+    public static void dateEdited() throws ParseException {
         String date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(DatePickerFragment.formattedDate);
         dateText.setText(date);
     }
@@ -295,12 +300,11 @@ public class CreateEventFragment extends Fragment{
     }
 
 
-    public class getEventsTask extends AsyncTask<Void, Void, Boolean> {
+    public class putEventsTask extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
                 String url = "http://18.218.18.192:8000/events/";
-//                String url = "http://192.168.1.5:8000/events/";
                 URL object = new URL(url);
 
                 HttpURLConnection c = (HttpURLConnection) object.openConnection();
@@ -319,7 +323,6 @@ public class CreateEventFragment extends Fragment{
                 encodedString = Base64.encodeToString(byte_arr, 0);
 
                 eventDateStringUp = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(DatePickerFragment.formattedDate);
-                System.out.println("The date of all this :"+eventDateStringUp);
 
                 JSONObject ev = new JSONObject();
                 try {

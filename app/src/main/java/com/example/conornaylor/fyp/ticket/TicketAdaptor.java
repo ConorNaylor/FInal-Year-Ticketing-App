@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.conornaylor.fyp.event.Event;
 import com.example.conornaylor.fyp.R;
 import com.squareup.picasso.Picasso;
@@ -68,7 +69,12 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
         ticketName.setText(t.getEvent().getTitle());
         ticketDate.setText(date);
         ticketSeat.setText(t.getSeat());
-        Picasso.with(context).load("http://18.218.18.192:8000"  + t.getEvent().getImageURL()).into(eventImage);
+
+        Glide.with(context)
+                .load("http://18.218.18.192:8000"  + t.getEvent().getImageURL())
+                .fitCenter()
+                .into(eventImage);
+
         if(t.getEvent().getPrice() <= 0){
             ticketPrice.setText("Free");
         }else {

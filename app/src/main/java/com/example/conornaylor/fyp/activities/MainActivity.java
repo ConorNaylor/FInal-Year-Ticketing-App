@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.conornaylor.fyp.ticket.Ticket;
+import com.example.conornaylor.fyp.ticket.ViewTicketFragment;
 import com.example.conornaylor.fyp.utilities.AccountFragment;
 import com.example.conornaylor.fyp.event.Event;
 import com.example.conornaylor.fyp.event.EventsListFragment;
@@ -151,7 +152,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (getVisibleFragment() instanceof TicketsListFragment){
+        if (getVisibleFragment() instanceof ViewTicketFragment){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, new TicketsListFragment()).addToBackStack("blah");
+            ft.commit();
+        }else if (getVisibleFragment() instanceof TicketsListFragment){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, new EventsListFragment());
             ft.commitAllowingStateLoss();

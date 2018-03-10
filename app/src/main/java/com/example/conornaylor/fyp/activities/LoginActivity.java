@@ -99,18 +99,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-//        if(NfcAdapter.getDefaultAdapter(this) == null){
-//            basicAlert("Your device is not NFC enabled.");
-//        }else if(!NfcAdapter.getDefaultAdapter(this).isEnabled()){
-//            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-//            Intent NFCSettingsintent = new Intent(Settings.ACTION_NFC_SETTINGS);
-//            Intent closeAppIntent = new Intent(Intent.ACTION_MAIN);
-//            closeAppIntent.addCategory(Intent.CATEGORY_HOME);
-//            settingsAlert("Enable your NFC chip to continue.", NFCSettingsintent,closeAppIntent);
-//        }else{
-//            nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-//        }
-
 
         // Set up the login form.
         mUsername = (AutoCompleteTextView) findViewById(R.id.email);

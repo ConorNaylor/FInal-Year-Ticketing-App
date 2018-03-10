@@ -22,7 +22,9 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -85,17 +87,22 @@ public class TicketsListFragment extends Fragment {
         // Inflate the layout for this fragment
         ArrayList<Ticket> myUpcomingTickets = new ArrayList<>();
         ArrayList<Ticket> myPastTickets = new ArrayList<>();
+        ArrayList<Ticket> uniqueTicketForEvents = Ticket.getOneTicketPerEvent();
+        ArrayList<ArrayList<Ticket>> splitTickets = Ticket.getAllTicketsPerEvent();
 
-        for (Ticket t : Ticket.getTickets()) {
+        for (Ticket t : uniqueTicketForEvents) {
             dateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(t.getEvent().getDate());
             if (t.getEvent().getDate().after(date) || todayString.equals(dateString)) {
-                if(!myUpcomingTickets.contains(t)){
-                    myUpcomingTickets.add(t);
-                }
+                myUpcomingTickets.add(t);
             } else {
-                if(!myPastTickets.contains(t)){
-                    myPastTickets.add(t);
-                }
+                myPastTickets.add(t);
+            }
+        }
+
+        for (ArrayList i : splitTickets) {
+            for (Object t : i) {
+                Ticket tick = (Ticket) t;
+                System.out.println(tick.getEvent().getId());
             }
         }
 
@@ -131,5 +138,4 @@ public class TicketsListFragment extends Fragment {
                 }
         );
     }
-
 }

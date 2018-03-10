@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,11 +32,11 @@
             android:layout_gravity="bottom|right"
             android:layout_margin="16dp"
             android:longClickable="true"
+            android:scaleType="center"
             android:src="@android:drawable/ic_input_add"
-            android:tint="@color/colorPrimary"
-            app:backgroundTint="@android:color/background_light"
-            app:layout_anchorGravity="bottom|right|end"
-            android:scaleType="center" />
+            android:tint="@android:color/background_light"
+            app:backgroundTint="@color/colorPrimary"
+            app:layout_anchorGravity="bottom|right|end" />
 
     </android.support.design.widget.CoordinatorLayout>
 

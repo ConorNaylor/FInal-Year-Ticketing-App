@@ -144,7 +144,6 @@ public class AccountFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/event/";
                 String url = "http://18.218.18.192:8000/profile/";
                 URL object = new URL(url);
 

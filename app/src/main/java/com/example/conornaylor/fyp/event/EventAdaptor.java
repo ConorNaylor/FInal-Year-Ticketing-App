@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.conornaylor.fyp.R;
 import com.squareup.picasso.Picasso;
 
@@ -71,18 +72,24 @@ public class EventAdaptor extends ArrayAdapter<Event> {
             eventPrice.setText("€" + e.getPrice().toString());
         }
 
-        Picasso.Builder builder = new Picasso.Builder(context);
+        //Picasso.Builder builder = new Picasso.Builder(context);
 
-        builder.listener(new Picasso.Listener()
-        {
-            @Override
-            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
-            {
-                exception.printStackTrace();
-            }
-        });
+//        builder.listener(new Picasso.Listener()
+//        {
+//            @Override
+//            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
+//            {
+//                exception.printStackTrace();
+//            }
+//        });
 
-        builder.build().load("http://18.218.18.192:8000"  + e.getImageURL()).into(eventImage);
+        //builder.build().load("http://18.218.18.192:8000"  + e.getImageURL()).into(eventImage);
+
+        Glide.with(context)
+                .load("http://18.218.18.192:8000"  + e.getImageURL())
+                .fitCenter()
+                .into(eventImage);
+
         return customView;
     }
 }

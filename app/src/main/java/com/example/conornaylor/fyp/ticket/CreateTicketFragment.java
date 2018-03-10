@@ -47,16 +47,19 @@ public class CreateTicketFragment extends Fragment {
     private String userID;
     private Ticket ticket;
     private CreateTicketFragment.createTicketTask mAuthTask = null;
+    private CreateTicketFragment.getSeatTask getSeatTask = null;
     private Event event;
     private Button button;
     private TextView eventName;
     private TextView eventPrice;
     private String input;
+    private String numberTicketsInput;
     private ProgressBar spinner;
     private View mProgressView;
     private View mLoginFormView;
     private Gson gson;
     private String str;
+    private String seat;
 
     public CreateTicketFragment() {
         // Required empty public constructor
@@ -94,6 +97,31 @@ public class CreateTicketFragment extends Fragment {
         }
     }
 
+    private String getSeat(String in){
+        try {
+            gson = new Gson();
+            str = gson.toJson(event);
+            JSONObject obj = new JSONObject(in);
+            int s = obj.getInt("count");
+            int count = 0;
+            int sum = s;
+            int[] ints = new int[100];
+            char[] chars = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+            for (int i = 0; i < 100; ++i) {
+                ints[i] = i + 1;
+            }
+            while(sum - 100 > 100) {
+                count++;
+                sum = sum - 100;
+            }
+
+            return chars[count] + Integer.toString(ints[sum]);
+        }catch(JSONException e ) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,6 +138,7 @@ public class CreateTicketFragment extends Fragment {
         userID = preferences.getString(userId, null);
 
         mAuthTask = new createTicketTask();
+        getSeatTask = new getSeatTask();
 
         button = getActivity().findViewById(R.id.confirm_purchase);
         eventName = getActivity().findViewById(R.id.confirmEventName);
@@ -128,7 +157,7 @@ public class CreateTicketFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mAuthTask.execute();
+                        getSeatTask.execute();
                         showProgress(true);
                     }
                 }
@@ -173,7 +202,6 @@ public class CreateTicketFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-//                String url = "http://192.168.0.59:8000/tickets/";
                 String url = "http://18.218.18.192:8000/tickets/";
                 URL object = new URL(url);
 
@@ -188,7 +216,7 @@ public class CreateTicketFragment extends Fragment {
                 JSONObject ev = new JSONObject();
                 try{
                     ev.put("event", event.getId());
-                    ev.put("seat", "5A");
+                    ev.put("seat", getSeat(numberTicketsInput));
                     ev.put("user", userID);
                 }catch(JSONException e){
                     e.printStackTrace();
@@ -228,7 +256,7 @@ public class CreateTicketFragment extends Fragment {
             showProgress(false);
             if(b) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.replace(R.id.container, new TicketsListFragment());//.addToBackStack("buyTicket");
+                ft.replace(R.id.container, new TicketsListFragment());
                 ft.commit();
                 makeTicket(input);
             }else{
@@ -240,6 +268,70 @@ public class CreateTicketFragment extends Fragment {
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+        }
+    }
+
+    public class getSeatTask extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                String url = "http://18.218.18.192:8000/numtickets/";
+                URL object = new URL(url);
+
+                HttpURLConnection con = (HttpURLConnection) object.openConnection();
+                con.setDoInput(true);
+                con.setDoOutput(true);
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                con.setRequestProperty("Accept", "application/json");
+                con.setRequestProperty("Authorization", "Token " + token);
+                con.setRequestMethod("POST");
+
+                JSONObject ev = new JSONObject();
+                try {
+                    ev.put("event", event.getId());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                wr.write(ev.toString());
+                wr.flush();
+
+                StringBuilder sb = new StringBuilder();
+                int HttpResult = con.getResponseCode();
+                if (HttpResult == HttpURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(con.getInputStream(), "utf-8"));
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    if (sb.toString() != null) {
+                        numberTicketsInput = sb.toString();
+                        System.out.println(numberTicketsInput);
+                    }
+                } else {
+                    System.out.println(con.getResponseMessage());
+                    return false;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            getSeatTask = null;
+            if (b) {
+                mAuthTask.execute();
+            }
+        }
+
+        @Override
+        protected void onCancelled () {
+            getSeatTask = null;
         }
     }
 }

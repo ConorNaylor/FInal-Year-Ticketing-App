@@ -10,18 +10,23 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.conornaylor.fyp.activities.EnterActivity;
 import com.example.conornaylor.fyp.event.ViewEventFragment;
 import com.example.conornaylor.fyp.R;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -34,7 +39,6 @@ public class ViewTicketFragment extends Fragment {
     private Ticket ticket;
     private TextView nameText;
     private TextView dateText;
-    private TextView seatText;
     private TextView priceText;
     private TextView locText;
     private ImageView ticketImage;
@@ -44,6 +48,9 @@ public class ViewTicketFragment extends Fragment {
     private boolean isTicketOwner = true;
     private String date;
     private String todayString;
+    private ArrayList<Ticket> tickets;
+    private Spinner spinner;
+    private int iCurrentSelection;
 
     public ViewTicketFragment() {
         // Required empty public constructor
@@ -75,6 +82,13 @@ public class ViewTicketFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         readBundle(getArguments());
 
+        tickets = Ticket.getAllTicketsForEvent(ticket.getEvent());
+        for(int i = 0; i < tickets.size(); i++){
+            if(tickets.get(i) == ticket){
+            iCurrentSelection = i;
+            }
+        }
+
         getActivity().setTitle(ticket.getEvent().getTitle());
 
         Date today = new Date();
@@ -86,10 +100,10 @@ public class ViewTicketFragment extends Fragment {
         nameText = getActivity().findViewById(R.id.viewEventName);
         dateText = getActivity().findViewById(R.id.viewTicketDate);
         priceText = getActivity().findViewById(R.id.viewTicketPrice);
-        seatText = getActivity().findViewById(R.id.viewTicketSeat);
         locText = getActivity().findViewById(R.id.viewEventLocation);
         ticketImage = getActivity().findViewById(R.id.imageViewTicket);
         enteredBox = getActivity().findViewById(R.id.enteredRadio);
+        spinner = getActivity().findViewById(R.id.ticketSpinner);
 
         enteredBox.setChecked(ticket.isEntered());
         enteredBox.setClickable(false);
@@ -101,14 +115,17 @@ public class ViewTicketFragment extends Fragment {
 
         nameText.setText(ticket.getEvent().getTitle());
         dateText.setText(date);
-        seatText.setText(ticket.getSeat());
         locText.setText(ticket.getEvent().getAddress());
         if(ticket.getEvent().getPrice() <= 0){
             priceText.setText("Free");
         }else {
             priceText.setText("€" + ticket.getEvent().getPrice().toString());
         }
-        Picasso.with(getActivity()).load("http://18.218.18.192:8000"  + ticket.getEvent().getImageURL()).into(ticketImage);
+
+        Glide.with(getActivity())
+                .load("http://18.218.18.192:8000"  + ticket.getEvent().getImageURL())
+                .fitCenter()
+                .into(ticketImage);
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -132,6 +149,27 @@ public class ViewTicketFragment extends Fragment {
                 }
         );
 
+        ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, tickets);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(iCurrentSelection);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if (iCurrentSelection != i){
+                    Ticket t = (Ticket) adapterView.getItemAtPosition(i);
+                    Fragment fragment = ViewTicketFragment.newInstance(t);
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.replace(R.id.container, fragment).addToBackStack(t.getSeat());
+                    ft.commit();
+                }
+                iCurrentSelection = i;
+            }
+
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                return;
+            }
+        });
     }
 
 }

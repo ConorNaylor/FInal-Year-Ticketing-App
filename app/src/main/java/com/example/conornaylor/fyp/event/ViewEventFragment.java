@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.conornaylor.fyp.ticket.CreateTicketFragment;
 import com.example.conornaylor.fyp.utilities.NFCDisplayActivity;
 import com.example.conornaylor.fyp.R;
@@ -48,8 +48,6 @@ public class ViewEventFragment extends Fragment {
     private Button authButton;
     private ImageView eventImageView;
     private boolean show = false;
-    private FloatingActionButton editFab;
-    private FloatingActionButton deleteFab;
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
     private String userIdString = "id";
@@ -96,8 +94,6 @@ public class ViewEventFragment extends Fragment {
 
 //        show = false;
         authButton = getActivity().findViewById(R.id.auth_button);
-        editFab = getActivity().findViewById(R.id.editFab);
-        deleteFab = getActivity().findViewById(R.id.deleteFab);
         button = getActivity().findViewById(R.id.viewStatsButton);
         nameText = getActivity().findViewById(R.id.viewEventName);
         descText = getActivity().findViewById(R.id.viewEventDescription);
@@ -107,20 +103,17 @@ public class ViewEventFragment extends Fragment {
         locText = getActivity().findViewById(R.id.viewEventLocation);
         eventImageView = getActivity().findViewById(R.id.viewEventImage);
 
-        deleteFab.setVisibility(View.INVISIBLE);
-        editFab.setImageResource(ic_menu_manage);
+        Glide.with(getActivity())
+                .load("http://18.218.18.192:8000"  + event.getImageURL())
+                .fitCenter()
+                .into(eventImageView);
 
-        Picasso.with(getActivity()).load("http://18.218.18.192:8000"  + event.getImageURL()).into(eventImageView);
 
         date = new Date();
         todayString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(date);
         dateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate());
 
         if (!event.getUserId().equals(userID)) {
-            editFab.setVisibility(View.INVISIBLE);
-            editFab.setEnabled(false);
-            deleteFab.setVisibility(View.INVISIBLE);
-            deleteFab.setEnabled(false);
             numTicksText.setVisibility(View.INVISIBLE);
             button.setText("Buy Ticket");
 
@@ -150,46 +143,6 @@ public class ViewEventFragment extends Fragment {
         }
         numTicksText.setText(event.getNumTicks() + "");
 
-        deleteFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                show = false;
-                deleteFab.setVisibility(View.INVISIBLE);
-                editFab.setImageResource(ic_menu_manage);
-                nameText.setEnabled(show);
-                descText.setEnabled(show);
-                dateText.setEnabled(show);
-                locText.setEnabled(show);
-                numTicksText.setEnabled(show);
-            }
-        });
-
-        editFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (show) {
-                    show = false;
-                    editFab.setImageResource(ic_menu_manage);
-                    updateEvent();
-                } else {
-                    nameText.requestFocus();
-                    show = true;
-                    editFab.setImageResource(ic_menu_save);
-                }
-                if(show) {
-                    deleteFab.setVisibility(View.VISIBLE);
-                }
-                else{
-                    deleteFab.setVisibility(View.INVISIBLE);
-                }
-                nameText.setEnabled(show);
-                descText.setEnabled(show);
-                dateText.setEnabled(show);
-                locText.setEnabled(show);
-                numTicksText.setEnabled(show);
-            }
-        });
-
         {
 
             authButton.setOnClickListener(
@@ -204,10 +157,10 @@ public class ViewEventFragment extends Fragment {
                                     Toast.makeText(getActivity(), "Only available on day of event.", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
-                                    Fragment fragment = ViewTicketFragment.newInstance(ticket);
-                                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                                    ft.replace(R.id.container, fragment).addToBackStack("viewTicket");
-                                    ft.commit();
+                                Fragment fragment = ViewTicketFragment.newInstance(ticket);
+                                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                                ft.replace(R.id.container, fragment).addToBackStack("viewTicket").addToBackStack(ticket.getSeat());
+                                ft.commit();
                             }
                         }
                     }
@@ -219,10 +172,10 @@ public class ViewEventFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         if (event.getUserId().equals(userID)) {
-                                Fragment fragment = EventStatsFragment.newInstance(event);
-                                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                                ft.replace(R.id.container, fragment).addToBackStack("stats");
-                                ft.commit();
+                            Fragment fragment = EventStatsFragment.newInstance(event);
+                            FragmentTransaction ft = getFragmentManager().beginTransaction();
+                            ft.replace(R.id.container, fragment).addToBackStack("stats");
+                            ft.commit();
                         } else {
                             if(date.before(event.getDate()) || dateString.equals(todayString)){
                                 Fragment fragment = CreateTicketFragment.newInstance(event);
@@ -238,16 +191,6 @@ public class ViewEventFragment extends Fragment {
 
     }
 
-    private void updateEvent() {
-        if(!event.getTitle().equals(nameText.getText().toString()) || !event.getDescription().equals(descText.getText().toString()) || !new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(event.getDate()).equals(dateText.getText().toString()) || !event.getAddress().equals(locText.getText().toString()) || event.getNumTicks() != Integer.parseInt(numTicksText.getText().toString())){
-            event.setTitle(nameText.getText().toString());
-            event.setDescription(descText.getText().toString());
-            event.setAddress(locText.getText().toString());
-            event.setNumTicks(Integer.parseInt(numTicksText.getText().toString()));
-        }
-
-    }
-
     private boolean hasTicket(){
         for(Ticket t: Ticket.getTickets()){
             if(t.getEvent().getId().equals(event.getId())){
@@ -258,3 +201,4 @@ public class ViewEventFragment extends Fragment {
         return false;
     }
 }
+

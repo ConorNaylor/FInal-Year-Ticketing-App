@@ -72,7 +72,7 @@
                         android:id="@+id/eventLocation"
                         android:layout_width="240dp"
                         android:layout_height="wrap_content"
-                        android:hint="@string/location"
+                        android:hint="@string/venue"
                         android:imeActionId="@+id/login"
                         android:imeActionLabel="@string/action_sign_in_short"
                         android:imeOptions="actionUnspecified"

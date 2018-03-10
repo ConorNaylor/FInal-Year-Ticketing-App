@@ -6,14 +6,6 @@
     android:padding="10dp"
     tools:context="com.example.conornaylor.fyp.event.ViewEventFragment">
 
-    <ProgressBar
-        android:id="@+id/create_event_progress"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/main_content"
         android:layout_width="match_parent"
@@ -193,28 +185,6 @@
             </LinearLayout>
 
         </ScrollView>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/editFab"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="5dp"
-            android:src="@drawable/ic_menu_manage"
-            android:tint="@color/colorPrimary"
-            app:backgroundTint="@android:color/background_light"
-            app:layout_anchorGravity="bottom|right|end" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/deleteFab"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="bottom|left"
-            android:layout_margin="5dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="@color/colorPrimary"
-            app:backgroundTint="@android:color/background_light"
-            app:layout_anchorGravity="bottom|right|end" />
 
     </android.support.design.widget.CoordinatorLayout>
 

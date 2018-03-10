@@ -52,7 +52,7 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
         formattedDate = c.getTime();
         try {
-            CreateEventFragment.dateEditied();
+            CreateEventFragment.dateEdited();
         } catch (ParseException e) {
             e.printStackTrace();
         }

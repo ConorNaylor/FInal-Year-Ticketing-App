@@ -41,4 +41,5 @@
     <string name="revenue">Revenue</string>
     <string name="purcahseDate">Purchase Date</string>
     <string name="username">Username</string>
+    <string name="venue">Venue</string>
 </resources>
