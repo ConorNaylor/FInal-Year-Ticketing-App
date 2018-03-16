@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -27,7 +28,7 @@ public class AttendeeAdaptor extends ArrayAdapter<Attendee> {
     private String tk = "token";
     private TextView usernameIDView;
     private TextView purchaseDateView;
-    private ImageButton blockButton;
+    private CheckBox enteredBox;
     private Attendee a;
     public static String clickedUserID;
 
@@ -46,11 +47,12 @@ public class AttendeeAdaptor extends ArrayAdapter<Attendee> {
         a = getItem(position);
         usernameIDView  = customView.findViewById(R.id.customUsernameID);
         purchaseDateView = customView.findViewById(R.id.customPurchaseDate);
-        blockButton = customView.findViewById(R.id.blockButton);
-        blockButton.setVisibility(View.INVISIBLE);
+        enteredBox = customView.findViewById(R.id.enteredBox);
 
         String date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(a.getPruchaseDate());
 
+        enteredBox.setChecked(a.getEntered());
+        enteredBox.setClickable(false);
         usernameIDView.setText(a.getName() + " - " + a.getUserId());
         purchaseDateView.setText(date);
 

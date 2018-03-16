@@ -3,76 +3,87 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:background="@drawable/rect"
+    android:orientation="vertical"
+    android:padding="5dp"
     android:weightSum="1">
 
-    <ImageView
-        android:id="@+id/customeventImage"
-        android:layout_width="175dp"
-        android:layout_height="148dp"
-        android:padding="10dp"
-        app:srcCompat="@drawable/boltmess" />
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="148dp">
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect2"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
-        <TextView
-            android:id="@+id/customeventName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_weight="1"
-            android:padding="5dp"
-            android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/black" />
+        <ImageView
+            android:id="@+id/customeventImage"
+            android:layout_width="175dp"
+            android:layout_height="148dp"
+            android:padding="10dp"
+            app:srcCompat="@drawable/boltmess" />
 
-        <TextView
-            android:id="@+id/customeventAddress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/customeventDate"
-            android:layout_weight="1"
-            android:maxLines="2"
-            android:padding="5dp"
-            android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/black"
-            android:textSize="14sp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="148dp">
 
-        <TextView
-            android:id="@+id/customeventDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/customeventName"
-            android:layout_weight="1"
-            android:maxLines="2"
-            android:padding="5dp"
-            android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/black"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/customeventName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@android:color/black" />
 
-        <TextView
-            android:id="@+id/customeventPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/customeventAddress"
-            android:layout_weight="1"
-            android:padding="5dp"
-            android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/black"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/customeventAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/customeventDate"
+                android:layout_weight="1"
+                android:maxLines="2"
+                android:padding="5dp"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/customeventDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/customeventName"
+                android:layout_weight="1"
+                android:maxLines="2"
+                android:padding="5dp"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/customeventPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/customeventAddress"
+                android:layout_weight="1"
+                android:padding="5dp"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

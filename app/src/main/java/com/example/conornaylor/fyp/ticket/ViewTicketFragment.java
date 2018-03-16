@@ -89,7 +89,7 @@ public class ViewTicketFragment extends Fragment {
             }
         }
 
-        getActivity().setTitle(ticket.getEvent().getTitle());
+        getActivity().setTitle("Ticket - " + ticket.getSeat());
 
         Date today = new Date();
         date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(ticket.getEvent().getDate());

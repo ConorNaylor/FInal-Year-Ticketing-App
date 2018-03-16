@@ -104,7 +104,7 @@ public class Ticket implements Serializable{
         return list;
     }
 
-    public static ArrayList<ArrayList<Ticket>> getAllTicketsPerEvent() {
+    public static ArrayList<ArrayList<Ticket>> getAllTicketsForEachEvent() {
         Map<String, ArrayList<Ticket>> map = new HashMap<>();
         ArrayList<Ticket> allTickets = Ticket.getTickets();
 

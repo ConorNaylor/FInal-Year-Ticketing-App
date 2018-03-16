@@ -20,33 +20,47 @@
             android:layout_height="wrap_content">
 
             <EditText
-                android:focusable="false"
                 android:id="@+id/customUsernameID"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
+                android:focusable="false"
                 android:text="@string/username"
                 android:textColor="@android:color/black"
-                android:textSize="12sp" />
+                android:textSize="8sp" />
 
             <EditText
-                android:focusable="false"
                 android:id="@+id/customPurchaseDate"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/customUsernameID"
+                android:focusable="false"
                 android:text="@string/purcahseDate"
+                android:textColor="@android:color/black"
+                android:textSize="8sp" />
+
+            <CheckBox
+                android:id="@+id/enteredBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/customPurchaseDate"
+                android:layout_alignBottom="@+id/customPurchaseDate"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/customUsernameID" />
+
+            <TextView
+                android:id="@+id/entered"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/customUsernameID"
+                android:text="Entered"
+                android:textAppearance="@android:style/TextAppearance.Material.Medium.Inverse"
                 android:textColor="@android:color/black"
                 android:textSize="12sp" />
 
-            <ImageButton
-                android:id="@+id/blockButton"
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:layout_toEndOf="@+id/customUsernameID"
-                app:srcCompat="@android:drawable/ic_menu_delete" />
         </RelativeLayout>
     </LinearLayout>
 </LinearLayout>

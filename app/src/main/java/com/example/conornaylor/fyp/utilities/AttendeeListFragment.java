@@ -128,7 +128,8 @@ public class AttendeeListFragment extends Fragment {
                             obj.getString("username"),
                             obj.getString("user_id"),
                             obj.getString("ticket_id"),
-                            date);
+                            date,
+                            obj.getBoolean("entered"));
                     attendees.add(a);
                 } catch (JSONException e1) {
                     e1.printStackTrace();
@@ -147,12 +148,11 @@ public class AttendeeListFragment extends Fragment {
     }
 
 
-        public class getUsers extends AsyncTask<Void, Void, Boolean> {
+    public class getUsers extends AsyncTask<Void, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Void...params) {
             try {
-//                String url = "http://192.168.0.59:8000/getusers/";
-                    String url = "http://18.218.18.192:8000/getusers/";
+                String url = "http://18.218.18.192:8000/getusers/";
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();

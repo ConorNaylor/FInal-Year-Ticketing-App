@@ -12,25 +12,29 @@ public class Attendee {
     private String name;
     private String id;
     private String ticketId;
-    private Date pruchaseDate;
+    private Date purchaseDate;
+    private boolean entered;
     private static ArrayList<Attendee> attendees = new ArrayList<>();
 
 
-    public Attendee(String name, String id, String TicketId, Date purchaseDate){
+    public Attendee(String name, String id, String TicketId, Date purchaseDate, boolean entered){
         this.name = name;
         this.id = id;
         this.ticketId = TicketId;
-        this.pruchaseDate = purchaseDate;
+        this.purchaseDate = purchaseDate;
+        this.entered = entered;
         addUniqueAttendees(this);
     }
 
     public String getName() { return name; }
 
-    public Date getPruchaseDate() { return pruchaseDate; }
+    public Date getPruchaseDate() { return purchaseDate; }
 
     public String getTicketId() { return ticketId; }
 
     public String getUserId() { return this.id; }
+
+    public boolean getEntered() { return this.entered; }
 
     public void addUniqueAttendees(Attendee t) {
         if(attendees.isEmpty()){
