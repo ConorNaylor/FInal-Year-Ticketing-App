@@ -1,9 +1,7 @@
 package com.example.conornaylor.fyp.event;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +11,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.conornaylor.fyp.R;
-import com.example.conornaylor.fyp.activities.LoginActivity;
-import com.example.conornaylor.fyp.activities.MainActivity;
-import com.example.conornaylor.fyp.activities.MapsActivity;
-import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -76,22 +70,9 @@ public class EventAdaptor extends ArrayAdapter<Event> {
             eventPrice.setText("€" + e.getPrice().toString());
         }
 
-        //Picasso.Builder builder = new Picasso.Builder(context);
-
-//        builder.listener(new Picasso.Listener()
-//        {
-//            @Override
-//            public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception)
-//            {
-//                exception.printStackTrace();
-//            }
-//        });
-
-        //builder.build().load("http://18.218.18.192:8000"  + e.getImageURL()).into(eventImage);
-
         Glide.with(context)
                 .load("http://18.218.18.192:8000"  + e.getImageURL())
-                .fitCenter()
+                .centerCrop()
                 .into(eventImage);
 
 

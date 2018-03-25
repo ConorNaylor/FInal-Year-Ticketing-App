@@ -27,7 +27,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.utilities.DatePickerFragment;
@@ -179,6 +178,7 @@ public class CreateEventFragment extends Fragment implements GoogleApiClient.OnC
         eventImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                timeOrPlacePicker = 1;
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -189,7 +189,6 @@ public class CreateEventFragment extends Fragment implements GoogleApiClient.OnC
         eventDate.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View view) {
-                                             timeOrPlacePicker = 1;
                                              DialogFragment datePicker = new DatePickerFragment();
                                              datePicker.show(getActivity().getSupportFragmentManager(), "Date Picker");
                                          }
@@ -256,13 +255,9 @@ public class CreateEventFragment extends Fragment implements GoogleApiClient.OnC
                 }
             } else if (timeOrPlacePicker == 0) {
                 Place place = PlacePicker.getPlace(data, getActivity());
-                StringBuilder stBuilder = new StringBuilder();
                 latitude = place.getLatLng().latitude;
                 longitude = place.getLatLng().longitude;
                 address = String.format("%s", place.getAddress());
-                stBuilder.append("Address: ");
-                stBuilder.append(address);
-                Toast.makeText(getActivity(), stBuilder.toString(), Toast.LENGTH_SHORT).show();
                 eventLoc.setHint(address);
             }
         }
@@ -316,32 +311,34 @@ public class CreateEventFragment extends Fragment implements GoogleApiClient.OnC
     }
 
     public void makeEvent(String input) {
-        try {
-            obj = new JSONObject(input);
-            LocationData loc = new LocationData(latitude, longitude);
+        if(input != null && input.length() > 0) {
             try {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                date = formatter.parse(obj.getString("date"));
-            } catch (ParseException e) {
+                obj = new JSONObject(input);
+                LocationData loc = new LocationData(obj.getDouble("loclat"), obj.getDouble("loclng"));
+                try {
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    date = formatter.parse(obj.getString("date"));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                Event ev = new Event(
+                        obj.getString("id"),
+                        obj.getString("title"),
+                        obj.getString("location"),
+                        obj.getString("description"),
+                        date,
+                        obj.getInt("num_tickets"),
+                        userID,
+                        loc,
+                        obj.getDouble("price"),
+                        obj.getString("image"));
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
-            Event ev = new Event(
-                    obj.getString("id"),
-                    obj.getString("title"),
-                    obj.getString("location"),
-                    obj.getString("description"),
-                    date,
-                    obj.getInt("num_tickets"),
-                    userID,
-                    loc,
-                    obj.getDouble("price"),
-                    obj.getString("image"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, new EventsListFragment()).addToBackStack("create");
+            ft.commit();
         }
-        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, new EventsListFragment()).addToBackStack("create");
-        ft.commit();
     }
 
     @Override
@@ -373,6 +370,8 @@ public class CreateEventFragment extends Fragment implements GoogleApiClient.OnC
 
                 eventDateStringUp = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(DatePickerFragment.formattedDate);
 
+                System.out.println(eventNameString + eventDescString  + eventLocString + eventDateStringUp + eventNumTicksInt + eventPriceD + userID + latitude + longitude);
+
                 JSONObject ev = new JSONObject();
                 try {
                     ev.put("image", encodedString);
@@ -383,6 +382,8 @@ public class CreateEventFragment extends Fragment implements GoogleApiClient.OnC
                     ev.put("num_tickets", eventNumTicksInt);
                     ev.put("price", eventPriceD);
                     ev.put("user", userID);
+                    ev.put("loclat", latitude);
+                    ev.put("loclng", longitude);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

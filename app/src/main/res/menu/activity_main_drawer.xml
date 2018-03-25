@@ -9,7 +9,7 @@
             android:title="Events" />
         <item
             android:id="@+id/nav_account"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_account_circle_black_48dp"
             android:title="Account" />
         <item
             android:id="@+id/nav_tickets"

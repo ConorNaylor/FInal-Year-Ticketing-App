@@ -130,21 +130,21 @@
 
                     </LinearLayout>
 
-                    <GridLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="50dp"
                         android:paddingTop="5dp">
 
                         <ImageView
                             android:id="@+id/mapImage"
-                            android:layout_width="64dp"
+                            android:layout_width="60dp"
                             android:layout_height="match_parent"
-                            android:src="@drawable/map"
+                            android:src="@drawable/ic_place_black_48dp"
                             android:tint="@color/colorPrimary" />
 
                         <TextView
                             android:id="@+id/viewEventLocation"
-                            android:layout_width="268dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:background="@android:color/transparent"
                             android:ems="10"
@@ -152,9 +152,9 @@
                             android:text="Location"
                             android:textAppearance="@style/TextAppearance.AppCompat.Large"
                             android:textColor="@android:color/black"
-                            android:textSize="22sp" />
+                            android:textSize="18sp" />
 
-                    </GridLayout>
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"

@@ -14,23 +14,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.activities.MapsActivity;
 import com.example.conornaylor.fyp.ticket.CreateTicketFragment;
-import com.example.conornaylor.fyp.utilities.NFCDisplayActivity;
-import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.ticket.Ticket;
 import com.example.conornaylor.fyp.ticket.ViewTicketFragment;
-import com.squareup.picasso.Picasso;
+import com.example.conornaylor.fyp.utilities.NFCDisplayActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static android.R.drawable.ic_menu_manage;
-import static android.R.drawable.ic_menu_save;
 
 
 /**
@@ -40,11 +37,11 @@ public class ViewEventFragment extends Fragment {
 
     private Event event;
     private EditText nameText;
-    private EditText descText;
+    private TextView descText;
     private EditText dateText;
     private EditText priceText;
     private EditText numTicksText;
-    private EditText locText;
+    private TextView locText;
     private Button button;
     private Button authButton;
     private ImageView eventImageView;
@@ -108,7 +105,7 @@ public class ViewEventFragment extends Fragment {
 
         Glide.with(getActivity())
                 .load("http://18.218.18.192:8000"  + event.getImageURL())
-                .fitCenter()
+                .centerCrop()
                 .into(eventImageView);
 
 
@@ -196,7 +193,7 @@ public class ViewEventFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent myIntent = new Intent(getActivity(), MapsActivity.class);
+                        Intent myIntent = new Intent(getActivity(), MapsActivity.class).putExtra("event", event.getId());
                         getActivity().startActivity(myIntent);
                     }
                 });

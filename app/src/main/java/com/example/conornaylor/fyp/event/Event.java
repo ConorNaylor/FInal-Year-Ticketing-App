@@ -128,4 +128,22 @@ public class Event implements Serializable{
             events.add(e);
         }
     }
+
+    public static Event searchForEvent(String in) {
+        for(Event e: getEvents()){
+            if(e.getTitle().equals(in) || e.getTitle().contains(in)){
+                return e;
+            }
+        }
+        return null;
+    }
+
+    public static Event getEventByTitle(String title) {
+        for(Event e: getEvents()){
+            if(e.getTitle().equals(title)){
+                return e;
+            }
+        }
+        return null;
+    }
 }

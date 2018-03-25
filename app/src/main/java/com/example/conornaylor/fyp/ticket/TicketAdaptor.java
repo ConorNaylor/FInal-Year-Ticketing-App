@@ -9,9 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.conornaylor.fyp.event.Event;
 import com.example.conornaylor.fyp.R;
-import com.squareup.picasso.Picasso;
+import com.example.conornaylor.fyp.event.Event;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ public class TicketAdaptor extends ArrayAdapter<Ticket> {
 
         Glide.with(context)
                 .load("http://18.218.18.192:8000"  + t.getEvent().getImageURL())
-                .fitCenter()
+                .centerCrop()
                 .into(eventImage);
 
         if(t.getEvent().getPrice() <= 0){

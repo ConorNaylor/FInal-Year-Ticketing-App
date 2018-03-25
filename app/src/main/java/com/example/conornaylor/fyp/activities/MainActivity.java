@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.conornaylor.fyp.event.ViewEventFragment;
 import com.example.conornaylor.fyp.ticket.Ticket;
 import com.example.conornaylor.fyp.ticket.ViewTicketFragment;
 import com.example.conornaylor.fyp.utilities.AccountFragment;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity
     private Fragment fragment;
     private DownloadTickets dt;
     private NfcAdapter nfcAdaptor;
+    private boolean nah;
 
 
     @Override
@@ -76,6 +78,19 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null && extras.getString("event") != null) {
+            nah = false;
+            System.out.println("BLHBLAHAJKLKD"+ extras.getString("event"));
+            Event e = Event.getEventByID(extras.getString("event"));
+            Toast.makeText(MainActivity.this, e.getTitle(), Toast.LENGTH_SHORT).show();
+            Fragment fragment = ViewEventFragment.newInstance(e);
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, fragment).addToBackStack("viewEvent1");
+            ft.commit();
+        }else{
+            nah = true;
+        }
 
         if(NfcAdapter.getDefaultAdapter(this) != null){
         nfcAdaptor = NfcAdapter.getDefaultAdapter(this);
@@ -122,7 +137,7 @@ public class MainActivity extends AppCompatActivity
                         e1.printStackTrace();
                     }
 
-                    LocationData loc = new LocationData(53.270962, -9.062691);
+                    LocationData loc = new LocationData(obj.getDouble("loclat"), obj.getDouble("loclng"));
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                     try {
                         date = formatter.parse(obj.getString("date"));
@@ -145,14 +160,20 @@ public class MainActivity extends AppCompatActivity
         } catch(JSONException e){
             e.printStackTrace();
         }
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.container, new EventsListFragment());
-        ft.commitAllowingStateLoss();
+        if(nah){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, new EventsListFragment());
+            ft.commitAllowingStateLoss();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        if (getVisibleFragment() instanceof ViewTicketFragment){
+        if (getVisibleFragment() instanceof ViewEventFragment){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.container, new EventsListFragment()).addToBackStack(null);
+            ft.commit();
+        }else if (getVisibleFragment() instanceof ViewTicketFragment){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, new TicketsListFragment()).addToBackStack("blah");
             ft.commit();

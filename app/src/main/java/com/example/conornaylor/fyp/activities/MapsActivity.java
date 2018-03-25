@@ -1,10 +1,12 @@
 package com.example.conornaylor.fyp.activities;
 
-import android.location.Address;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
 import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.event.Event;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -12,8 +14,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import java.util.List;
+
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -27,6 +30,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double d1, d2;
     private Button button1;
     private EditText searchview;
+    private boolean allEvents = true;
+    private Event e;
 
 
     @Override
@@ -34,19 +39,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null && extras.getString("event") != null) {
+            e = Event.getEventByID(extras.getString("event"));
+            allEvents = false;
+        }
+
+        setTitle("Location");
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         button1 = findViewById(R.id.button1);
         searchview = findViewById(R.id.searchView1);
+
+        if(!allEvents){
+            button1.setVisibility(View.INVISIBLE);
+            searchview.setVisibility(View.INVISIBLE);
+        }
+
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                search(searchview.getText().toString());
+            }
+        });
+
+    }
+
+    private void focusOnEvent(Event e) {
+        LatLng latLng = new LatLng(e.getLocation().lat, e.getLocation().lng);
+
+        mMap.addMarker(new MarkerOptions().position(latLng).title(e.getTitle()));
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        putEventsOnMap();
+        if(allEvents) {
+            putEventsOnMap();
+            setClickListeners();
+        }else { focusOnEvent(e); }
     }
 
-
+    private void setClickListeners() {
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Event e = Event.getEventByTitle(marker.getTitle());
+                Intent myIntent = new Intent(MapsActivity.this, MainActivity.class);
+                myIntent.putExtra("event",e.getId());
+                MapsActivity.this.startActivity(myIntent);
+                finish();
+                return false;
+            }
+        });
+    }
 
 
     @Override
@@ -68,31 +119,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    protected void search(List<Address> addresses) {
+    protected void search(String str) {
 
-        Address address = addresses.get(0);
-        double home_long = address.getLongitude();
-        double home_lat = address.getLatitude();
-        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+        Event e = Event.searchForEvent(str);
 
-        String addressText = String.format(
-                "%s, %s",
-                address.getMaxAddressLineIndex() > 0 ? address
-                        .getAddressLine(0) : "", address.getCountryName());
+        if(e != null) {
 
-        MarkerOptions markerOptions = new MarkerOptions();
+            LatLng latLng = new LatLng(e.getLocation().lat, e.getLocation().lng);
 
-        markerOptions.position(latLng);
-        markerOptions.title(addressText);
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title(e.getTitle());
 
-        mMap.clear();
-        mMap.addMarker(markerOptions);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-//        locationTv.setText("Latitude:" + address.getLatitude() + ", Longitude:"
-//                + address.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
-
+        }
     }
 
 }

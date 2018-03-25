@@ -2,6 +2,7 @@ package com.example.conornaylor.fyp.event;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.activities.MapsActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +38,10 @@ public class EventsListFragment extends Fragment {
     private boolean canMakeEvent;
     private String dateString;
     private String todayString;
+    private FloatingActionButton fab1;
+    private FloatingActionButton fab2;
+    private FloatingActionButton fab3;
+    private boolean isFABOpen = false;
 
 
     public EventsListFragment() {
@@ -90,8 +96,23 @@ public class EventsListFragment extends Fragment {
                 }
         );
 
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab0 = view.findViewById(R.id.fab0);
+        fab1 = view.findViewById(R.id.fab1);
+        fab2 = view.findViewById(R.id.fab2);
+        fab3 = view.findViewById(R.id.fab3);
+
+        fab0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isFABOpen){
+                    showFABMenu();
+                }else{
+                    closeFABMenu();
+                }
+            }
+        });
+
+        fab2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -100,7 +121,35 @@ public class EventsListFragment extends Fragment {
             }
         });
         if(!canMakeEvent) {
-            fab.hide();
+            fab2.hide();
         }
+
+        fab1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent myIntent = new Intent(getActivity(), MapsActivity.class);
+                getActivity().startActivity(myIntent);
+            }
+        });
+    }
+
+    private void showFABMenu(){
+        isFABOpen=true;
+        fab1.animate().translationY(-getResources().getDimension(R.dimen.fab_margin65));
+        fab1.animate().translationX(-getResources().getDimension(R.dimen.fab_margin));
+        fab2.animate().translationY(-getResources().getDimension(R.dimen.fab_margin195));
+        fab2.animate().translationX(-getResources().getDimension(R.dimen.fab_quadtriple));
+        fab3.animate().translationY(-getResources().getDimension(R.dimen.fab_margin130));
+        fab3.animate().translationX(-getResources().getDimension(R.dimen.fab_margintriple));
+    }
+
+    private void closeFABMenu(){
+        isFABOpen=false;
+        fab1.animate().translationY(0);
+        fab2.animate().translationY(0);
+        fab1.animate().translationX(0);
+        fab2.animate().translationX(0);
+        fab3.animate().translationX(0);
+        fab3.animate().translationY(0);
     }
 }
