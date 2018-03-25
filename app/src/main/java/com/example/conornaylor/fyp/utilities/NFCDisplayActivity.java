@@ -74,7 +74,9 @@ public class NFCDisplayActivity extends AppCompatActivity {
 
                 NdefMessage message = (NdefMessage) rawMessages[0]; // only one message transferred
                 ticketID = new String(message.getRecords()[0].getPayload());
-                mAuthTask.execute();
+                if(!ticketID.isEmpty()) {
+                    mAuthTask.execute();
+                }
             }
         }
 
@@ -91,7 +93,7 @@ public class NFCDisplayActivity extends AppCompatActivity {
                     handler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            mStatusView.setText("");
+                            mStatusView.setText("Waiting for ticket...");
                             showProgress(true);
                             enterView.setVisibility(View.INVISIBLE);
                         }

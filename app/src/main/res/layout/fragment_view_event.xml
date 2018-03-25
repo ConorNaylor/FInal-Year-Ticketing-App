@@ -132,7 +132,7 @@
                         android:id="@+id/mapImage"
                         android:layout_width="64dp"
                         android:layout_height="match_parent"
-                        android:src="@drawable/map"
+                        android:src="@android:drawable/ic_dialog_map"
                         android:tint="@color/colorPrimary" />
 
                     <EditText

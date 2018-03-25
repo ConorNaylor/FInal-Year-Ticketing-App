@@ -34,8 +34,8 @@
                 android:layout_gravity="bottom|right"
                 android:layout_margin="10dp"
                 android:src="?android:attr/actionModePasteDrawable"
-                android:tint="@color/colorPrimary"
-                app:backgroundTint="@android:color/background_light"
+                android:tint="@android:color/background_light"
+                app:backgroundTint="@color/colorPrimary"
                 app:layout_anchorGravity="bottom|right|end" />
 
             <ScrollView

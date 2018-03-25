@@ -51,39 +51,6 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ImageView
-                    android:id="@+id/mapImage"
-                    android:layout_width="93dp"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/map"
-                    android:tint="@color/colorPrimary" />
-
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_column="6"
-                    android:layout_row="0">
-
-                    <EditText
-                        android:id="@+id/eventLocation"
-                        android:layout_width="240dp"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/venue"
-                        android:imeActionId="@+id/login"
-                        android:imeActionLabel="@string/action_sign_in_short"
-                        android:imeOptions="actionUnspecified"
-                        android:inputType="text"
-                        android:maxLines="1" />
-
-
-                </android.support.design.widget.TextInputLayout>
-
-            </GridLayout>
-
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -122,6 +89,29 @@
                     android:inputType="number" />
             </GridLayout>
 
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/eventLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/colorPrimary"
+                        android:hint="@string/venue"
+                        android:textColor="@android:color/background_light"
+                        android:textColorHint="@android:color/background_light" />
+
+
+                </LinearLayout>
+
+            </GridLayout>
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -137,8 +127,8 @@
                         android:backgroundTint="@color/colorPrimary"
                         android:hint="@string/date"
                         android:maxLines="1"
-                        android:text="Date"
-                        android:textColor="@android:color/background_light" />
+                        android:textColor="@android:color/background_light"
+                        android:textColorHint="@android:color/background_light" />
 
                     <TextView
                         android:id="@+id/dateText"
@@ -167,8 +157,9 @@
                     android:backgroundTint="@color/colorPrimary"
                     android:drawableRight="@drawable/ic_menu_gallery"
                     android:drawableTint="@android:color/background_light"
-                    android:text="Choose Event Image"
-                    android:textColor="@android:color/background_light" />
+                    android:hint="@string/choose_event_image"
+                    android:textColor="@android:color/background_light"
+                    android:textColorHint="@android:color/background_light" />
 
                 <ImageView
                     android:id="@+id/imageView"
@@ -191,8 +182,9 @@
                     android:drawableRight="@drawable/ic_menu_send"
                     android:drawableTint="@android:color/background_light"
                     android:elevation="0dp"
-                    android:text="@string/create_event"
-                    android:textColor="@android:color/background_light" />
+                    android:hint="@string/createeventimage"
+                    android:textColor="@android:color/background_light"
+                    android:textColorHint="@android:color/background_light" />
 
             </LinearLayout>
 

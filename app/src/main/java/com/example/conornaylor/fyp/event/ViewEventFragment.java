@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.conornaylor.fyp.activities.MapsActivity;
 import com.example.conornaylor.fyp.ticket.CreateTicketFragment;
 import com.example.conornaylor.fyp.utilities.NFCDisplayActivity;
 import com.example.conornaylor.fyp.R;
@@ -47,6 +48,7 @@ public class ViewEventFragment extends Fragment {
     private Button button;
     private Button authButton;
     private ImageView eventImageView;
+    private ImageView mapImage;
     private boolean show = false;
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
@@ -102,6 +104,7 @@ public class ViewEventFragment extends Fragment {
         numTicksText = getActivity().findViewById(R.id.viewnumTickets);
         locText = getActivity().findViewById(R.id.viewEventLocation);
         eventImageView = getActivity().findViewById(R.id.viewEventImage);
+        mapImage = getActivity().findViewById(R.id.mapImage);
 
         Glide.with(getActivity())
                 .load("http://18.218.18.192:8000"  + event.getImageURL())
@@ -188,6 +191,15 @@ public class ViewEventFragment extends Fragment {
                     }
                 }
         );
+
+        mapImage.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent myIntent = new Intent(getActivity(), MapsActivity.class);
+                        getActivity().startActivity(myIntent);
+                    }
+                });
 
     }
 

@@ -29,10 +29,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.utilities.DatePickerFragment;
 import com.example.conornaylor.fyp.utilities.ImageHandler;
 import com.example.conornaylor.fyp.utilities.LocationData;
-import com.example.conornaylor.fyp.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.places.ui.PlacePicker;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +64,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CreateEventFragment extends Fragment{
+public class CreateEventFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener{
 
     private static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
@@ -72,11 +79,10 @@ public class CreateEventFragment extends Fragment{
     private EditText eventNumTicks;
     private EditText eventPrice;
     private EditText eventDesc;
-    private EditText eventLoc;
+    private Button eventLoc;
     public static TextView dateText;
     private Button eventDate;
     private ImageView imageview;
-    private ImageView mapImage;
     private Button createEvent;
     private Button eventImage;
     private String eventNameString;
@@ -87,11 +93,11 @@ public class CreateEventFragment extends Fragment{
     private String eventImagineString;
     private Double eventPriceD;
     private int eventNumTicksInt;
+    private String address;
     private Date date;
     private Bitmap bitmap;
     ImageHandler imageUp;
     private String encodedString;
-
     private Event event;
     private LocationData data = null;
     private String encodedImage;
@@ -101,6 +107,11 @@ public class CreateEventFragment extends Fragment{
     private String input;
     private boolean pictureChosen = false;
     private View focusView = null;
+    private GoogleApiClient mGoogleApiClient;
+    private int PLACE_PICKER_REQUEST = 1;
+    private int timeOrPlacePicker;
+    private double latitude;
+    private double longitude;
 
     public CreateEventFragment() {
         // Required empty public constructor
@@ -113,6 +124,13 @@ public class CreateEventFragment extends Fragment{
         return inflater.inflate(R.layout.fragment_create_event, container, false);
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mGoogleApiClient.stopAutoManage(getActivity());
+        mGoogleApiClient.disconnect();
+    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -136,8 +154,27 @@ public class CreateEventFragment extends Fragment{
         createEvent = getActivity().findViewById(R.id.button_create_event);
         eventImage = getActivity().findViewById(R.id.button_image);
         imageview = getActivity().findViewById(R.id.imageView);
-        mapImage = getActivity().findViewById(R.id.mapImage);
         dateText = getActivity().findViewById(R.id.dateText);
+
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(getActivity())
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(getActivity(),this)
+                .build();
+
+        eventLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                timeOrPlacePicker = 0;
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(getActivity()), PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         eventImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,16 +186,10 @@ public class CreateEventFragment extends Fragment{
             }
         });
 
-        mapImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(getActivity(), "Choose your location.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         eventDate.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View view) {
+                                             timeOrPlacePicker = 1;
                                              DialogFragment datePicker = new DatePickerFragment();
                                              datePicker.show(getActivity().getSupportFragmentManager(), "Date Picker");
                                          }
@@ -171,7 +202,7 @@ public class CreateEventFragment extends Fragment{
             public void onClick(View view) {
                 eventNameString = eventName.getText().toString();
                 eventDescString = eventDesc.getText().toString();
-                eventLocString = eventLoc.getText().toString();
+                eventLocString = address;
                 eventDateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(DatePickerFragment.formattedDate);
                 if (TextUtils.isEmpty(eventNameString)) {
                     eventName.setError(getString(R.string.error_field_required));
@@ -218,8 +249,22 @@ public class CreateEventFragment extends Fragment{
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == 1 && null != data) {
-            decodeUri(data.getData());
+        if(resultCode == RESULT_OK && requestCode == 1) {
+            if (timeOrPlacePicker == 1) {
+                if (null != data) {
+                    decodeUri(data.getData());
+                }
+            } else if (timeOrPlacePicker == 0) {
+                Place place = PlacePicker.getPlace(data, getActivity());
+                StringBuilder stBuilder = new StringBuilder();
+                latitude = place.getLatLng().latitude;
+                longitude = place.getLatLng().longitude;
+                address = String.format("%s", place.getAddress());
+                stBuilder.append("Address: ");
+                stBuilder.append(address);
+                Toast.makeText(getActivity(), stBuilder.toString(), Toast.LENGTH_SHORT).show();
+                eventLoc.setHint(address);
+            }
         }
     }
 
@@ -273,7 +318,7 @@ public class CreateEventFragment extends Fragment{
     public void makeEvent(String input) {
         try {
             obj = new JSONObject(input);
-            LocationData loc = new LocationData(0, 0);
+            LocationData loc = new LocationData(latitude, longitude);
             try {
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                 date = formatter.parse(obj.getString("date"));
@@ -299,6 +344,10 @@ public class CreateEventFragment extends Fragment{
         ft.commit();
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 
     public class putEventsTask extends AsyncTask<Void, Void, Boolean> {
         @Override

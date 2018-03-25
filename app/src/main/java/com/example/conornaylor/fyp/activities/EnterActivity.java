@@ -10,6 +10,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Build;
 import android.os.Handler;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.ticket.DownloadTickets;
 import com.example.conornaylor.fyp.ticket.Ticket;
+import com.example.conornaylor.fyp.ticket.TicketsListFragment;
 
 public class EnterActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback {
 
@@ -55,12 +57,16 @@ public class EnterActivity extends AppCompatActivity implements NfcAdapter.Creat
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                onBackPressed();
                 Ticket.deleteTickets();
                 dt = new DownloadTickets(context);
             }
-        }, 10000);
+        }, 5000);
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        //No call for super(). Bug on API Level > 11.
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)

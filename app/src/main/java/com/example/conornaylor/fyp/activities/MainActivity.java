@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity
                         e1.printStackTrace();
                     }
 
-                    LocationData loc = new LocationData(0, 0);
+                    LocationData loc = new LocationData(53.270962, -9.062691);
                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                     try {
                         date = formatter.parse(obj.getString("date"));

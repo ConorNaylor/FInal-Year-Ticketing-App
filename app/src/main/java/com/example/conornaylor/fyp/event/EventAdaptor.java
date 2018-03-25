@@ -1,6 +1,7 @@
 package com.example.conornaylor.fyp.event;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -12,6 +13,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.activities.LoginActivity;
+import com.example.conornaylor.fyp.activities.MainActivity;
+import com.example.conornaylor.fyp.activities.MapsActivity;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -89,6 +93,7 @@ public class EventAdaptor extends ArrayAdapter<Event> {
                 .load("http://18.218.18.192:8000"  + e.getImageURL())
                 .fitCenter()
                 .into(eventImage);
+
 
         return customView;
     }

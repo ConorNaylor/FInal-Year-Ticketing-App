@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.conornaylor.fyp.event.Event;
 import com.example.conornaylor.fyp.R;
@@ -57,9 +58,8 @@ public class CreateTicketFragment extends Fragment {
     private ProgressBar spinner;
     private View mProgressView;
     private View mLoginFormView;
-    private Gson gson;
-    private String str;
     private String seat;
+
 
     public CreateTicketFragment() {
         // Required empty public constructor
@@ -82,8 +82,6 @@ public class CreateTicketFragment extends Fragment {
 
     private void makeTicket(String input) {
         try {
-            gson = new Gson();
-            str = gson.toJson(event);
             JSONObject obj = new JSONObject(input);
             ticket = new Ticket(
                     obj.getString("id"),
@@ -99,10 +97,14 @@ public class CreateTicketFragment extends Fragment {
 
     private String getSeat(String in){
         try {
-            gson = new Gson();
-            str = gson.toJson(event);
             JSONObject obj = new JSONObject(in);
             int s = obj.getInt("count");
+            if(s >= event.getNumTicks()){
+                getSeatTask = null;
+                showProgress(false);
+                Toast.makeText(getActivity(),"Sorry, this event is sold out.",Toast.LENGTH_SHORT).show();
+                return null;
+            }
             int count = 0;
             int sum = s;
             int[] ints = new int[100];
@@ -119,7 +121,7 @@ public class CreateTicketFragment extends Fragment {
         }catch(JSONException e ) {
             e.printStackTrace();
         }
-        return "";
+        return null;
     }
 
     @Override
@@ -138,7 +140,6 @@ public class CreateTicketFragment extends Fragment {
         userID = preferences.getString(userId, null);
 
         mAuthTask = new createTicketTask();
-        getSeatTask = new getSeatTask();
 
         button = getActivity().findViewById(R.id.confirm_purchase);
         eventName = getActivity().findViewById(R.id.confirmEventName);
@@ -157,6 +158,7 @@ public class CreateTicketFragment extends Fragment {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        getSeatTask = new getSeatTask();
                         getSeatTask.execute();
                         showProgress(true);
                     }
@@ -216,7 +218,7 @@ public class CreateTicketFragment extends Fragment {
                 JSONObject ev = new JSONObject();
                 try{
                     ev.put("event", event.getId());
-                    ev.put("seat", getSeat(numberTicketsInput));
+                    ev.put("seat", seat);
                     ev.put("user", userID);
                 }catch(JSONException e){
                     e.printStackTrace();
@@ -309,7 +311,6 @@ public class CreateTicketFragment extends Fragment {
                     br.close();
                     if (sb.toString() != null) {
                         numberTicketsInput = sb.toString();
-                        System.out.println(numberTicketsInput);
                     }
                 } else {
                     System.out.println(con.getResponseMessage());
@@ -325,7 +326,10 @@ public class CreateTicketFragment extends Fragment {
         protected void onPostExecute(Boolean b) {
             getSeatTask = null;
             if (b) {
-                mAuthTask.execute();
+                seat = getSeat(numberTicketsInput);
+                if(seat != null) {
+                    mAuthTask.execute();
+                }
             }
         }
 

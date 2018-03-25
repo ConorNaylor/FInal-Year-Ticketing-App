@@ -39,7 +39,10 @@
     <string name="refresh">Refresh</string>
     <string name="number_tickets_sold">Tickets Sold</string>
     <string name="revenue">Revenue</string>
-    <string name="purcahseDate">Purchase Date</string>
+    <string name="purchaseDate">Purchase Date</string>
     <string name="username">Username</string>
     <string name="venue">Venue</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="choose_event_image">Choose Event Image</string>
+    <string name="createeventimage">Create Event</string>
 </resources>
