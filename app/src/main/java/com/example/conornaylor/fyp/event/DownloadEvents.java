@@ -1,4 +1,8 @@
-package com.example.conornaylor.fyp.ticket;
+package com.example.conornaylor.fyp.event;
+
+/**
+ * Created by conornaylor on 25/03/2018.
+ */
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,7 +10,7 @@ import android.os.AsyncTask;
 import android.widget.ListAdapter;
 import android.widget.TabHost;
 
-import com.example.conornaylor.fyp.event.Event;
+import com.example.conornaylor.fyp.utilities.LocationData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,12 +21,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by conornaylor on 17/02/2018.
  */
 
-public class DownloadTickets {
+public class DownloadEvents {
 
     private TabHost tabHost;
     public static final String MyPreferences = "preferences";
@@ -32,37 +41,63 @@ public class DownloadTickets {
     private String userId = "id";
     private String token;
     private String userID;
-    private DownloadTickets.getTicketsTask mAuthTask;
+    private getEventsTask mAuthTask;
     private JSONObject obj;
     private JSONArray jArray;
     private ListAdapter myUpcomingAdapter;
     private ListAdapter myPastAdapter;
+    private Date date;
 
-    public DownloadTickets(Context context){
+
+    public DownloadEvents(Context context){
         preferences = context.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
         token = preferences.getString(tk, null);
         userID = preferences.getString(userId, null);
+        mAuthTask = new getEventsTask();
+    }
 
-        mAuthTask = new getTicketsTask();
-        mAuthTask.execute();
+    public boolean execute(){
+        try {
+            return mAuthTask.execute().get();
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        } catch (ExecutionException e1) {
+            e1.printStackTrace();
+        }
+        return false;
     }
 
 
-    public void makeTickets(JSONArray jArray){
-        try {
-            for (int i = 0; i < jArray.length(); i++) {
-                try {
-                    obj = jArray.getJSONObject(i);
-                } catch (JSONException e1) {
-                    e1.printStackTrace();
-                }
 
-                Ticket tk = new Ticket(
-                        obj.getString("id"),
-                        obj.getString("seat"),
-                        obj.getString("user"),
-                        Event.getEventByID(obj.getString("event")),
-                        obj.getBoolean("entered"));
+    public void makeEvents(JSONArray jArray) {
+        try {
+            if (jArray != null) {
+                for (int i = 0; i < jArray.length(); i++) {
+                    try {
+                        obj = jArray.getJSONObject(i);
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    LocationData loc = new LocationData(obj.getDouble("loclat"), obj.getDouble("loclng"));
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+                    try {
+                        date = formatter.parse(obj.getString("date"));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    Event ev = new Event(
+                            obj.getString("id"),
+                            obj.getString("title"),
+                            obj.getString("location"),
+                            obj.getString("description"),
+                            date,
+                            obj.getInt("num_tickets"),
+                            obj.getString("user"),
+                            loc,
+                            obj.getDouble("price"),
+                            obj.getString("image"));
+                }
             }
         } catch(JSONException e){
             e.printStackTrace();
@@ -70,12 +105,11 @@ public class DownloadTickets {
     }
 
 
-    public class getTicketsTask extends AsyncTask<Void, Void, Boolean> {
+    public class getEventsTask extends AsyncTask <Void, Void, Boolean>{
         @Override
         protected Boolean doInBackground(Void...params) {
             try {
-//                    String url = "http://192.168.0.59:8000/tickets/";
-                String url = "http://18.218.18.192:8000/tickets/";
+                String url = "http://18.218.18.192:8000/events/"; // Galway
                 URL object = new URL(url);
 
                 HttpURLConnection con = (HttpURLConnection) object.openConnection();
@@ -95,9 +129,8 @@ public class DownloadTickets {
                     }
                     br.close();
                     if (sb.toString() != null) {
-                        System.out.println(sb.toString());
                         jArray = new JSONArray(sb.toString());
-                        makeTickets(jArray);
+                        makeEvents(jArray);
                     }
                 } else {
                     System.out.println(con.getResponseMessage());
@@ -110,7 +143,9 @@ public class DownloadTickets {
         }
 
         @Override
-        protected void onPostExecute(Boolean b) { super.onPostExecute(b); }
+        protected void onPostExecute(Boolean b) {
+            super.onPostExecute(b);
+        }
 
         @Override
         protected void onCancelled() {
@@ -118,4 +153,3 @@ public class DownloadTickets {
         }
     }
 }
-

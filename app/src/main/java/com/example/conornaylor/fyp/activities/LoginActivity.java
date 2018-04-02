@@ -3,27 +3,22 @@ package com.example.conornaylor.fyp.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.nfc.NfcAdapter;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.app.LoaderManager.LoaderCallbacks;
-
-import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,9 +28,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.conornaylor.fyp.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,11 +45,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import android.os.Handler;
-
-import com.example.conornaylor.fyp.R;
-
-import static android.Manifest.permission.READ_CONTACTS;
 
 /**
  * A login screen that offers login via email/password.
@@ -77,6 +70,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private String passwordString = "password";
     private String userIdString = "id";
     private String canMakeEventString = "canMakeEvent";
+    private String remainLoggedInBoolString = "remainedLoggedIn";
+    private CheckBox remainLoggedIn;
+    private boolean remainLoggedInBool;
 
     public static final String MyPreferences = "preferences";
     private SharedPreferences preferences;
@@ -125,6 +121,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+        remainLoggedIn = (CheckBox) findViewById(R.id.remainloggedin);
 
         register = (TextView) findViewById(R.id.register);
         register.setOnClickListener(new View.OnClickListener() {
@@ -137,8 +134,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         preferences = getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
         username = preferences.getString(usernameString, null);
+        remainLoggedInBool = preferences.getBoolean(remainLoggedInBoolString, false);
         if(username != null) {
-            Toast.makeText(this, "Auto logging you in...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Auto logged in...", Toast.LENGTH_SHORT).show();
             showProgress(true);
             mAuthTask = new UserLoginTask(username, preferences.getString(passwordString, null));
             mAuthTask.execute((Void) null);
@@ -189,7 +187,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mUsername.getText().toString();
+        String usernm = mUsername.getText().toString();
         mPassword = mPasswordView.getText().toString();
 
         boolean cancel = false;
@@ -202,17 +200,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        // Check for a valid username.
+        if (TextUtils.isEmpty(usernm)) {
             mUsername.setError(getString(R.string.error_field_required));
             focusView = mUsername;
             cancel = true;
-        } else if (!isEmailValid(email)) {
-            mUsername.setError(getString(R.string.error_invalid_email));
-            focusView = mUsername;
-            cancel = true;
         }
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -221,20 +214,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, mPassword);
+            mAuthTask = new UserLoginTask(usernm, mPassword);
             mAuthTask.execute((Void) null);
         }
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-//        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-        return true;
-    }
-
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 7;
     }
 
     /**
@@ -392,13 +379,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }else if(auth.contains("token")){
                 e = preferences.edit();
                 try {
-                    obj = new JSONObject(auth);
-                    e.putString(tokenString, obj.getString(tokenString));
-                    e.putString(userIdString, obj.getString(userIdString));
-                    e.putString(userEmailString, obj.getString(userEmailString));
-                    e.putString(usernameString, obj.getString(usernameString));
-                    e.putBoolean(canMakeEventString, obj.getBoolean(canMakeEventString));
-                    e.putString(passwordString, mPassword);
+                        obj = new JSONObject(auth);
+                        e.putString(tokenString, obj.getString(tokenString));
+                        e.putString(userIdString, obj.getString(userIdString));
+                        e.putString(userEmailString, obj.getString(userEmailString));
+                        e.putString(usernameString, obj.getString(usernameString));
+                        e.putBoolean(canMakeEventString, obj.getBoolean(canMakeEventString));
+                        e.putString(passwordString, mPassword);
+                        e.putBoolean(remainLoggedInBoolString, remainLoggedIn.isChecked());
                 }catch(JSONException error){
                     error.printStackTrace();
                 }

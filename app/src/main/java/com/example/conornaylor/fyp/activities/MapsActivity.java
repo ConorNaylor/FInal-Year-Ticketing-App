@@ -6,17 +6,24 @@ import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.event.Event;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -32,6 +39,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private EditText searchview;
     private boolean allEvents = true;
     private Event e;
+    private ArrayList<Event> events;
 
 
     @Override
@@ -82,7 +90,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(allEvents) {
             putEventsOnMap();
             setClickListeners();
-        }else { focusOnEvent(e); }
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(53.43333, -7.95), 6.5f));
+        }else {
+            focusOnEvent(e);
+        }
     }
 
     private void setClickListeners() {
@@ -106,34 +117,61 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void putEventsOnMap() {
+        Date date = new Date();
+        String todayString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(date);
+        events = new ArrayList<>();
         for (Event e : Event.getEvents()) {
+            String dateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(e.getDate());
+            if (e.getDate().after(date) || todayString.equals(dateString)) {
+                message = e.getTitle();
 
-            message = e.getTitle();
+                d1 = e.getLocation().lat;
+                d2 = e.getLocation().lng;
 
-            d1 = e.getLocation().lat;
-            d2 = e.getLocation().lng;
+                latlng = new LatLng(d1, d2);
 
-            latlng = new LatLng(d1, d2);
+                mMap.addMarker(new MarkerOptions().position(latlng).title(message));
 
-            mMap.addMarker(new MarkerOptions().position(latlng).title(message));
+                events.add(e);
+            }
         }
     }
 
     protected void search(String str) {
 
-        Event e = Event.searchForEvent(str);
+        ArrayList<Marker> markers = new ArrayList<>();
+        ArrayList<Event> searchResults = Event.searchForEvent(str);
+        boolean noResults = false;
 
-        if(e != null) {
 
-            LatLng latLng = new LatLng(e.getLocation().lat, e.getLocation().lng);
+        if(events == null || searchResults == null || events.isEmpty() || searchResults.isEmpty()) {
+            noResults = true;
+        } else {
+            for (Event ev : events) {
+                if (searchResults.contains(ev)) {
+                    LatLng latLng = new LatLng(ev.getLocation().lat, ev.getLocation().lng);
 
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title(e.getTitle());
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title(ev.getTitle()));
+                    marker.showInfoWindow();
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-
+                    markers.add(marker);
+                }
+            }
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (Marker m : markers) {
+                builder.include(m.getPosition());
+            }
+            if(markers.isEmpty()) {
+                noResults = true;
+            }else {
+                LatLngBounds bounds = builder.build();
+                int padding = ((500 * 10) / 100);
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                mMap.animateCamera(cu);
+            }
+        }
+        if(noResults) {
+            Toast.makeText(this, "No search results.", Toast.LENGTH_SHORT).show();
         }
     }
 

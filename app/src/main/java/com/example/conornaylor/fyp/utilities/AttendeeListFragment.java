@@ -107,8 +107,6 @@ public class AttendeeListFragment extends Fragment {
 
         attendeeList = view.findViewById(R.id.attendeeList);
 
-        String a = AttendeeAdaptor.clickedUserID;
-//        basicAlert(a);
     }
 
 

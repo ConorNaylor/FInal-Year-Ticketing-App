@@ -18,13 +18,12 @@
         <ImageView
             android:id="@+id/customeventImage"
             android:layout_width="175dp"
-            android:layout_height="148dp"
-            android:padding="10dp"
-            app:srcCompat="@drawable/boltmess" />
+            android:layout_height="150dp"
+            android:padding="5dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="148dp">
+            android:layout_height="150dp">
 
             <TextView
                 android:id="@+id/customeventName"
@@ -33,7 +32,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentStart="true"
                 android:layout_weight="1"
-                android:padding="5dp"
+                android:paddingTop="5dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="@android:color/black" />
@@ -47,7 +46,7 @@
                 android:layout_below="@+id/customeventDate"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:padding="5dp"
+                android:paddingTop="5dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@android:color/black"
@@ -62,7 +61,7 @@
                 android:layout_below="@+id/customeventName"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:padding="5dp"
+                android:paddingTop="5dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@android:color/black"
@@ -76,7 +75,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_below="@+id/customeventAddress"
                 android:layout_weight="1"
-                android:padding="5dp"
+                android:paddingTop="5dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="@android:color/black"

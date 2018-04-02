@@ -56,11 +56,7 @@ public class Event implements Serializable{
 
     public String getUserId() { return userId; }
 
-    public void setUserId(String userId) { this.userId = userId; }
-
     public int getNumTicks() { return numTicks; }
-
-    public void setNumTicks(int numTicks) { this.numTicks = numTicks; }
 
     public String getId(){
         return this.id;
@@ -78,16 +74,8 @@ public class Event implements Serializable{
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public String getDescription() {
         return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public Date getDate() {return date;}
@@ -108,15 +96,13 @@ public class Event implements Serializable{
         return events;
     }
 
-    public void removeEvent(Event event){
-        events.remove(event);
-    }
-
     public String toString(){
         return this.id;
     }
 
-    public void addToUniqueEvents(Event e) {
+    public static void deleteEvents(){ events.clear(); }
+
+    private void addToUniqueEvents(Event e) {
         if(events.isEmpty()){
             events.add(e);
         }else{
@@ -129,13 +115,14 @@ public class Event implements Serializable{
         }
     }
 
-    public static Event searchForEvent(String in) {
+    public static ArrayList<Event> searchForEvent(String in) {
+        ArrayList<Event> events = new ArrayList<>();
         for(Event e: getEvents()){
-            if(e.getTitle().equals(in) || e.getTitle().contains(in)){
-                return e;
+            if(e.getTitle().toLowerCase().equals(in.toLowerCase()) || e.getTitle().toLowerCase().contains(in.toLowerCase())){
+                events.add(e);
             }
         }
-        return null;
+        return events;
     }
 
     public static Event getEventByTitle(String title) {

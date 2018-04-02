@@ -3,11 +3,8 @@ package com.example.conornaylor.fyp.ticket;
 import com.example.conornaylor.fyp.event.Event;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -48,10 +45,6 @@ public class Ticket implements Serializable{
 
     public String getSeat() {
         return seat;
-    }
-
-    public String getUserId() {
-        return userId;
     }
 
     public String toString(){
@@ -104,7 +97,7 @@ public class Ticket implements Serializable{
         return list;
     }
 
-    public static ArrayList<ArrayList<Ticket>> getAllTicketsForEachEvent() {
+    public static ArrayList<ArrayList<Ticket>> mapTicketsForEachEvent() {
         Map<String, ArrayList<Ticket>> map = new HashMap<>();
         ArrayList<Ticket> allTickets = Ticket.getTickets();
 

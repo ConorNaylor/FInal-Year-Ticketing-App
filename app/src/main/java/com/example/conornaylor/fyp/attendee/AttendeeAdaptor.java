@@ -1,13 +1,11 @@
 package com.example.conornaylor.fyp.attendee;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.conornaylor.fyp.R;
@@ -22,21 +20,13 @@ import java.util.Locale;
 
 public class AttendeeAdaptor extends ArrayAdapter<Attendee> {
 
-    private static final String MyPreferences = "preferences";
-    private SharedPreferences preferences;
-    private String token;
-    private String tk = "token";
     private TextView usernameIDView;
     private TextView purchaseDateView;
     private CheckBox enteredBox;
     private Attendee a;
-    public static String clickedUserID;
 
     public AttendeeAdaptor(Context context, ArrayList<Attendee> attendees){
         super(context, R.layout.custom_attendee_row, attendees);
-
-        preferences = context.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
-        token = preferences.getString(tk, null);
     }
 
     @Override
@@ -49,7 +39,7 @@ public class AttendeeAdaptor extends ArrayAdapter<Attendee> {
         purchaseDateView = customView.findViewById(R.id.customPurchaseDate);
         enteredBox = customView.findViewById(R.id.enteredBox);
 
-        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(a.getPruchaseDate());
+        String date = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(a.getPurchaseDate());
 
         enteredBox.setChecked(a.getEntered());
         enteredBox.setClickable(false);

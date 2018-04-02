@@ -22,9 +22,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 
 /**
@@ -88,7 +86,7 @@ public class TicketsListFragment extends Fragment {
         ArrayList<Ticket> myUpcomingTickets = new ArrayList<>();
         ArrayList<Ticket> myPastTickets = new ArrayList<>();
         ArrayList<Ticket> uniqueTicketForEvents = Ticket.getOneTicketPerEvent();
-        ArrayList<ArrayList<Ticket>> splitTickets = Ticket.getAllTicketsForEachEvent();
+        ArrayList<ArrayList<Ticket>> splitTickets = Ticket.mapTicketsForEachEvent();
 
         for (Ticket t : uniqueTicketForEvents) {
             dateString = new SimpleDateFormat("dd-MM-yyyy", Locale.US).format(t.getEvent().getDate());

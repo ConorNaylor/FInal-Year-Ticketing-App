@@ -135,6 +135,8 @@ public class CreateEventFragment extends Fragment implements GoogleApiClient.OnC
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        getActivity().setTitle("Create Event");
+
         preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
         token = preferences.getString(tk, null);
         userID = preferences.getString(userId, null);

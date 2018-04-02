@@ -40,6 +40,8 @@
             android:layout_marginTop="15dp"
             android:background="@android:color/white"
             android:hint=" Search"
+            android:shadowDx="2"
+            android:shadowDy="2"
             android:textColor="@android:color/black"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="@+id/button1"

@@ -63,6 +63,12 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <CheckBox
+                android:id="@+id/remainloggedin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/stayloggedin" />
+
             <Button
                 android:id="@+id/sign_in"
                 style="?android:textAppearanceSmall"
@@ -76,7 +82,7 @@
 
             <TextView
                 android:id="@+id/register"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_weight="1.13"
                 android:text="Register"

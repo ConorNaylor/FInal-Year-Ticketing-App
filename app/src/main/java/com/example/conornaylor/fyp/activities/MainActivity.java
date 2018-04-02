@@ -4,13 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,32 +19,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.conornaylor.fyp.event.ViewEventFragment;
-import com.example.conornaylor.fyp.ticket.Ticket;
-import com.example.conornaylor.fyp.ticket.ViewTicketFragment;
-import com.example.conornaylor.fyp.utilities.AccountFragment;
+import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.event.DownloadEvents;
 import com.example.conornaylor.fyp.event.Event;
 import com.example.conornaylor.fyp.event.EventsListFragment;
-import com.example.conornaylor.fyp.R;
+import com.example.conornaylor.fyp.event.ViewEventFragment;
 import com.example.conornaylor.fyp.ticket.DownloadTickets;
+import com.example.conornaylor.fyp.ticket.Ticket;
 import com.example.conornaylor.fyp.ticket.TicketsListFragment;
-import com.example.conornaylor.fyp.utilities.LocationData;
+import com.example.conornaylor.fyp.ticket.ViewTicketFragment;
+import com.example.conornaylor.fyp.utilities.AccountFragment;
 import com.example.conornaylor.fyp.utilities.SerializableManager;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -58,8 +48,7 @@ public class MainActivity extends AppCompatActivity
     private String token;
     private String userID;
     private boolean canMakeEvent;
-    private getEventsTask mAuthTask;
-    private getEventsTask mAuthTaskRefresh;
+//    private getEventsTask mAuthTask;
     private JSONObject obj;
     private JSONArray jArray;
     private JSONArray jsonArray;
@@ -69,8 +58,10 @@ public class MainActivity extends AppCompatActivity
     private Date date;
     private Fragment fragment;
     private DownloadTickets dt;
+    private DownloadEvents de;
     private NfcAdapter nfcAdaptor;
-    private boolean nah;
+    private boolean renderEventList;
+    private  DrawerLayout drawer;
 
 
     @Override
@@ -80,8 +71,7 @@ public class MainActivity extends AppCompatActivity
 
         Bundle extras = getIntent().getExtras();
         if (extras != null && extras.getString("event") != null) {
-            nah = false;
-            System.out.println("BLHBLAHAJKLKD"+ extras.getString("event"));
+            renderEventList = false;
             Event e = Event.getEventByID(extras.getString("event"));
             Toast.makeText(MainActivity.this, e.getTitle(), Toast.LENGTH_SHORT).show();
             Fragment fragment = ViewEventFragment.newInstance(e);
@@ -89,7 +79,7 @@ public class MainActivity extends AppCompatActivity
             ft.replace(R.id.container, fragment).addToBackStack("viewEvent1");
             ft.commit();
         }else{
-            nah = true;
+            renderEventList = true;
         }
 
         if(NfcAdapter.getDefaultAdapter(this) != null){
@@ -105,18 +95,18 @@ public class MainActivity extends AppCompatActivity
         userID = preferences.getString(userIdString, null);
         canMakeEvent = preferences.getBoolean(canMakeEventString, false);
 
-        mAuthTask = new MainActivity.getEventsTask();
-        try {
-            Boolean done = mAuthTask.execute().get();
-        } catch (InterruptedException e1) {
-            e1.printStackTrace();
-        } catch (ExecutionException e1) {
-            e1.printStackTrace();
+        if(renderEventList){
+            de = new DownloadEvents(this);
+            if(de.execute()){
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.container, new EventsListFragment());
+                ft.commitAllowingStateLoss();
+            }
         }
 
         dt = new DownloadTickets(this);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -126,62 +116,23 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-
-    public void makeEvents(JSONArray jArray) {
-        try {
-            if (jArray != null) {
-                for (int i = 0; i < jArray.length(); i++) {
-                    try {
-                        obj = jArray.getJSONObject(i);
-                    } catch (JSONException e1) {
-                        e1.printStackTrace();
-                    }
-
-                    LocationData loc = new LocationData(obj.getDouble("loclat"), obj.getDouble("loclng"));
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-                    try {
-                        date = formatter.parse(obj.getString("date"));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    Event ev = new Event(
-                            obj.getString("id"),
-                            obj.getString("title"),
-                            obj.getString("location"),
-                            obj.getString("description"),
-                            date,
-                            obj.getInt("num_tickets"),
-                            obj.getString("user"),
-                            loc,
-                            obj.getDouble("price"),
-                            obj.getString("image"));
-                }
-            }
-        } catch(JSONException e){
-            e.printStackTrace();
-        }
-        if(nah){
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, new EventsListFragment());
-            ft.commitAllowingStateLoss();
-        }
-    }
-
     @Override
     public void onBackPressed() {
-        if (getVisibleFragment() instanceof ViewEventFragment){
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else if (getVisibleFragment() instanceof ViewEventFragment){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, new EventsListFragment()).addToBackStack(null);
             ft.commit();
-        }else if (getVisibleFragment() instanceof ViewTicketFragment){
+        } else if (getVisibleFragment() instanceof ViewTicketFragment){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, new TicketsListFragment()).addToBackStack("blah");
             ft.commit();
-        }else if (getVisibleFragment() instanceof TicketsListFragment){
+        } else if (getVisibleFragment() instanceof TicketsListFragment){
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.container, new EventsListFragment());
             ft.commitAllowingStateLoss();
-        }else if (getVisibleFragment() instanceof EventsListFragment){
+        } else if (getVisibleFragment() instanceof EventsListFragment){
             if (doubleBackToExitPressedOnce) {
                 Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(logoutIntent);
@@ -196,7 +147,7 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this, "Click BACK again to Log Out", Toast.LENGTH_SHORT).show();
 
             mHandler.postDelayed(mRunnable, 2000);
-        }else if(getFragmentManager().getBackStackEntryCount() > 0) {
+        } else if(getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();
         } else {
             super.onBackPressed();
@@ -239,8 +190,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.logout) {
             Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(logoutIntent);
@@ -250,13 +199,6 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences settings = this.getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
             settings.edit().clear().apply();
             return true;
-        }
-        if (id == R.id.refresh) {
-            mAuthTaskRefresh = new MainActivity.getEventsTask();
-            mAuthTaskRefresh.execute();
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.container, new EventsListFragment());
-            ft.commit();
         }
 
         return super.onOptionsItemSelected(item);
@@ -288,55 +230,5 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-
-    public class getEventsTask extends AsyncTask <Void, Void, Boolean>{
-        @Override
-        protected Boolean doInBackground(Void...params) {
-                try {
-                    String url = "http://18.218.18.192:8000/events/"; // Galway
-                    URL object = new URL(url);
-
-                    HttpURLConnection con = (HttpURLConnection) object.openConnection();
-                    con.setDoInput(true);
-                    con.setRequestMethod("GET");
-                    con.setRequestProperty("Accept", "application/json");
-                    con.setRequestProperty("Authorization", "Token " + token);
-
-                    StringBuilder sb = new StringBuilder();
-                    int HttpResult = con.getResponseCode();
-                    if (HttpResult == HttpURLConnection.HTTP_OK) {
-                        BufferedReader br = new BufferedReader(
-                                new InputStreamReader(con.getInputStream(), "utf-8"));
-                        String line = null;
-                        while ((line = br.readLine()) != null) {
-                            sb.append(line + "\n");
-                        }
-                        br.close();
-                        if (sb.toString() != null) {
-                            jArray = new JSONArray(sb.toString());
-                            makeEvents(jArray);
-                        }
-                    } else {
-                        System.out.println(con.getResponseMessage());
-                        return false;
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
-                }
-            return true;
-            }
-
-        @Override
-        protected void onPostExecute(Boolean b) {
-            makeEvents(jArray);
-            super.onPostExecute(b);
-        }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
     }
 }

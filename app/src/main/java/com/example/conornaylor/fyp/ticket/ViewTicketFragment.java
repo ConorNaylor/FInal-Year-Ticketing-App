@@ -15,15 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.conornaylor.fyp.activities.EnterActivity;
-import com.example.conornaylor.fyp.event.ViewEventFragment;
 import com.example.conornaylor.fyp.R;
-import com.squareup.picasso.Picasso;
+import com.example.conornaylor.fyp.activities.EnterActivity;
+import com.example.conornaylor.fyp.activities.MapsActivity;
+import com.example.conornaylor.fyp.event.ViewEventFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ public class ViewTicketFragment extends Fragment {
     private TextView priceText;
     private TextView locText;
     private ImageView ticketImage;
+    private ImageView mapView;
     private Button button;
     private CheckBox enteredBox;
     private FloatingActionButton fab;
@@ -102,6 +102,7 @@ public class ViewTicketFragment extends Fragment {
         priceText = getActivity().findViewById(R.id.viewTicketPrice);
         locText = getActivity().findViewById(R.id.viewEventLocation);
         ticketImage = getActivity().findViewById(R.id.imageViewTicket);
+        mapView = getActivity().findViewById(R.id.mapImage);
         enteredBox = getActivity().findViewById(R.id.enteredRadio);
         spinner = getActivity().findViewById(R.id.ticketSpinner);
 
@@ -124,7 +125,7 @@ public class ViewTicketFragment extends Fragment {
 
         Glide.with(getActivity())
                 .load("http://18.218.18.192:8000"  + ticket.getEvent().getImageURL())
-                .fitCenter()
+                .centerCrop()
                 .into(ticketImage);
 
 
@@ -148,6 +149,15 @@ public class ViewTicketFragment extends Fragment {
                     }
                 }
         );
+
+        mapView.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent myIntent = new Intent(getActivity(), MapsActivity.class).putExtra("event", ticket.getEvent().getId());
+                        getActivity().startActivity(myIntent);
+                    }
+                });
 
         ArrayAdapter adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, tickets);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

@@ -28,7 +28,7 @@ public class Attendee {
 
     public String getName() { return name; }
 
-    public Date getPruchaseDate() { return purchaseDate; }
+    public Date getPurchaseDate() { return purchaseDate; }
 
     public String getTicketId() { return ticketId; }
 
@@ -36,7 +36,7 @@ public class Attendee {
 
     public boolean getEntered() { return this.entered; }
 
-    public void addUniqueAttendees(Attendee t) {
+    private void addUniqueAttendees(Attendee t) {
         if(attendees.isEmpty()){
             attendees.add(t);
         }else{

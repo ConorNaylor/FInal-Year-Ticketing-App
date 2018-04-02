@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.example.conornaylor.fyp.R;
 import com.example.conornaylor.fyp.activities.MapsActivity;
+import com.example.conornaylor.fyp.ticket.DownloadTickets;
+import com.example.conornaylor.fyp.ticket.Ticket;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,6 +44,10 @@ public class EventsListFragment extends Fragment {
     private FloatingActionButton fab2;
     private FloatingActionButton fab3;
     private boolean isFABOpen = false;
+    private DownloadEvents mAuthTaskRefresh;
+    private DownloadTickets dt;
+    private Context context;
+
 
 
     public EventsListFragment() {
@@ -60,6 +66,8 @@ public class EventsListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getActivity().setTitle("Events");
+
+        context = getActivity();
 
         preferences = getActivity().getSharedPreferences(MyPreferences, Context.MODE_PRIVATE);
         userID = preferences.getString(userIdString, null);
@@ -85,7 +93,6 @@ public class EventsListFragment extends Fragment {
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-//                        showProgress(true);
                         String event = String.valueOf((parent.getItemAtPosition(pos)));
                         Toast.makeText(getActivity(), Event.getEventByID(event).getTitle(), Toast.LENGTH_SHORT).show();
                         Fragment fragment = ViewEventFragment.newInstance((Event)parent.getItemAtPosition(pos));
@@ -111,6 +118,22 @@ public class EventsListFragment extends Fragment {
                 }
             }
         });
+
+        fab3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Event.deleteEvents();
+                mAuthTaskRefresh = new DownloadEvents(getActivity());
+                if(mAuthTaskRefresh.execute()) {
+                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                    ft.replace(R.id.container, new EventsListFragment());
+                    ft.commit();
+                }
+                Ticket.deleteTickets();
+                dt = new DownloadTickets(context);
+            }
+        });
+
 
         fab2.setOnClickListener(new View.OnClickListener() {
             @Override
